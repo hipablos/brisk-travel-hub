@@ -71,35 +71,33 @@ function SidebarGroup({ group }: { group: Group }) {
       </button>
       <div 
         className={cn(
-          "grid transition-all duration-300 ease-in-out", 
-          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          "overflow-hidden transition-all duration-300 ease-in-out", 
+          isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 mb-0"
         )}
       >
-        <div className="overflow-hidden">
-          <ul className="space-y-0.5">
-            {group.items.map((it) => (
-              <li key={it.label}>
-                <a
-                  href="#"
-                  className={cn(
-                    "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                    it.active
-                      ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
-                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-                  )}
-                >
-                  <it.icon className="size-4 shrink-0" />
-                  <span className="flex-1 truncate">{it.label}</span>
-                  {it.badge && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground">
-                      {it.badge}
-                    </span>
-                  )}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="space-y-0.5">
+          {group.items.map((it) => (
+            <li key={it.label}>
+              <a
+                href="#"
+                className={cn(
+                  "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
+                  it.active
+                    ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
+                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                )}
+              >
+                <it.icon className="size-4 shrink-0" />
+                <span className="flex-1 truncate">{it.label}</span>
+                {it.badge && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground">
+                    {it.badge}
+                  </span>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
