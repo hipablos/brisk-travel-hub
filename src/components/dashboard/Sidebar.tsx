@@ -15,7 +15,7 @@ const groups: Group[] = [
   {
     title: "Principal",
     items: [
-      { icon: LayoutDashboard, label: "Dashboard", active: true, href: "/" },
+      { icon: LayoutDashboard, label: "Dashboard", href: "/" },
       { icon: FileText, label: "Cotações", badge: "3", href: "/cotacoes" },
       { icon: Calendar, label: "Calendário" },
       { icon: CheckSquare, label: "Tarefas" },
@@ -81,13 +81,8 @@ function SidebarGroup({ group }: { group: Group }) {
             <li key={it.label}>
               {it.href ? (
                 <Link
-                  to={it.href}
-                  className={cn(
-                    "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                    it.active
-                      ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
-                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-                  )}
+                  to={it.href as any}
+                  className="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all"
                   activeProps={{
                     className: "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
                   }}
