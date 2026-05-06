@@ -15,7 +15,7 @@ const groups: Group[] = [
   {
     title: "Principal",
     items: [
-      { icon: LayoutDashboard, label: "Dashboard", active: true },
+      { icon: LayoutDashboard, label: "Dashboard", active: true, href: "/" },
       { icon: FileText, label: "Cotações", badge: "3", href: "/cotacoes" },
       { icon: Calendar, label: "Calendário" },
       { icon: CheckSquare, label: "Tarefas" },
