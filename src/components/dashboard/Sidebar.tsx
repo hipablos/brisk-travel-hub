@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   LayoutDashboard, FileText, Calendar, CheckSquare, Plane, Hotel, Car,
   MapPin, Ship, Shield, ShoppingCart, Wallet, ArrowDownCircle, ArrowUpCircle,
@@ -49,6 +50,61 @@ const groups: Group[] = [
   { title: "Cadastros", items: [{ icon: Users, label: "Clientes" }] },
 ];
 
+function SidebarGroup({ group }: { group: Group }) {
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <div>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-3 py-1.5 mb-1 cursor-pointer hover:bg-sidebar-accent/50 rounded-md transition-colors group/trigger"
+      >
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground group-hover/trigger:text-sidebar-foreground transition-colors">
+          {group.title}
+        </span>
+        <ChevronDown 
+          className={cn(
+            "size-3 text-muted-foreground transition-transform duration-300 ease-in-out group-hover/trigger:text-sidebar-foreground", 
+            isOpen ? "rotate-0" : "-rotate-90"
+          )} 
+        />
+      </button>
+      <div 
+        className={cn(
+          "grid transition-all duration-300 ease-in-out", 
+          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        )}
+      >
+        <div className="overflow-hidden">
+          <ul className="space-y-0.5">
+            {group.items.map((it) => (
+              <li key={it.label}>
+                <a
+                  href="#"
+                  className={cn(
+                    "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
+                    it.active
+                      ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
+                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                  )}
+                >
+                  <it.icon className="size-4 shrink-0" />
+                  <span className="flex-1 truncate">{it.label}</span>
+                  {it.badge && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground">
+                      {it.badge}
+                    </span>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function Sidebar() {
   return (
     <aside className="hidden lg:flex flex-col w-64 bg-sidebar border-r border-sidebar-border h-screen sticky top-0 overflow-y-auto">
@@ -66,37 +122,7 @@ export function Sidebar() {
 
       <nav className="flex-1 px-3 py-4 space-y-5">
         {groups.map((g) => (
-          <div key={g.title}>
-            <div className="flex items-center justify-between px-3 mb-2">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {g.title}
-              </span>
-              <ChevronDown className="size-3 text-muted-foreground" />
-            </div>
-            <ul className="space-y-0.5">
-              {g.items.map((it) => (
-                <li key={it.label}>
-                  <a
-                    href="#"
-                    className={cn(
-                      "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                      it.active
-                        ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
-                        : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-                    )}
-                  >
-                    <it.icon className="size-4 shrink-0" />
-                    <span className="flex-1 truncate">{it.label}</span>
-                    {it.badge && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground">
-                        {it.badge}
-                      </span>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <SidebarGroup key={g.title} group={g} />
         ))}
       </nav>
     </aside>
