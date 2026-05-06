@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, Calendar, CheckSquare, Plane, Hotel, Car,
   MapPin, Ship, Shield, ShoppingCart, Wallet, ArrowDownCircle, ArrowUpCircle,
@@ -7,7 +8,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Item = { icon: React.ComponentType<{ className?: string }>; label: string; badge?: string; active?: boolean };
+type Item = { icon: React.ComponentType<{ className?: string }>; label: string; badge?: string; active?: boolean; href?: string };
 type Group = { title: string; items: Item[] };
 
 const groups: Group[] = [
@@ -15,7 +16,7 @@ const groups: Group[] = [
     title: "Principal",
     items: [
       { icon: LayoutDashboard, label: "Dashboard", active: true },
-      { icon: FileText, label: "Cotações", badge: "3" },
+      { icon: FileText, label: "Cotações", badge: "3", href: "/cotacoes" },
       { icon: Calendar, label: "Calendário" },
       { icon: CheckSquare, label: "Tarefas" },
     ],
@@ -78,23 +79,49 @@ function SidebarGroup({ group }: { group: Group }) {
         <ul className="space-y-0.5">
           {group.items.map((it) => (
             <li key={it.label}>
-              <a
-                href="#"
-                className={cn(
-                  "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                  it.active
-                    ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
-                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
-                )}
-              >
-                <it.icon className="size-4 shrink-0" />
-                <span className="flex-1 truncate">{it.label}</span>
-                {it.badge && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground">
-                    {it.badge}
-                  </span>
-                )}
-              </a>
+              {it.href ? (
+                <Link
+                  to={it.href}
+                  className={cn(
+                    "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
+                    it.active
+                      ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
+                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                  )}
+                  activeProps={{
+                    className: "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
+                  }}
+                  inactiveProps={{
+                    className: "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  }}
+                >
+                  <it.icon className="size-4 shrink-0" />
+                  <span className="flex-1 truncate">{it.label}</span>
+                  {it.badge && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground">
+                      {it.badge}
+                    </span>
+                  )}
+                </Link>
+              ) : (
+                <a
+                  href="#"
+                  className={cn(
+                    "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
+                    it.active
+                      ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
+                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                  )}
+                >
+                  <it.icon className="size-4 shrink-0" />
+                  <span className="flex-1 truncate">{it.label}</span>
+                  {it.badge && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground">
+                      {it.badge}
+                    </span>
+                  )}
+                </a>
+              )}
             </li>
           ))}
         </ul>
