@@ -53,15 +53,6 @@ const groups: Group[] = [
 
 function SidebarGroup({ group }: { group: Group }) {
   const [isOpen, setIsOpen] = useState(true);
-  
-  // Use TanStack router to get the exact location to avoid any highlighting bugs
-  const location = useLocation();
-
-  const isLinkActive = (href?: string, manualActive?: boolean) => {
-    if (manualActive) return true;
-    if (!href) return false;
-    return location.pathname === href;
-  };
 
   return (
     <div>
@@ -87,21 +78,15 @@ function SidebarGroup({ group }: { group: Group }) {
       >
         <ul className="space-y-0.5">
           {group.items.map((it) => {
-            const isActive = isLinkActive(it.href, it.active);
-            
-            // Render a proper Link for internal routing to avoid full page reloads,
-            // while preserving our custom precise active state logic.
             if (it.href) {
               return (
                 <li key={it.label}>
                   <Link
                     to={it.href as any}
-                    className={cn(
-                      "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                      isActive
-                        ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
-                        : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                    )}
+                    activeProps={{ className: "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary" }}
+                    inactiveProps={{ className: "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground" }}
+                    activeOptions={{ exact: true }}
+                    className="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all"
                   >
                     <it.icon className="size-4 shrink-0" />
                     <span className="flex-1 truncate">{it.label}</span>
@@ -121,7 +106,7 @@ function SidebarGroup({ group }: { group: Group }) {
                   href="#"
                   className={cn(
                     "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                    isActive
+                    it.active
                       ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
                       : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
                   )}
