@@ -53,6 +53,7 @@ const groups: Group[] = [
 
 function SidebarGroup({ group }: { group: Group }) {
   const [isOpen, setIsOpen] = useState(true);
+  const location = useLocation();
 
   return (
     <div>
@@ -78,15 +79,19 @@ function SidebarGroup({ group }: { group: Group }) {
       >
         <ul className="space-y-0.5">
           {group.items.map((it) => {
+            const isActive = it.href ? location.pathname === it.href : Boolean(it.active);
+
             if (it.href) {
               return (
                 <li key={it.label}>
                   <Link
                     to={it.href as any}
-                    activeProps={{ className: "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary" }}
-                    inactiveProps={{ className: "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground" }}
-                    activeOptions={{ exact: true }}
-                    className="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all"
+                    className={cn(
+                      "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
+                      isActive
+                        ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
+                        : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    )}
                   >
                     <it.icon className="size-4 shrink-0" />
                     <span className="flex-1 truncate">{it.label}</span>
@@ -106,7 +111,7 @@ function SidebarGroup({ group }: { group: Group }) {
                   href="#"
                   className={cn(
                     "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                    it.active
+                    isActive
                       ? "bg-secondary/15 text-secondary font-medium border-l-2 border-secondary"
                       : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
                   )}
