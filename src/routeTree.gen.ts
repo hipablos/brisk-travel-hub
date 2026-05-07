@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
+import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
 
 const CotacoesRoute = CotacoesRouteImport.update({
   id: '/cotacoes',
@@ -28,34 +29,43 @@ const CotacoesNovaRoute = CotacoesNovaRouteImport.update({
   path: '/cotacoes/nova',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CotacoesIdRoute = CotacoesIdRouteImport.update({
+  id: '/cotacoes_/$id',
+  path: '/cotacoes/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cotacoes': typeof CotacoesRoute
+  '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cotacoes': typeof CotacoesRoute
+  '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cotacoes': typeof CotacoesRoute
+  '/cotacoes_/$id': typeof CotacoesIdRoute
   '/cotacoes_/nova': typeof CotacoesNovaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cotacoes' | '/cotacoes/nova'
+  fullPaths: '/' | '/cotacoes' | '/cotacoes/$id' | '/cotacoes/nova'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cotacoes' | '/cotacoes/nova'
-  id: '__root__' | '/' | '/cotacoes' | '/cotacoes_/nova'
+  to: '/' | '/cotacoes' | '/cotacoes/$id' | '/cotacoes/nova'
+  id: '__root__' | '/' | '/cotacoes' | '/cotacoes_/$id' | '/cotacoes_/nova'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CotacoesRoute: typeof CotacoesRoute
+  CotacoesIdRoute: typeof CotacoesIdRoute
   CotacoesNovaRoute: typeof CotacoesNovaRoute
 }
 
@@ -82,14 +92,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CotacoesNovaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cotacoes_/$id': {
+      id: '/cotacoes_/$id'
+      path: '/cotacoes/$id'
+      fullPath: '/cotacoes/$id'
+      preLoaderRoute: typeof CotacoesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CotacoesRoute: CotacoesRoute,
+  CotacoesIdRoute: CotacoesIdRoute,
   CotacoesNovaRoute: CotacoesNovaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
