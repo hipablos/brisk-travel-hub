@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Hash, Tag, Eye, CheckSquare, MoreVertical, MessageSquare, FileDown } from "lucide-react";
+import { Hash, Tag, Eye, CheckSquare, MoreVertical, MessageSquare } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useCotacoes, formatBRL, type CotacaoStatus, type Cotacao } from "@/lib/cotacoes-store";
 
