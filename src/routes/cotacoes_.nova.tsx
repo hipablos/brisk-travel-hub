@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/cotacoes/nova")({
+export const Route = createFileRoute("/cotacoes_/nova")({
   component: NovaCotacao,
   head: () => ({
     meta: [
