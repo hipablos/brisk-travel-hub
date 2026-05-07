@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Filter, CalendarIcon, Link as LinkIcon, Plus } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export function CotacoesFilters() {
   return (
@@ -20,9 +21,11 @@ export function CotacoesFilters() {
             <LinkIcon className="size-4" />
             Links
           </Button>
-          <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Plus className="size-4" />
-            Nova Cotação
+          <Button asChild className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Link to="/cotacoes/nova">
+              <Plus className="size-4" />
+              Nova Cotação
+            </Link>
           </Button>
         </div>
       </div>
