@@ -84,8 +84,8 @@ function SidebarGroup({ group }: { group: Group }) {
             if (it.href) {
               return (
                 <li key={it.label}>
-                  <Link
-                    to={it.href as any}
+                  <a
+                    href={it.href}
                     className={cn(
                       "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
                       isActive
@@ -100,7 +100,7 @@ function SidebarGroup({ group }: { group: Group }) {
                         {it.badge}
                       </span>
                     )}
-                  </Link>
+                  </a>
                 </li>
               );
             }
