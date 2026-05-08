@@ -138,3 +138,53 @@ export const STATUS_LABELS: Record<CotacaoStatus, string> = {
   aprovado: "Aprovado",
   reprovado: "Reprovado",
 };
+
+// ---- Labels (etiquetas visuais) ----
+export type LabelDef = { name: string; color: string };
+
+export const PRESET_LABELS: LabelDef[] = [
+  { name: "Urgente", color: "#ef4444" },
+  { name: "VIP", color: "#a855f7" },
+  { name: "Emitido", color: "#10b981" },
+  { name: "Aguardando pagamento", color: "#f59e0b" },
+  { name: "Prioridade alta", color: "#f97316" },
+];
+
+const LABELS_KEY = "brisk:labels";
+
+export function loadCustomLabels(): LabelDef[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(localStorage.getItem(LABELS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomLabel(l: LabelDef) {
+  const all = loadCustomLabels();
+  if (all.some((x) => x.name.toLowerCase() === l.name.toLowerCase())) return;
+  all.push(l);
+  localStorage.setItem(LABELS_KEY, JSON.stringify(all));
+  emit("labels");
+}
+
+export function useAllLabels() {
+  const [custom, setCustom] = useState<LabelDef[]>(() => loadCustomLabels());
+  useEffect(() => {
+    const h = () => setCustom(loadCustomLabels());
+    window.addEventListener("brisk:labels", h);
+    window.addEventListener("storage", h);
+    return () => {
+      window.removeEventListener("brisk:labels", h);
+      window.removeEventListener("storage", h);
+    };
+  }, []);
+  return [...PRESET_LABELS, ...custom];
+}
+
+export function updateCotacaoLabels(id: string, labels: string[]) {
+  const c = getCotacao(id);
+  if (!c) return;
+  saveCotacao({ ...c, labels });
+}
