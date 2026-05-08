@@ -145,30 +145,33 @@ function NovaCotacao() {
           <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               <section className="bg-card border border-border/50 rounded-xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
-                    <User className="size-4" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
+                      <User className="size-4" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-foreground">Dados do Cliente</h2>
                   </div>
-                  <h2 className="text-lg font-semibold text-foreground">Dados do Cliente</h2>
+                  <Button asChild type="button" variant="outline" size="sm" className="gap-2">
+                    <Link to="/clientes/novo" search={{ redirect: "/cotacoes/nova" }}>
+                      <UserPlus className="size-4" />
+                      Cadastrar cliente
+                    </Link>
+                  </Button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label>Cliente *</Label>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1">
-                        <Select value={clienteId} onValueChange={setClienteId}>
-                          <SelectTrigger>
-                            <SelectValue placeholder={clientes.length ? "Selecione o cliente" : "Nenhum cliente — cadastre ao lado"} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {clientes.map((c) => (
-                              <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <NovoClienteDialog onCreated={(c) => setClienteId(c.id)} />
-                    </div>
+                    <Select value={clienteId} onValueChange={setClienteId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={clientes.length ? "Selecione o cliente" : "Nenhum cliente — cadastre acima"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clientes.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1.5">
                     <Label>E-mail</Label>
