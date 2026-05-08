@@ -18,7 +18,7 @@ import {
   saveCotacao, useClientes, genCode, formatBRL,
   type CotacaoStatus, type Cotacao,
 } from "@/lib/cotacoes-store";
-import { NovoClienteDialog } from "@/components/cotacoes/NovoClienteDialog";
+
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/cotacoes_/nova")({
