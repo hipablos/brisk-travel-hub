@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
@@ -15,14 +15,20 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  saveCotacao, useClientes, genCode, formatBRL,
+  saveCotacao, useClientes, getCotacao, genCode, formatBRL,
   type CotacaoStatus, type Cotacao,
 } from "@/lib/cotacoes-store";
 
 import { toast } from "sonner";
 
+type NovaSearch = { id?: string; redirect?: string };
+
 export const Route = createFileRoute("/cotacoes_/nova")({
   component: NovaCotacao,
+  validateSearch: (search: Record<string, unknown>): NovaSearch => ({
+    id: typeof search.id === "string" ? search.id : undefined,
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Brisk Viagens — Nova Cotação" },
