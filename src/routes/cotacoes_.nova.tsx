@@ -53,6 +53,8 @@ type ServiceItem = { id: string; type: ServiceType; description: string; value: 
 function NovaCotacao() {
   const navigate = useNavigate();
   const clientes = useClientes();
+  const { id: editId } = Route.useSearch();
+  const editing = !!editId;
 
   const [clienteId, setClienteId] = useState<string>("");
   const [email, setEmail] = useState("");
@@ -72,6 +74,37 @@ function NovaCotacao() {
   const [services, setServices] = useState<ServiceItem[]>([
     { id: "1", type: "voo", description: "", value: "" },
   ]);
+
+  // Load existing cotacao when editing
+  useEffect(() => {
+    if (!editId) return;
+    const c = getCotacao(editId);
+    if (!c) return;
+    setClienteId(c.cliente.id);
+    setEmail(c.cliente.email ?? "");
+    setTelefone(c.cliente.telefone ?? "");
+    setTag(c.tag ?? "");
+    setOrigem(c.origem ?? "");
+    setDestino(c.destino ?? "");
+    setIda(c.ida ?? "");
+    setVolta(c.volta ?? "");
+    setAdultos(c.adultos);
+    setCriancas(c.criancas);
+    setObservacoes(c.observacoes ?? "");
+    setStatus(c.status);
+    setValidade(c.validade ?? "");
+    setPagamento(c.pagamento ?? "");
+    setServices(
+      c.servicos.length
+        ? c.servicos.map((s) => ({
+            id: s.id,
+            type: s.type as ServiceType,
+            description: s.description,
+            value: String(s.value),
+          }))
+        : [{ id: "1", type: "voo", description: "", value: "" }]
+    );
+  }, [editId]);
 
   const addService = (type: ServiceType) => {
     setServices((s) => [...s, { id: crypto.randomUUID(), type, description: "", value: "" }]);
