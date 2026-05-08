@@ -9,12 +9,23 @@ export type CotacaoServico = {
   value: number;
 };
 
+export type TipoCliente = "passageiro" | "cliente" | "fornecedor" | "representante";
+
 export type Cliente = {
   id: string;
   nome: string;
   email?: string;
   telefone?: string;
   documento?: string;
+  dataNascimento?: string;
+  sexo?: "masculino" | "feminino" | "outro";
+  tipo?: TipoCliente;
+  rg?: string;
+  cpf?: string;
+  passaporte?: string;
+  passaporteExpedicao?: string;
+  passaporteVencimento?: string;
+  vistoEmissao?: string;
 };
 
 export type Cotacao = {
