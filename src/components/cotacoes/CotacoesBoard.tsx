@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
-import { Hash, Tag, Eye, CheckSquare, MoreVertical, MessageSquare } from "lucide-react";
+import { Hash, Eye, Pencil, MoreVertical, MessageSquare } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { useCotacoes, formatBRL, type CotacaoStatus, type Cotacao } from "@/lib/cotacoes-store";
+import { useCotacoes, useAllLabels, formatBRL, type CotacaoStatus, type Cotacao } from "@/lib/cotacoes-store";
+import { LabelsPopover } from "./LabelsPopover";
 
 type QuoteCard = {
   id: string;
@@ -10,6 +11,7 @@ type QuoteCard = {
   amount: string;
   name: string;
   tag?: string;
+  labels: string[];
   isWhatsApp?: boolean;
   saved?: boolean;
 };
@@ -24,8 +26,11 @@ type ColumnProps = {
 };
 
 function KanbanCard({ card }: { card: QuoteCard }) {
-  const inner = (
-    <div className="bg-card border border-border/50 rounded-lg p-3 hover:border-primary/50 transition-colors flex flex-col gap-3 cursor-pointer">
+  const allLabels = useAllLabels();
+  const colorOf = (name: string) => allLabels.find((l) => l.name === name)?.color ?? "#64748b";
+
+  return (
+    <div className="bg-card border border-border/50 rounded-lg p-3 hover:border-primary/50 transition-colors flex flex-col gap-3">
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground font-mono bg-secondary/20 px-1.5 py-0.5 rounded">{card.code}</span>
@@ -36,6 +41,20 @@ function KanbanCard({ card }: { card: QuoteCard }) {
         </div>
         <span className="font-bold text-foreground">{card.amount}</span>
       </div>
+
+      {card.labels.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {card.labels.map((l) => (
+            <span
+              key={l}
+              className="text-[10px] font-semibold px-1.5 py-0.5 rounded text-white"
+              style={{ background: colorOf(l) }}
+            >
+              {l}
+            </span>
+          ))}
+        </div>
+      )}
 
       <div>
         <div className="flex items-center gap-1.5 font-semibold text-sm text-foreground uppercase tracking-wider">
@@ -52,15 +71,32 @@ function KanbanCard({ card }: { card: QuoteCard }) {
       <div className="flex items-center justify-between pt-2 border-t border-border/40 text-muted-foreground">
         <span className="p-1"><Hash className="size-3.5" /></span>
         <div className="flex items-center gap-1">
-          <span className="p-1"><Tag className="size-3.5" /></span>
-          <span className="p-1"><Eye className="size-3.5" /></span>
-          <span className="p-1"><CheckSquare className="size-3.5" /></span>
+          {card.saved ? (
+            <>
+              <LabelsPopover cotacaoId={card.id} selected={card.labels} />
+              <Link to="/cotacoes/$id" params={{ id: card.id }} className="p-1 hover:text-foreground" title="Visualizar PDF">
+                <Eye className="size-3.5" />
+              </Link>
+              <Link
+                to="/cotacoes/nova"
+                search={{ id: card.id }}
+                className="p-1 hover:text-foreground"
+                title="Editar cotação"
+              >
+                <Pencil className="size-3.5" />
+              </Link>
+            </>
+          ) : (
+            <>
+              <span className="p-1 opacity-40" title="Disponível ao salvar"><Eye className="size-3.5" /></span>
+              <span className="p-1 opacity-40" title="Disponível ao salvar"><Pencil className="size-3.5" /></span>
+            </>
+          )}
           <span className="p-1"><MoreVertical className="size-3.5" /></span>
         </div>
       </div>
     </div>
   );
-  return card.saved ? <Link to="/cotacoes/$id" params={{ id: card.id }}>{inner}</Link> : inner;
 }
 
 function KanbanColumn({ title, count, totalAmount, colorClass, cards }: ColumnProps) {
@@ -115,6 +151,7 @@ export function CotacoesBoard() {
         amount: formatBRL(c.total),
         name: c.cliente.nome,
         tag: c.tag,
+        labels: c.labels ?? [],
         saved: saved.some((s) => s.id === c.id),
       })),
     };
