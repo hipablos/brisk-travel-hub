@@ -170,9 +170,9 @@ function NovaCotacao() {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Link to="/cotacoes" className="hover:text-foreground">Cotações</Link>
                   <span>/</span>
-                  <span className="text-foreground">Nova</span>
+                  <span className="text-foreground">{editing ? "Editar" : "Nova"}</span>
                 </div>
-                <h1 className="text-2xl font-bold text-foreground">Nova Cotação</h1>
+                <h1 className="text-2xl font-bold text-foreground">{editing ? "Editar Cotação" : "Nova Cotação"}</h1>
               </div>
             </div>
             <div className="flex items-center gap-2">
