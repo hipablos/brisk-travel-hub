@@ -130,13 +130,15 @@ function NovaCotacao() {
       toast.error("Informe o destino da viagem");
       return;
     }
+    const existing = editId ? getCotacao(editId) : undefined;
     const cotacao: Cotacao = {
-      id: crypto.randomUUID(),
-      code: genCode(),
-      createdAt: new Date().toISOString(),
+      id: existing?.id ?? crypto.randomUUID(),
+      code: existing?.code ?? genCode(),
+      createdAt: existing?.createdAt ?? new Date().toISOString(),
       status,
       cliente: { ...cliente, email: email || cliente.email, telefone: telefone || cliente.telefone },
       tag: tag || undefined,
+      labels: existing?.labels ?? [],
       origem, destino, ida, volta,
       adultos, criancas,
       servicos: services.map((s) => ({
@@ -149,7 +151,7 @@ function NovaCotacao() {
       total,
     };
     saveCotacao(cotacao);
-    toast.success("Cotação salva!");
+    toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
     navigate({ to: "/cotacoes/$id", params: { id: cotacao.id } });
   };
 
