@@ -35,6 +35,7 @@ export type Cotacao = {
   status: CotacaoStatus;
   cliente: Cliente;
   tag?: string;
+  labels?: string[];
   origem?: string;
   destino?: string;
   ida?: string;
