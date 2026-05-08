@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
@@ -15,14 +15,20 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  saveCotacao, useClientes, genCode, formatBRL,
+  saveCotacao, useClientes, getCotacao, genCode, formatBRL,
   type CotacaoStatus, type Cotacao,
 } from "@/lib/cotacoes-store";
 
 import { toast } from "sonner";
 
+type NovaSearch = { id?: string; redirect?: string };
+
 export const Route = createFileRoute("/cotacoes_/nova")({
   component: NovaCotacao,
+  validateSearch: (search: Record<string, unknown>): NovaSearch => ({
+    id: typeof search.id === "string" ? search.id : undefined,
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Brisk Viagens — Nova Cotação" },
@@ -47,6 +53,8 @@ type ServiceItem = { id: string; type: ServiceType; description: string; value: 
 function NovaCotacao() {
   const navigate = useNavigate();
   const clientes = useClientes();
+  const { id: editId } = Route.useSearch();
+  const editing = !!editId;
 
   const [clienteId, setClienteId] = useState<string>("");
   const [email, setEmail] = useState("");
@@ -66,6 +74,37 @@ function NovaCotacao() {
   const [services, setServices] = useState<ServiceItem[]>([
     { id: "1", type: "voo", description: "", value: "" },
   ]);
+
+  // Load existing cotacao when editing
+  useEffect(() => {
+    if (!editId) return;
+    const c = getCotacao(editId);
+    if (!c) return;
+    setClienteId(c.cliente.id);
+    setEmail(c.cliente.email ?? "");
+    setTelefone(c.cliente.telefone ?? "");
+    setTag(c.tag ?? "");
+    setOrigem(c.origem ?? "");
+    setDestino(c.destino ?? "");
+    setIda(c.ida ?? "");
+    setVolta(c.volta ?? "");
+    setAdultos(c.adultos);
+    setCriancas(c.criancas);
+    setObservacoes(c.observacoes ?? "");
+    setStatus(c.status);
+    setValidade(c.validade ?? "");
+    setPagamento(c.pagamento ?? "");
+    setServices(
+      c.servicos.length
+        ? c.servicos.map((s) => ({
+            id: s.id,
+            type: s.type as ServiceType,
+            description: s.description,
+            value: String(s.value),
+          }))
+        : [{ id: "1", type: "voo", description: "", value: "" }]
+    );
+  }, [editId]);
 
   const addService = (type: ServiceType) => {
     setServices((s) => [...s, { id: crypto.randomUUID(), type, description: "", value: "" }]);
@@ -91,13 +130,15 @@ function NovaCotacao() {
       toast.error("Informe o destino da viagem");
       return;
     }
+    const existing = editId ? getCotacao(editId) : undefined;
     const cotacao: Cotacao = {
-      id: crypto.randomUUID(),
-      code: genCode(),
-      createdAt: new Date().toISOString(),
+      id: existing?.id ?? crypto.randomUUID(),
+      code: existing?.code ?? genCode(),
+      createdAt: existing?.createdAt ?? new Date().toISOString(),
       status,
       cliente: { ...cliente, email: email || cliente.email, telefone: telefone || cliente.telefone },
       tag: tag || undefined,
+      labels: existing?.labels ?? [],
       origem, destino, ida, volta,
       adultos, criancas,
       servicos: services.map((s) => ({
@@ -110,7 +151,7 @@ function NovaCotacao() {
       total,
     };
     saveCotacao(cotacao);
-    toast.success("Cotação salva!");
+    toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
     navigate({ to: "/cotacoes/$id", params: { id: cotacao.id } });
   };
 
@@ -129,9 +170,9 @@ function NovaCotacao() {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Link to="/cotacoes" className="hover:text-foreground">Cotações</Link>
                   <span>/</span>
-                  <span className="text-foreground">Nova</span>
+                  <span className="text-foreground">{editing ? "Editar" : "Nova"}</span>
                 </div>
-                <h1 className="text-2xl font-bold text-foreground">Nova Cotação</h1>
+                <h1 className="text-2xl font-bold text-foreground">{editing ? "Editar Cotação" : "Nova Cotação"}</h1>
               </div>
             </div>
             <div className="flex items-center gap-2">
