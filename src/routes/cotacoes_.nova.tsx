@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import {
   ArrowLeft, Save, User, Plane, Hotel, Car, Ship, Shield, MapPin,
-  CalendarIcon, Plus, Trash2, FileText,
+  CalendarIcon, Plus, Trash2, FileText, UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
