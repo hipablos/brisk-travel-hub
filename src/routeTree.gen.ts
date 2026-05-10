@@ -9,12 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CotacoesRoute = CotacoesRouteImport.update({
   id: '/cotacoes',
   path: '/cotacoes',
@@ -44,6 +56,8 @@ const ClientesNovoRoute = ClientesNovoRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cotacoes': typeof CotacoesRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
@@ -51,6 +65,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cotacoes': typeof CotacoesRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
@@ -59,6 +75,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cotacoes': typeof CotacoesRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/clientes_/novo': typeof ClientesNovoRoute
   '/cotacoes_/$id': typeof CotacoesIdRoute
   '/cotacoes_/nova': typeof CotacoesNovaRoute
@@ -68,15 +86,26 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cotacoes'
+    | '/login'
+    | '/reset-password'
     | '/clientes/novo'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cotacoes' | '/clientes/novo' | '/cotacoes/$id' | '/cotacoes/nova'
+  to:
+    | '/'
+    | '/cotacoes'
+    | '/login'
+    | '/reset-password'
+    | '/clientes/novo'
+    | '/cotacoes/$id'
+    | '/cotacoes/nova'
   id:
     | '__root__'
     | '/'
     | '/cotacoes'
+    | '/login'
+    | '/reset-password'
     | '/clientes_/novo'
     | '/cotacoes_/$id'
     | '/cotacoes_/nova'
@@ -85,6 +114,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CotacoesRoute: typeof CotacoesRoute
+  LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ClientesNovoRoute: typeof ClientesNovoRoute
   CotacoesIdRoute: typeof CotacoesIdRoute
   CotacoesNovaRoute: typeof CotacoesNovaRoute
@@ -92,6 +123,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cotacoes': {
       id: '/cotacoes'
       path: '/cotacoes'
@@ -133,6 +178,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CotacoesRoute: CotacoesRoute,
+  LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ClientesNovoRoute: ClientesNovoRoute,
   CotacoesIdRoute: CotacoesIdRoute,
   CotacoesNovaRoute: CotacoesNovaRoute,

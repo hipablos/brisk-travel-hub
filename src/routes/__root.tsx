@@ -10,6 +10,10 @@ import {
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider, RequireAuth } from "@/hooks/use-auth";
+import { useRouterState } from "@tanstack/react-router";
+
+const PUBLIC_ROUTES = ["/login", "/reset-password"];
 
 function NotFoundComponent() {
   return (
@@ -115,11 +119,15 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isPublic = PUBLIC_ROUTES.includes(pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <Toaster richColors position="top-right" />
+      <AuthProvider>
+        {isPublic ? <Outlet /> : <RequireAuth><Outlet /></RequireAuth>}
+        <Toaster richColors position="top-right" />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
