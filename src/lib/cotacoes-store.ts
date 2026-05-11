@@ -96,6 +96,16 @@ export function saveCliente(c: Cliente) {
   emit("clientes");
 }
 
+export function deleteCliente(id: string) {
+  const all = loadClientes().filter((x) => x.id !== id);
+  localStorage.setItem(CLIENTES_KEY, JSON.stringify(all));
+  emit("clientes");
+}
+
+export function getCliente(id: string): Cliente | undefined {
+  return loadClientes().find((c) => c.id === id);
+}
+
 export function useCotacoes() {
   const [list, setList] = useState<Cotacao[]>(() => loadCotacoes());
   useEffect(() => {
