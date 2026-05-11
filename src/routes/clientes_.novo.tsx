@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -11,11 +11,12 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Save, User, FileText, CalendarIcon } from "lucide-react";
-import { saveCliente, type Cliente, type TipoCliente } from "@/lib/cotacoes-store";
+import { saveCliente, getCliente, type Cliente, type TipoCliente } from "@/lib/cotacoes-store";
 import { toast } from "sonner";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
+  id: z.string().optional(),
 });
 
 export const Route = createFileRoute("/clientes_/novo")({
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/clientes_/novo")({
 
 function NovoCliente() {
   const navigate = useNavigate();
-  const { redirect } = useSearch({ from: "/clientes_/novo" });
+  const { redirect, id: editId } = useSearch({ from: "/clientes_/novo" });
 
   const [form, setForm] = useState({
     nome: "",
@@ -51,6 +52,26 @@ function NovoCliente() {
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
 
+  useEffect(() => {
+    if (!editId) return;
+    const c = getCliente(editId);
+    if (!c) return;
+    setForm({
+      nome: c.nome || "",
+      email: c.email || "",
+      telefone: c.telefone || "",
+      dataNascimento: c.dataNascimento || "",
+      sexo: (c.sexo as "" | "masculino" | "feminino" | "outro") || "",
+      tipo: (c.tipo as "" | TipoCliente) || "",
+      rg: c.rg || "",
+      cpf: c.cpf || "",
+      passaporte: c.passaporte || "",
+      passaporteExpedicao: c.passaporteExpedicao || "",
+      passaporteVencimento: c.passaporteVencimento || "",
+      vistoEmissao: c.vistoEmissao || "",
+    });
+  }, [editId]);
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.nome.trim()) {
@@ -58,7 +79,7 @@ function NovoCliente() {
       return;
     }
     const cliente: Cliente = {
-      id: crypto.randomUUID(),
+      id: editId || crypto.randomUUID(),
       nome: form.nome,
       email: form.email || undefined,
       telefone: form.telefone || undefined,
@@ -74,12 +95,12 @@ function NovoCliente() {
       vistoEmissao: form.vistoEmissao || undefined,
     };
     saveCliente(cliente);
-    toast.success("Cliente cadastrado!");
+    toast.success(editId ? "Cliente atualizado!" : "Cliente cadastrado!");
     if (redirect) navigate({ to: redirect });
-    else navigate({ to: "/cotacoes" });
+    else navigate({ to: "/clientes" });
   };
 
-  const backTo = redirect || "/cotacoes";
+  const backTo = redirect || "/clientes";
 
   return (
     <div className="min-h-screen bg-background flex">
