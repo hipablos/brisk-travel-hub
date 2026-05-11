@@ -11,6 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Save, User, FileText, CalendarIcon } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { saveCliente, getCliente, type Cliente, type TipoCliente } from "@/lib/cotacoes-store";
 import { toast } from "sonner";
 
