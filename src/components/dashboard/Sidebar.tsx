@@ -62,8 +62,14 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
     g.items.some((it) => it.href && location.pathname === it.href)
   )?.title ?? "Principal";
 
-  // Single-open accordion: only one group expanded at a time.
-  const [openGroup, setOpenGroup] = useState<string | null>(activeGroupTitle);
+  // Multi-open accordion: each group toggles independently.
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set([activeGroupTitle]));
+  const toggleGroup = (title: string) =>
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      next.has(title) ? next.delete(title) : next.add(title);
+      return next;
+    });
 
   return (
     <>
@@ -81,11 +87,11 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
         {groups.map((group) => {
-          const isOpen = openGroup === group.title;
+          const isOpen = openGroups.has(group.title);
           return (
             <div key={group.title}>
               <button
-                onClick={() => setOpenGroup(isOpen ? null : group.title)}
+                onClick={() => toggleGroup(group.title)}
                 className="w-full flex items-center justify-between px-3 py-1.5 mb-1 hover:bg-sidebar-accent/50 rounded-md transition-colors"
               >
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
