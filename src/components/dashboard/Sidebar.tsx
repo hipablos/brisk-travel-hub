@@ -62,8 +62,14 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
     g.items.some((it) => it.href && location.pathname === it.href)
   )?.title ?? "Principal";
 
-  // Single-open accordion: only one group expanded at a time.
-  const [openGroup, setOpenGroup] = useState<string | null>(activeGroupTitle);
+  // Multi-open accordion: each group toggles independently.
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set([activeGroupTitle]));
+  const toggleGroup = (title: string) =>
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      next.has(title) ? next.delete(title) : next.add(title);
+      return next;
+    });
 
   return (
     <>
