@@ -20,6 +20,7 @@ export type Cliente = {
   dataNascimento?: string;
   sexo?: "masculino" | "feminino" | "outro";
   tipo?: TipoCliente;
+  tipos?: TipoCliente[];
   rg?: string;
   cpf?: string;
   passaporte?: string;
