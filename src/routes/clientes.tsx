@@ -59,19 +59,20 @@ function ClientesList() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     let list = clientes.filter((c) => {
-      if (tipoFilter && c.tipo !== tipoFilter) return false;
+      const tipos = c.tipos && c.tipos.length ? c.tipos : (c.tipo ? [c.tipo] : []);
+      if (tipoFilter && !tipos.includes(tipoFilter)) return false;
       if (showWithEmail && !c.email) return false;
       if (showWithPhone && !c.telefone) return false;
       if (!q) return true;
       const blob = [
         c.nome, c.email, c.telefone, c.cpf, c.documento, c.passaporte,
-        c.tipo ? TIPO_LABELS[c.tipo] : "",
+        ...tipos.map((t) => TIPO_LABELS[t]),
       ].filter(Boolean).join(" ").toLowerCase();
       return blob.includes(q);
     });
     if (sortBy === "nome") list = [...list].sort((a, b) => a.nome.localeCompare(b.nome));
     else if (sortBy === "tipo") {
-      list = [...list].sort((a, b) => (a.tipo || "").localeCompare(b.tipo || ""));
+      list = [...list].sort((a, b) => (a.tipo || a.tipos?.[0] || "").localeCompare(b.tipo || b.tipos?.[0] || ""));
     }
     return list;
   }, [clientes, search, tipoFilter, sortBy, showWithEmail, showWithPhone]);
