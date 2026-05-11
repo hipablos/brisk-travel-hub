@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
@@ -11,7 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Save, User, FileText, CalendarIcon } from "lucide-react";
-import { saveCliente, type Cliente, type TipoCliente } from "@/lib/cotacoes-store";
+import { saveCliente, getCliente, type Cliente, type TipoCliente } from "@/lib/cotacoes-store";
 import { toast } from "sonner";
 
 const searchSchema = z.object({
