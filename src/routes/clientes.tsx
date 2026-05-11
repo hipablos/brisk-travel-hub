@@ -114,10 +114,13 @@ function ClientesList() {
                   className="pl-9"
                 />
               </div>
-              <Select value={tipoFilter} onValueChange={(v) => setTipoFilter(v as typeof tipoFilter)}>
+              <Select
+                value={tipoFilter || "all"}
+                onValueChange={(v) => setTipoFilter(v === "all" ? "" : (v as TipoCliente))}
+              >
                 <SelectTrigger className="md:w-56"><SelectValue placeholder="Tipo de cliente" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os tipos</SelectItem>
+                  <SelectItem value="all">Todos os tipos</SelectItem>
                   <SelectItem value="passageiro">Passageiro</SelectItem>
                   <SelectItem value="cliente">Cliente</SelectItem>
                   <SelectItem value="fornecedor">Fornecedor</SelectItem>
