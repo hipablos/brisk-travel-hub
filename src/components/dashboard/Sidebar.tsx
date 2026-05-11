@@ -50,7 +50,7 @@ const groups: Group[] = [
   },
   { title: "Documentos", items: [{ icon: FolderClosed, label: "Arquivos" }] },
   { title: "Relatórios", items: [{ icon: FileBarChart, label: "Geral" }] },
-  { title: "Cadastros", items: [{ icon: Users, label: "Clientes" }] },
+  { title: "Cadastros", items: [{ icon: Users, label: "Clientes", href: "/clientes/novo" }] },
 ];
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
