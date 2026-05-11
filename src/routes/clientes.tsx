@@ -180,17 +180,24 @@ function ClientesList() {
                       <TableCell className="text-muted-foreground">{c.email || "—"}</TableCell>
                       <TableCell className="text-muted-foreground">{c.cpf || c.documento || "—"}</TableCell>
                       <TableCell>
-                        {c.tipo ? <Badge variant="secondary">{TIPO_LABELS[c.tipo]}</Badge> : "—"}
+                        {(() => {
+                          const tipos = c.tipos && c.tipos.length ? c.tipos : (c.tipo ? [c.tipo] : []);
+                          if (!tipos.length) return "—";
+                          return (
+                            <div className="flex flex-wrap gap-1">
+                              {tipos.map((t) => (
+                                <Badge key={t} variant="secondary">{TIPO_LABELS[t]}</Badge>
+                              ))}
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Editar"
-                            onClick={() => navigate({ to: "/clientes/novo", search: { id: c.id } })}
-                          >
-                            <Pencil className="size-4" />
+                          <Button asChild variant="ghost" size="icon" title="Editar">
+                            <Link to="/clientes/novo" search={{ id: c.id }}>
+                              <Pencil className="size-4" />
+                            </Link>
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
