@@ -11,6 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Save, User, FileText, CalendarIcon } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { saveCliente, getCliente, type Cliente, type TipoCliente } from "@/lib/cotacoes-store";
 import { toast } from "sonner";
 
@@ -40,7 +41,7 @@ function NovoCliente() {
     telefone: "",
     dataNascimento: "",
     sexo: "" as "" | "masculino" | "feminino" | "outro",
-    tipo: "" as "" | TipoCliente,
+    tipos: [] as TipoCliente[],
     rg: "",
     cpf: "",
     passaporte: "",
@@ -62,7 +63,7 @@ function NovoCliente() {
       telefone: c.telefone || "",
       dataNascimento: c.dataNascimento || "",
       sexo: (c.sexo as "" | "masculino" | "feminino" | "outro") || "",
-      tipo: (c.tipo as "" | TipoCliente) || "",
+      tipos: c.tipos && c.tipos.length ? c.tipos : (c.tipo ? [c.tipo] : []),
       rg: c.rg || "",
       cpf: c.cpf || "",
       passaporte: c.passaporte || "",
@@ -85,7 +86,8 @@ function NovoCliente() {
       telefone: form.telefone || undefined,
       dataNascimento: form.dataNascimento || undefined,
       sexo: form.sexo || undefined,
-      tipo: form.tipo || undefined,
+      tipo: form.tipos[0],
+      tipos: form.tipos.length ? form.tipos : undefined,
       rg: form.rg || undefined,
       cpf: form.cpf || undefined,
       documento: form.cpf || form.passaporte || undefined,
@@ -161,17 +163,39 @@ function NovoCliente() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Tipo de Cliente</Label>
-                    <Select value={form.tipo} onValueChange={(v) => set("tipo", v as TipoCliente)}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="passageiro">Passageiro</SelectItem>
-                        <SelectItem value="cliente">Cliente</SelectItem>
-                        <SelectItem value="fornecedor">Fornecedor</SelectItem>
-                        <SelectItem value="representante">Representante</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label>Tipo de Cliente <span className="text-xs text-muted-foreground font-normal">(marque uma ou mais)</span></Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                      {([
+                        { v: "passageiro", l: "Passageiro" },
+                        { v: "cliente", l: "Cliente" },
+                        { v: "fornecedor", l: "Fornecedor" },
+                        { v: "representante", l: "Representante" },
+                      ] as { v: TipoCliente; l: string }[]).map((opt) => {
+                        const checked = form.tipos.includes(opt.v);
+                        return (
+                          <label
+                            key={opt.v}
+                            className={`flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer transition-colors ${
+                              checked ? "border-primary bg-primary/5" : "border-border hover:bg-muted/40"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={checked}
+                              onCheckedChange={(c) =>
+                                set(
+                                  "tipos",
+                                  c
+                                    ? [...form.tipos, opt.v]
+                                    : form.tipos.filter((t) => t !== opt.v),
+                                )
+                              }
+                            />
+                            <span className="text-sm">{opt.l}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
                   </div>
                   <div className="space-y-1.5">
                     <Label>E-mail</Label>
