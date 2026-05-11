@@ -63,7 +63,7 @@ function NovoCliente() {
       telefone: c.telefone || "",
       dataNascimento: c.dataNascimento || "",
       sexo: (c.sexo as "" | "masculino" | "feminino" | "outro") || "",
-      tipo: (c.tipo as "" | TipoCliente) || "",
+      tipos: c.tipos && c.tipos.length ? c.tipos : (c.tipo ? [c.tipo] : []),
       rg: c.rg || "",
       cpf: c.cpf || "",
       passaporte: c.passaporte || "",
