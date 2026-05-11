@@ -32,7 +32,7 @@ export const Route = createFileRoute("/clientes_/novo")({
 
 function NovoCliente() {
   const navigate = useNavigate();
-  const { redirect } = useSearch({ from: "/clientes_/novo" });
+  const { redirect, id: editId } = useSearch({ from: "/clientes_/novo" });
 
   const [form, setForm] = useState({
     nome: "",
