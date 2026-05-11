@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
+  id: z.string().optional(),
 });
 
 export const Route = createFileRoute("/clientes_/novo")({
