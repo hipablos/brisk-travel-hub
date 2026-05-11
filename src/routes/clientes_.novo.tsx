@@ -79,7 +79,7 @@ function NovoCliente() {
       return;
     }
     const cliente: Cliente = {
-      id: crypto.randomUUID(),
+      id: editId || crypto.randomUUID(),
       nome: form.nome,
       email: form.email || undefined,
       telefone: form.telefone || undefined,
@@ -95,12 +95,12 @@ function NovoCliente() {
       vistoEmissao: form.vistoEmissao || undefined,
     };
     saveCliente(cliente);
-    toast.success("Cliente cadastrado!");
+    toast.success(editId ? "Cliente atualizado!" : "Cliente cadastrado!");
     if (redirect) navigate({ to: redirect });
-    else navigate({ to: "/cotacoes" });
+    else navigate({ to: "/clientes" });
   };
 
-  const backTo = redirect || "/cotacoes";
+  const backTo = redirect || "/clientes";
 
   return (
     <div className="min-h-screen bg-background flex">
