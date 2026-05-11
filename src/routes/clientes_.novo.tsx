@@ -41,7 +41,7 @@ function NovoCliente() {
     telefone: "",
     dataNascimento: "",
     sexo: "" as "" | "masculino" | "feminino" | "outro",
-    tipo: "" as "" | TipoCliente,
+    tipos: [] as TipoCliente[],
     rg: "",
     cpf: "",
     passaporte: "",
