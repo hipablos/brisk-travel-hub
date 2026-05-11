@@ -87,11 +87,11 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
         {groups.map((group) => {
-          const isOpen = openGroup === group.title;
+          const isOpen = openGroups.has(group.title);
           return (
             <div key={group.title}>
               <button
-                onClick={() => setOpenGroup(isOpen ? null : group.title)}
+                onClick={() => toggleGroup(group.title)}
                 className="w-full flex items-center justify-between px-3 py-1.5 mb-1 hover:bg-sidebar-accent/50 rounded-md transition-colors"
               >
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
