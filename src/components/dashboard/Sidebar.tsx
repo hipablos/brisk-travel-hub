@@ -26,7 +26,7 @@ const groups: Group[] = [
   {
     title: "Acompanhamento",
     items: [
-      { icon: Plane, label: "Voos" },
+      { icon: Plane, label: "Voos", href: "/voos" },
       { icon: Hotel, label: "Hospedagens" },
       { icon: Car, label: "Transportes" },
       { icon: MapPin, label: "Experiências Turísticas" },

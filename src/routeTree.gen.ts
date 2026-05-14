@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VoosRouteImport } from './routes/voos'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CotacoesRouteImport } from './routes/cotacoes'
@@ -18,6 +19,11 @@ import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
 
+const VoosRoute = VoosRouteImport.update({
+  id: '/voos',
+  path: '/voos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/cotacoes': typeof CotacoesRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/voos': typeof VoosRoute
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/cotacoes': typeof CotacoesRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/voos': typeof VoosRoute
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/cotacoes': typeof CotacoesRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/voos': typeof VoosRoute
   '/clientes_/novo': typeof ClientesNovoRoute
   '/cotacoes_/$id': typeof CotacoesIdRoute
   '/cotacoes_/nova': typeof CotacoesNovaRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/cotacoes'
     | '/login'
     | '/reset-password'
+    | '/voos'
     | '/clientes/novo'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/cotacoes'
     | '/login'
     | '/reset-password'
+    | '/voos'
     | '/clientes/novo'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/cotacoes'
     | '/login'
     | '/reset-password'
+    | '/voos'
     | '/clientes_/novo'
     | '/cotacoes_/$id'
     | '/cotacoes_/nova'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   CotacoesRoute: typeof CotacoesRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  VoosRoute: typeof VoosRoute
   ClientesNovoRoute: typeof ClientesNovoRoute
   CotacoesIdRoute: typeof CotacoesIdRoute
   CotacoesNovaRoute: typeof CotacoesNovaRoute
@@ -136,6 +149,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/voos': {
+      id: '/voos'
+      path: '/voos'
+      fullPath: '/voos'
+      preLoaderRoute: typeof VoosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   CotacoesRoute: CotacoesRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  VoosRoute: VoosRoute,
   ClientesNovoRoute: ClientesNovoRoute,
   CotacoesIdRoute: CotacoesIdRoute,
   CotacoesNovaRoute: CotacoesNovaRoute,
