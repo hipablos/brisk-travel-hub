@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
-import { Hash, Eye, Pencil, MoreVertical, MessageSquare } from "lucide-react";
+import { Hash, Eye, Pencil, MoreVertical, MessageSquare, GripVertical } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { useCotacoes, useAllLabels, formatBRL, type CotacaoStatus } from "@/lib/cotacoes-store";
+import { useState } from "react";
+import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, type CotacaoStatus } from "@/lib/cotacoes-store";
 import { LabelsPopover } from "./LabelsPopover";
+import { toast } from "sonner";
 
 type QuoteCard = {
   id: string;
@@ -23,16 +25,37 @@ type ColumnProps = {
   totalAmount: string;
   colorClass: string;
   cards: QuoteCard[];
+  onDropCard: (id: string, status: CotacaoStatus) => void;
+  onDragCard: (id: string) => void;
+  draggingId: string | null;
 };
 
-function KanbanCard({ card }: { card: QuoteCard }) {
+function KanbanCard({
+  card,
+  status,
+  onDragCard,
+}: {
+  card: QuoteCard;
+  status: CotacaoStatus;
+  onDragCard: (id: string) => void;
+}) {
   const allLabels = useAllLabels();
   const colorOf = (name: string) => allLabels.find((l) => l.name === name)?.color ?? "#64748b";
 
   return (
-    <div className="bg-card border border-border/50 rounded-lg p-3 hover:border-primary/50 transition-colors flex flex-col gap-3">
+    <div
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.setData("text/plain", card.id);
+        e.dataTransfer.effectAllowed = "move";
+        onDragCard(card.id);
+      }}
+      className="group bg-card border border-border/50 rounded-lg p-3 hover:border-primary/50 transition-colors flex flex-col gap-3 cursor-grab active:cursor-grabbing"
+      data-status={status}
+    >
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
+          <GripVertical className="size-3.5 text-muted-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity" />
           <span className="text-muted-foreground font-mono bg-secondary/20 px-1.5 py-0.5 rounded">{card.code}</span>
           <span className="text-muted-foreground">{card.date}</span>
           <div className="size-5 rounded-full bg-secondary shrink-0 overflow-hidden">
@@ -99,17 +122,37 @@ function KanbanCard({ card }: { card: QuoteCard }) {
   );
 }
 
-function KanbanColumn({ title, count, totalAmount, colorClass, cards }: ColumnProps) {
+function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, onDropCard, onDragCard, draggingId }: ColumnProps) {
+  const [over, setOver] = useState(false);
   return (
     <div className="flex flex-col min-w-[300px] max-w-[350px] w-full shrink-0">
       <div className={cn("flex items-center justify-between px-3 py-2 rounded-t-lg font-bold text-xs uppercase tracking-wider", colorClass)}>
         <span>{title} ({count})</span>
         <span>{totalAmount}</span>
       </div>
-      <div className="flex-1 bg-card/30 border border-border/50 border-t-0 p-2 flex flex-col gap-2 overflow-y-auto">
+      <div
+        onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (!over) setOver(true); }}
+        onDragLeave={() => setOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setOver(false);
+          const id = e.dataTransfer.getData("text/plain");
+          if (id) onDropCard(id, status);
+        }}
+        className={cn(
+          "flex-1 bg-card/30 border border-border/50 border-t-0 p-2 flex flex-col gap-2 overflow-y-auto transition-colors",
+          over && "bg-primary/5 border-primary/40 ring-2 ring-primary/30 ring-inset",
+          draggingId && !over && "border-dashed"
+        )}
+      >
         {cards.map((c) => (
-          <KanbanCard key={c.id} card={c} />
+          <KanbanCard key={c.id} card={c} status={status} onDragCard={onDragCard} />
         ))}
+        {cards.length === 0 && (
+          <div className="text-[11px] text-muted-foreground/70 text-center py-6 select-none">
+            Arraste uma cotação para cá
+          </div>
+        )}
       </div>
     </div>
   );
@@ -118,6 +161,7 @@ function KanbanColumn({ title, count, totalAmount, colorClass, cards }: ColumnPr
 export function CotacoesBoard() {
   const saved = useCotacoes();
   const all = saved;
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const statuses: { status: CotacaoStatus; title: string; colorClass: string }[] = [
     { status: "aguardando", title: "Aguardando", colorClass: "bg-muted text-muted-foreground" },
@@ -126,6 +170,15 @@ export function CotacoesBoard() {
     { status: "reprovado", title: "Reprovado", colorClass: "bg-destructive text-destructive-foreground" },
   ];
 
+  const handleDrop = (id: string, status: CotacaoStatus) => {
+    const cot = all.find((c) => c.id === id);
+    setDraggingId(null);
+    if (!cot || cot.status === status) return;
+    setCotacaoStatus(id, status);
+    const label = statuses.find((s) => s.status === status)?.title ?? status;
+    toast.success(`Cotação movida para ${label}`);
+  };
+
   const columns: ColumnProps[] = statuses.map(({ status, title, colorClass }) => {
     const items = all.filter((c) => c.status === status);
     const total = items.reduce((s, c) => s + c.total, 0);
@@ -133,6 +186,9 @@ export function CotacoesBoard() {
       title, status, colorClass,
       count: items.length,
       totalAmount: formatBRL(total),
+      onDropCard: handleDrop,
+      onDragCard: setDraggingId,
+      draggingId,
       cards: items.map((c) => ({
         id: c.id,
         code: c.code,
@@ -147,7 +203,10 @@ export function CotacoesBoard() {
   });
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4 h-[calc(100vh-280px)] items-start mt-6">
+    <div
+      className="flex gap-4 overflow-x-auto pb-4 h-[calc(100vh-280px)] items-start mt-6"
+      onDragEnd={() => setDraggingId(null)}
+    >
       {columns.map((col) => (
         <KanbanColumn key={col.title} {...col} />
       ))}
