@@ -79,6 +79,12 @@ export function getCotacao(id: string): Cotacao | undefined {
   return loadCotacoes().find((c) => c.id === id);
 }
 
+export function setCotacaoStatus(id: string, status: CotacaoStatus) {
+  const c = getCotacao(id);
+  if (!c) return;
+  saveCotacao({ ...c, status });
+}
+
 export function loadClientes(): Cliente[] {
   if (typeof window === "undefined") return [];
   try {
