@@ -1,17 +1,8 @@
 import { useState } from "react";
-
-const clients = [
-  { name: "Fabiano Franco", value: 48200, trips: 6 },
-  { name: "Ana Beatriz Souza", value: 39800, trips: 4 },
-  { name: "Carlos Mendes", value: 31500, trips: 5 },
-  { name: "Elizes Carvalho", value: 27300, trips: 3 },
-  { name: "Mariana Lopes", value: 22150, trips: 4 },
-  { name: "Roberto Dias", value: 19420, trips: 2 },
-];
+import { Users } from "lucide-react";
 
 export function TopClients() {
   const [tab, setTab] = useState<"fat" | "lucro">("fat");
-  const max = Math.max(...clients.map((c) => c.value));
   return (
     <div className="bg-card border border-border rounded-xl p-5 shadow-[var(--shadow-card)]">
       <div className="flex items-center justify-between mb-4">
@@ -31,32 +22,10 @@ export function TopClients() {
           </button>
         </div>
       </div>
-      <ul className="space-y-3">
-        {clients.map((c, i) => {
-          const v = tab === "fat" ? c.value : Math.round(c.value * 0.22);
-          return (
-            <li key={c.name}>
-              <div className="flex items-center justify-between text-sm mb-1">
-                <div className="flex items-center gap-2">
-                  <span className="size-5 rounded grid place-items-center text-[10px] font-bold bg-secondary text-secondary-foreground">
-                    {i + 1}
-                  </span>
-                  <span className="text-foreground/90">{c.name}</span>
-                </div>
-                <span className="font-semibold text-foreground tabular-nums">
-                  R$ {v.toLocaleString("pt-BR")}
-                </span>
-              </div>
-              <div className="h-1.5 bg-primary/30 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-secondary to-secondary/70 rounded-full"
-                  style={{ width: `${(c.value / max) * 100}%` }}
-                />
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <Users className="size-12 text-muted-foreground/40 mb-3" />
+        <p className="text-sm text-muted-foreground">Nenhum cliente com vendas registradas.</p>
+      </div>
     </div>
   );
 }

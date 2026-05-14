@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Hash, Eye, Pencil, MoreVertical, MessageSquare } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { useCotacoes, useAllLabels, formatBRL, type CotacaoStatus, type Cotacao } from "@/lib/cotacoes-store";
+import { useCotacoes, useAllLabels, formatBRL, type CotacaoStatus } from "@/lib/cotacoes-store";
 import { LabelsPopover } from "./LabelsPopover";
 
 type QuoteCard = {
@@ -117,18 +117,7 @@ function KanbanColumn({ title, count, totalAmount, colorClass, cards }: ColumnPr
 
 export function CotacoesBoard() {
   const saved = useCotacoes();
-
-  const mock: Cotacao[] = [
-    { id: "m1", code: "fusxk", createdAt: "2026-05-05", status: "aguardando", cliente: { id: "c1", nome: "Karla" }, tag: "Ficar Olhando", adultos: 2, criancas: 0, servicos: [], total: 1444.20 },
-    { id: "m2", code: "9h42d", createdAt: "2026-04-23", status: "aguardando_cliente", cliente: { id: "c2", nome: "Junior Almeida" }, adultos: 2, criancas: 0, servicos: [], total: 11382 },
-    { id: "m3", code: "1uipw", createdAt: "2026-04-17", status: "aguardando_cliente", cliente: { id: "c3", nome: "Wilson" }, adultos: 2, criancas: 0, servicos: [], total: 4119 },
-    { id: "m4", code: "i802b", createdAt: "2026-04-25", status: "aprovado", cliente: { id: "c4", nome: "Elizes" }, adultos: 2, criancas: 0, servicos: [], total: 2143.86 },
-    { id: "m5", code: "62gt8", createdAt: "2026-04-15", status: "aprovado", cliente: { id: "c5", nome: "Leticia Pacheco" }, adultos: 2, criancas: 0, servicos: [], total: 1354.57 },
-    { id: "m6", code: "gh976", createdAt: "2026-04-27", status: "reprovado", cliente: { id: "c6", nome: "Venicios" }, adultos: 2, criancas: 0, servicos: [], total: 14103.60 },
-    { id: "m7", code: "9yom7", createdAt: "2026-04-26", status: "reprovado", cliente: { id: "c7", nome: "Priscila Malveira" }, adultos: 2, criancas: 0, servicos: [], total: 2994.10 },
-  ];
-
-  const all = [...saved, ...mock];
+  const all = saved;
 
   const statuses: { status: CotacaoStatus; title: string; colorClass: string }[] = [
     { status: "aguardando", title: "Aguardando", colorClass: "bg-muted text-muted-foreground" },
