@@ -11,12 +11,18 @@ import {
 } from "@/components/ui/select";
 import {
   ArrowLeft, Save, User, Plane, Hotel, Car, Ship, Shield, MapPin,
-  CalendarIcon, Plus, Trash2, FileText, UserPlus,
+  CalendarIcon, Plus, Trash2, FileText, UserPlus, DollarSign, ShoppingCart,
+  Star, FileSignature, BookmarkCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
 import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
-  type CotacaoStatus, type Cotacao,
+  type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
 
 import { toast } from "sonner";
