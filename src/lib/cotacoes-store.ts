@@ -9,6 +9,38 @@ export type CotacaoServico = {
   value: number;
 };
 
+export type ValorCusto = {
+  id: string;
+  conta?: string;
+  fornecedor?: string;
+  pagamento?: string;
+  parcelas?: string;
+  vencimento?: string;
+  categoria?: string;
+  descricao?: string;
+  valor: number;
+};
+
+export type ValorVenda = {
+  id: string;
+  descricao?: string;
+  valor: number;
+};
+
+export type VendaLinha = {
+  id: string;
+  parte?: string; // fornecedor (custo) ou cliente (venda)
+  conta?: string;
+  categoria?: string;
+  descricao?: string;
+  forma?: string;
+  parcela?: string;
+  vencimento?: string;
+  pagamento?: string;
+  valor: number;
+  pago: boolean;
+};
+
 export type TipoCliente = "passageiro" | "cliente" | "fornecedor" | "representante";
 
 export type Cliente = {
@@ -48,6 +80,12 @@ export type Cotacao = {
   validade?: string;
   pagamento?: string;
   total: number;
+  valoresCusto?: ValorCusto[];
+  valoresVenda?: ValorVenda[];
+  vendaCustos?: VendaLinha[];
+  vendaVendas?: VendaLinha[];
+  vendaObservacoes?: string;
+  dataVenda?: string;
 };
 
 const COTACOES_KEY = "brisk:cotacoes";

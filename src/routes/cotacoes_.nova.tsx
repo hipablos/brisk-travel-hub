@@ -11,12 +11,18 @@ import {
 } from "@/components/ui/select";
 import {
   ArrowLeft, Save, User, Plane, Hotel, Car, Ship, Shield, MapPin,
-  CalendarIcon, Plus, Trash2, FileText, UserPlus,
+  CalendarIcon, Plus, Trash2, FileText, UserPlus, DollarSign, ShoppingCart,
+  Star, FileSignature, BookmarkCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
 import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
-  type CotacaoStatus, type Cotacao,
+  type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
 
 import { toast } from "sonner";
@@ -75,6 +81,16 @@ function NovaCotacao() {
     { id: "1", type: "voo", description: "", value: "" },
   ]);
 
+  // Valores tab
+  const [valoresCusto, setValoresCusto] = useState<ValorCusto[]>([]);
+  const [valoresVenda, setValoresVenda] = useState<ValorVenda[]>([]);
+
+  // Venda tab
+  const [vendaCustos, setVendaCustos] = useState<VendaLinha[]>([]);
+  const [vendaVendas, setVendaVendas] = useState<VendaLinha[]>([]);
+  const [vendaObservacoes, setVendaObservacoes] = useState("");
+  const [dataVenda, setDataVenda] = useState("");
+
   // Load existing cotacao when editing
   useEffect(() => {
     if (!editId) return;
@@ -104,7 +120,41 @@ function NovaCotacao() {
           }))
         : [{ id: "1", type: "voo", description: "", value: "" }]
     );
+    setValoresCusto(c.valoresCusto ?? []);
+    setValoresVenda(c.valoresVenda ?? []);
+    setVendaCustos(c.vendaCustos ?? []);
+    setVendaVendas(c.vendaVendas ?? []);
+    setVendaObservacoes(c.vendaObservacoes ?? "");
+    setDataVenda(c.dataVenda ?? "");
   }, [editId]);
+
+  // Valores helpers
+  const addValorCusto = () => setValoresCusto((l) => [...l, { id: crypto.randomUUID(), valor: 0 }]);
+  const updValorCusto = (id: string, p: Partial<ValorCusto>) =>
+    setValoresCusto((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const delValorCusto = (id: string) => setValoresCusto((l) => l.filter((x) => x.id !== id));
+
+  const addValorVenda = () => setValoresVenda((l) => [...l, { id: crypto.randomUUID(), valor: 0 }]);
+  const updValorVenda = (id: string, p: Partial<ValorVenda>) =>
+    setValoresVenda((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const delValorVenda = (id: string) => setValoresVenda((l) => l.filter((x) => x.id !== id));
+
+  const totalCustos = useMemo(() => valoresCusto.reduce((s, v) => s + (v.valor || 0), 0), [valoresCusto]);
+  const totalVendas = useMemo(() => valoresVenda.reduce((s, v) => s + (v.valor || 0), 0), [valoresVenda]);
+  const lucro = totalVendas - totalCustos;
+
+  // Venda helpers
+  const addVendaCusto = () =>
+    setVendaCustos((l) => [...l, { id: crypto.randomUUID(), valor: 0, pago: false }]);
+  const updVendaCusto = (id: string, p: Partial<VendaLinha>) =>
+    setVendaCustos((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const delVendaCusto = (id: string) => setVendaCustos((l) => l.filter((x) => x.id !== id));
+
+  const addVendaVenda = () =>
+    setVendaVendas((l) => [...l, { id: crypto.randomUUID(), valor: 0, pago: false }]);
+  const updVendaVenda = (id: string, p: Partial<VendaLinha>) =>
+    setVendaVendas((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const delVendaVenda = (id: string) => setVendaVendas((l) => l.filter((x) => x.id !== id));
 
   const addService = (type: ServiceType) => {
     setServices((s) => [...s, { id: crypto.randomUUID(), type, description: "", value: "" }]);
@@ -149,6 +199,12 @@ function NovaCotacao() {
       validade,
       pagamento,
       total,
+      valoresCusto,
+      valoresVenda,
+      vendaCustos,
+      vendaVendas,
+      vendaObservacoes,
+      dataVenda,
     };
     saveCotacao(cotacao);
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
@@ -184,7 +240,15 @@ function NovaCotacao() {
           </div>
 
           <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2">
+              <Tabs defaultValue="orcamento" className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="orcamento" className="gap-2"><FileText className="size-4" />Orçamento</TabsTrigger>
+                  <TabsTrigger value="valores" className="gap-2"><DollarSign className="size-4" />Valores</TabsTrigger>
+                  <TabsTrigger value="venda" className="gap-2"><ShoppingCart className="size-4" />Venda</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="orcamento" className="space-y-6 mt-0">
               <section className="bg-card border border-border/50 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
@@ -349,6 +413,242 @@ function NovaCotacao() {
                 <h2 className="text-lg font-semibold text-foreground mb-3">Observações</h2>
                 <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Notas internas sobre a cotação..." rows={4} />
               </section>
+                </TabsContent>
+
+                <TabsContent value="valores" className="space-y-6 mt-0">
+                  <section className="bg-card border border-border/50 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
+                          <DollarSign className="size-4" />
+                        </div>
+                        <h2 className="text-lg font-semibold text-foreground">Valores de Custo</h2>
+                      </div>
+                      <Button type="button" size="sm" variant="outline" className="gap-2" onClick={addValorCusto}>
+                        <Plus className="size-4" /> Incluir
+                      </Button>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Conta</TableHead>
+                            <TableHead>Fornecedor</TableHead>
+                            <TableHead>Pagamento</TableHead>
+                            <TableHead>Parcelas</TableHead>
+                            <TableHead>Vencimento</TableHead>
+                            <TableHead>Categoria</TableHead>
+                            <TableHead>Descrição</TableHead>
+                            <TableHead className="text-right">Valor (R$)</TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {valoresCusto.length === 0 && (
+                            <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-6">Nenhum custo lançado.</TableCell></TableRow>
+                          )}
+                          {valoresCusto.map((v) => (
+                            <TableRow key={v.id}>
+                              <TableCell><Input value={v.conta ?? ""} onChange={(e) => updValorCusto(v.id, { conta: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.fornecedor ?? ""} onChange={(e) => updValorCusto(v.id, { fornecedor: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.pagamento ?? ""} onChange={(e) => updValorCusto(v.id, { pagamento: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.parcelas ?? ""} onChange={(e) => updValorCusto(v.id, { parcelas: e.target.value })} /></TableCell>
+                              <TableCell><Input type="date" value={v.vencimento ?? ""} onChange={(e) => updValorCusto(v.id, { vencimento: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.categoria ?? ""} onChange={(e) => updValorCusto(v.id, { categoria: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.descricao ?? ""} onChange={(e) => updValorCusto(v.id, { descricao: e.target.value })} /></TableCell>
+                              <TableCell><Input type="number" step="0.01" className="text-right" value={v.valor || ""} onChange={(e) => updValorCusto(v.id, { valor: parseFloat(e.target.value) || 0 })} /></TableCell>
+                              <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => delValorCusto(v.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="size-4" /></Button></TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    <div className="flex justify-end pt-4 border-t border-border/50 mt-4">
+                      <div className="text-sm">
+                        <span className="text-muted-foreground mr-3">Total de Custos</span>
+                        <span className="text-lg font-bold text-foreground">R$ {formatBRL(totalCustos)}</span>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="bg-card border border-border/50 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="size-8 rounded-lg bg-secondary/10 grid place-items-center text-secondary">
+                          <ShoppingCart className="size-4" />
+                        </div>
+                        <h2 className="text-lg font-semibold text-foreground">Valores de Venda</h2>
+                      </div>
+                      <Button type="button" size="sm" variant="outline" className="gap-2" onClick={addValorVenda}>
+                        <Plus className="size-4" /> Incluir
+                      </Button>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Descrição</TableHead>
+                            <TableHead className="text-right">Valor (R$)</TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {valoresVenda.length === 0 && (
+                            <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">Nenhuma venda lançada.</TableCell></TableRow>
+                          )}
+                          {valoresVenda.map((v) => (
+                            <TableRow key={v.id}>
+                              <TableCell><Input value={v.descricao ?? ""} onChange={(e) => updValorVenda(v.id, { descricao: e.target.value })} /></TableCell>
+                              <TableCell><Input type="number" step="0.01" className="text-right" value={v.valor || ""} onChange={(e) => updValorVenda(v.id, { valor: parseFloat(e.target.value) || 0 })} /></TableCell>
+                              <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => delValorVenda(v.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="size-4" /></Button></TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    <div className="flex justify-end pt-4 border-t border-border/50 mt-4">
+                      <div className="text-sm">
+                        <span className="text-muted-foreground mr-3">Total de Venda</span>
+                        <span className="text-lg font-bold text-secondary">R$ {formatBRL(totalVendas)}</span>
+                      </div>
+                    </div>
+                  </section>
+                </TabsContent>
+
+                <TabsContent value="venda" className="space-y-6 mt-0">
+                  <section className="bg-card border border-border/50 rounded-xl p-6">
+                    <div className="flex flex-wrap items-center gap-2 mb-4">
+                      <Button type="button" variant="outline" size="sm" className="gap-2"><Star className="size-4" />Avaliação</Button>
+                      <Button type="button" variant="outline" size="sm" className="gap-2"><FileSignature className="size-4" />Contrato</Button>
+                      <Button type="button" variant="outline" size="sm" className="gap-2"><BookmarkCheck className="size-4" />Reserva</Button>
+                      <Button type="button" variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive"><Trash2 className="size-4" />Excluir Venda</Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-1.5">
+                        <Label>Data da Venda</Label>
+                        <div className="relative">
+                          <Input type="date" className="pl-9" value={dataVenda} onChange={(e) => setDataVenda(e.target.value)} />
+                          <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>Lucro</Label>
+                        <div className="h-9 px-3 rounded-md border border-border/40 bg-secondary/5 flex items-center font-semibold text-secondary">
+                          R$ {formatBRL(lucro)}
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>Lucro com Comissões</Label>
+                        <div className="h-9 px-3 rounded-md border border-border/40 bg-secondary/5 flex items-center font-semibold text-secondary">
+                          R$ {formatBRL(lucro)}
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="bg-card border border-border/50 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-lg font-semibold text-foreground">Valores de Custo</h2>
+                      <Button type="button" size="sm" variant="outline" className="gap-2" onClick={addVendaCusto}>
+                        <Plus className="size-4" /> Incluir
+                      </Button>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Fornecedor</TableHead>
+                            <TableHead>Conta</TableHead>
+                            <TableHead>Categoria</TableHead>
+                            <TableHead>Descrição</TableHead>
+                            <TableHead>Forma</TableHead>
+                            <TableHead>Parcela</TableHead>
+                            <TableHead>Vencimento</TableHead>
+                            <TableHead>Pagamento</TableHead>
+                            <TableHead className="text-right">Valor</TableHead>
+                            <TableHead className="text-center">Pago</TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {vendaCustos.length === 0 && (
+                            <TableRow><TableCell colSpan={11} className="text-center text-muted-foreground py-6">Nenhum custo lançado.</TableCell></TableRow>
+                          )}
+                          {vendaCustos.map((v) => (
+                            <TableRow key={v.id}>
+                              <TableCell><Input value={v.parte ?? ""} onChange={(e) => updVendaCusto(v.id, { parte: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.conta ?? ""} onChange={(e) => updVendaCusto(v.id, { conta: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.categoria ?? ""} onChange={(e) => updVendaCusto(v.id, { categoria: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.descricao ?? ""} onChange={(e) => updVendaCusto(v.id, { descricao: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.forma ?? ""} onChange={(e) => updVendaCusto(v.id, { forma: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.parcela ?? ""} onChange={(e) => updVendaCusto(v.id, { parcela: e.target.value })} /></TableCell>
+                              <TableCell><Input type="date" value={v.vencimento ?? ""} onChange={(e) => updVendaCusto(v.id, { vencimento: e.target.value })} /></TableCell>
+                              <TableCell><Input type="date" value={v.pagamento ?? ""} onChange={(e) => updVendaCusto(v.id, { pagamento: e.target.value })} /></TableCell>
+                              <TableCell><Input type="number" step="0.01" className="text-right" value={v.valor || ""} onChange={(e) => updVendaCusto(v.id, { valor: parseFloat(e.target.value) || 0 })} /></TableCell>
+                              <TableCell className="text-center"><Switch checked={v.pago} onCheckedChange={(c) => updVendaCusto(v.id, { pago: c })} /></TableCell>
+                              <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => delVendaCusto(v.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="size-4" /></Button></TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </section>
+
+                  <section className="bg-card border border-border/50 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-lg font-semibold text-foreground">Valores de Venda</h2>
+                      <Button type="button" size="sm" variant="outline" className="gap-2" onClick={addVendaVenda}>
+                        <Plus className="size-4" /> Incluir
+                      </Button>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Cliente</TableHead>
+                            <TableHead>Conta</TableHead>
+                            <TableHead>Categoria</TableHead>
+                            <TableHead>Descrição</TableHead>
+                            <TableHead>Forma</TableHead>
+                            <TableHead>Parcela</TableHead>
+                            <TableHead>Vencimento</TableHead>
+                            <TableHead>Pagamento</TableHead>
+                            <TableHead className="text-right">Valor</TableHead>
+                            <TableHead className="text-center">Pago</TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {vendaVendas.length === 0 && (
+                            <TableRow><TableCell colSpan={11} className="text-center text-muted-foreground py-6">Nenhuma venda lançada.</TableCell></TableRow>
+                          )}
+                          {vendaVendas.map((v) => (
+                            <TableRow key={v.id}>
+                              <TableCell><Input value={v.parte ?? ""} onChange={(e) => updVendaVenda(v.id, { parte: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.conta ?? ""} onChange={(e) => updVendaVenda(v.id, { conta: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.categoria ?? ""} onChange={(e) => updVendaVenda(v.id, { categoria: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.descricao ?? ""} onChange={(e) => updVendaVenda(v.id, { descricao: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.forma ?? ""} onChange={(e) => updVendaVenda(v.id, { forma: e.target.value })} /></TableCell>
+                              <TableCell><Input value={v.parcela ?? ""} onChange={(e) => updVendaVenda(v.id, { parcela: e.target.value })} /></TableCell>
+                              <TableCell><Input type="date" value={v.vencimento ?? ""} onChange={(e) => updVendaVenda(v.id, { vencimento: e.target.value })} /></TableCell>
+                              <TableCell><Input type="date" value={v.pagamento ?? ""} onChange={(e) => updVendaVenda(v.id, { pagamento: e.target.value })} /></TableCell>
+                              <TableCell><Input type="number" step="0.01" className="text-right" value={v.valor || ""} onChange={(e) => updVendaVenda(v.id, { valor: parseFloat(e.target.value) || 0 })} /></TableCell>
+                              <TableCell className="text-center"><Switch checked={v.pago} onCheckedChange={(c) => updVendaVenda(v.id, { pago: c })} /></TableCell>
+                              <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => delVendaVenda(v.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="size-4" /></Button></TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </section>
+
+                  <section className="bg-card border border-border/50 rounded-xl p-6">
+                    <h2 className="text-lg font-semibold text-foreground mb-3">Observação</h2>
+                    <Textarea value={vendaObservacoes} onChange={(e) => setVendaObservacoes(e.target.value)} placeholder="Observações sobre a venda..." rows={4} />
+                  </section>
+                </TabsContent>
+              </Tabs>
             </div>
 
             <aside className="space-y-6">
