@@ -81,6 +81,16 @@ function NovaCotacao() {
     { id: "1", type: "voo", description: "", value: "" },
   ]);
 
+  // Valores tab
+  const [valoresCusto, setValoresCusto] = useState<ValorCusto[]>([]);
+  const [valoresVenda, setValoresVenda] = useState<ValorVenda[]>([]);
+
+  // Venda tab
+  const [vendaCustos, setVendaCustos] = useState<VendaLinha[]>([]);
+  const [vendaVendas, setVendaVendas] = useState<VendaLinha[]>([]);
+  const [vendaObservacoes, setVendaObservacoes] = useState("");
+  const [dataVenda, setDataVenda] = useState("");
+
   // Load existing cotacao when editing
   useEffect(() => {
     if (!editId) return;
