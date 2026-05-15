@@ -199,6 +199,12 @@ function NovaCotacao() {
       validade,
       pagamento,
       total,
+      valoresCusto,
+      valoresVenda,
+      vendaCustos,
+      vendaVendas,
+      vendaObservacoes,
+      dataVenda,
     };
     saveCotacao(cotacao);
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
