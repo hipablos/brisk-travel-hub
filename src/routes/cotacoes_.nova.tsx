@@ -120,7 +120,41 @@ function NovaCotacao() {
           }))
         : [{ id: "1", type: "voo", description: "", value: "" }]
     );
+    setValoresCusto(c.valoresCusto ?? []);
+    setValoresVenda(c.valoresVenda ?? []);
+    setVendaCustos(c.vendaCustos ?? []);
+    setVendaVendas(c.vendaVendas ?? []);
+    setVendaObservacoes(c.vendaObservacoes ?? "");
+    setDataVenda(c.dataVenda ?? "");
   }, [editId]);
+
+  // Valores helpers
+  const addValorCusto = () => setValoresCusto((l) => [...l, { id: crypto.randomUUID(), valor: 0 }]);
+  const updValorCusto = (id: string, p: Partial<ValorCusto>) =>
+    setValoresCusto((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const delValorCusto = (id: string) => setValoresCusto((l) => l.filter((x) => x.id !== id));
+
+  const addValorVenda = () => setValoresVenda((l) => [...l, { id: crypto.randomUUID(), valor: 0 }]);
+  const updValorVenda = (id: string, p: Partial<ValorVenda>) =>
+    setValoresVenda((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const delValorVenda = (id: string) => setValoresVenda((l) => l.filter((x) => x.id !== id));
+
+  const totalCustos = useMemo(() => valoresCusto.reduce((s, v) => s + (v.valor || 0), 0), [valoresCusto]);
+  const totalVendas = useMemo(() => valoresVenda.reduce((s, v) => s + (v.valor || 0), 0), [valoresVenda]);
+  const lucro = totalVendas - totalCustos;
+
+  // Venda helpers
+  const addVendaCusto = () =>
+    setVendaCustos((l) => [...l, { id: crypto.randomUUID(), valor: 0, pago: false }]);
+  const updVendaCusto = (id: string, p: Partial<VendaLinha>) =>
+    setVendaCustos((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const delVendaCusto = (id: string) => setVendaCustos((l) => l.filter((x) => x.id !== id));
+
+  const addVendaVenda = () =>
+    setVendaVendas((l) => [...l, { id: crypto.randomUUID(), valor: 0, pago: false }]);
+  const updVendaVenda = (id: string, p: Partial<VendaLinha>) =>
+    setVendaVendas((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const delVendaVenda = (id: string) => setVendaVendas((l) => l.filter((x) => x.id !== id));
 
   const addService = (type: ServiceType) => {
     setServices((s) => [...s, { id: crypto.randomUUID(), type, description: "", value: "" }]);
