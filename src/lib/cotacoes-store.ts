@@ -80,6 +80,12 @@ export type Cotacao = {
   validade?: string;
   pagamento?: string;
   total: number;
+  valoresCusto?: ValorCusto[];
+  valoresVenda?: ValorVenda[];
+  vendaCustos?: VendaLinha[];
+  vendaVendas?: VendaLinha[];
+  vendaObservacoes?: string;
+  dataVenda?: string;
 };
 
 const COTACOES_KEY = "brisk:cotacoes";
