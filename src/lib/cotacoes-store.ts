@@ -293,7 +293,8 @@ export function useAllLabels() {
     const reload = () => fetchCustomLabels().then((d) => mounted && setCustom(d));
     reload();
     const channel = supabase
-      .channel("labels-changes")
+      .channel(`labels-changes-${Math.random().toString(36).slice(2)}`)
+
       .on("postgres_changes", { event: "*", schema: "public", table: "labels_custom" }, reload)
       .subscribe();
     return () => { mounted = false; supabase.removeChannel(channel); };
