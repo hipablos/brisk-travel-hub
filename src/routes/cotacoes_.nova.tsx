@@ -312,36 +312,37 @@ function NovaCotacao() {
                 </div>
               </section>
 
+              <FlightCard
+                direction="ida"
+                voo={vooIda}
+                onChange={(patch) => setVooIda((v) => ({ ...v, ...patch }))}
+              />
+
+              {vooVolta ? (
+                <FlightCard
+                  direction="volta"
+                  voo={vooVolta}
+                  onChange={(patch) => setVooVolta((v) => (v ? { ...v, ...patch } : v))}
+                  onRemove={() => setVooVolta(null)}
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setVooVolta(novoVoo())}
+                  className="w-full rounded-xl border border-dashed border-border hover:border-secondary hover:bg-secondary/5 text-sm text-muted-foreground hover:text-foreground py-4 flex items-center justify-center gap-2 transition-colors"
+                >
+                  <Plus className="size-4" /> Adicionar voo de volta
+                </button>
+              )}
+
               <section className="bg-card border border-border/50 rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
-                    <MapPin className="size-4" />
+                    <Users className="size-4" />
                   </div>
-                  <h2 className="text-lg font-semibold text-foreground">Detalhes da Viagem</h2>
+                  <h2 className="text-lg font-semibold text-foreground">Passageiros</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label>Origem</Label>
-                    <Input value={origem} onChange={(e) => setOrigem(e.target.value)} placeholder="Cidade de origem" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Destino *</Label>
-                    <Input value={destino} onChange={(e) => setDestino(e.target.value)} placeholder="Cidade de destino" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Ida</Label>
-                    <div className="relative">
-                      <Input type="date" className="pl-9" value={ida} onChange={(e) => setIda(e.target.value)} />
-                      <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Volta</Label>
-                    <div className="relative">
-                      <Input type="date" className="pl-9" value={volta} onChange={(e) => setVolta(e.target.value)} />
-                      <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
-                    </div>
-                  </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label>Adultos</Label>
                     <Input type="number" min={1} value={adultos} onChange={(e) => setAdultos(parseInt(e.target.value) || 1)} />
@@ -352,6 +353,7 @@ function NovaCotacao() {
                   </div>
                 </div>
               </section>
+
 
               <section className="bg-card border border-border/50 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
