@@ -223,7 +223,7 @@ export function useCotacoes() {
     const reload = () => fetchCotacoes().then((d) => mounted && setList(d));
     reload();
     const channel = supabase
-      .channel("cotacoes-changes")
+      .channel(`cotacoes-changes-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "cotacoes" }, reload)
       .subscribe();
     return () => { mounted = false; supabase.removeChannel(channel); };
@@ -238,13 +238,14 @@ export function useClientes() {
     const reload = () => fetchClientes().then((d) => mounted && setList(d));
     reload();
     const channel = supabase
-      .channel("clientes-changes")
+      .channel(`clientes-changes-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "clientes" }, reload)
       .subscribe();
     return () => { mounted = false; supabase.removeChannel(channel); };
   }, []);
   return list;
 }
+
 
 // ---------- Utils ----------
 export function genCode() {
@@ -292,7 +293,8 @@ export function useAllLabels() {
     const reload = () => fetchCustomLabels().then((d) => mounted && setCustom(d));
     reload();
     const channel = supabase
-      .channel("labels-changes")
+      .channel(`labels-changes-${Math.random().toString(36).slice(2)}`)
+
       .on("postgres_changes", { event: "*", schema: "public", table: "labels_custom" }, reload)
       .subscribe();
     return () => { mounted = false; supabase.removeChannel(channel); };
