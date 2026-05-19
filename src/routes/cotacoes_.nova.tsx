@@ -185,8 +185,9 @@ function NovaCotacao() {
       toast.error("Selecione ou cadastre um cliente");
       return;
     }
-    if (!destino.trim()) {
-      toast.error("Informe o destino da viagem");
+    const destinoFinal = (destino || vooIda.destino || "").trim();
+    if (!destinoFinal) {
+      toast.error("Informe o destino do voo de ida");
       return;
     }
     const existing = editId ? await getCotacao(editId) : undefined;
