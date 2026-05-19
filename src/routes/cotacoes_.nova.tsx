@@ -94,39 +94,41 @@ function NovaCotacao() {
   // Load existing cotacao when editing
   useEffect(() => {
     if (!editId) return;
-    const c = getCotacao(editId);
-    if (!c) return;
-    setClienteId(c.cliente.id);
-    setEmail(c.cliente.email ?? "");
-    setTelefone(c.cliente.telefone ?? "");
-    setTag(c.tag ?? "");
-    setOrigem(c.origem ?? "");
-    setDestino(c.destino ?? "");
-    setIda(c.ida ?? "");
-    setVolta(c.volta ?? "");
-    setAdultos(c.adultos);
-    setCriancas(c.criancas);
-    setObservacoes(c.observacoes ?? "");
-    setStatus(c.status);
-    setValidade(c.validade ?? "");
-    setPagamento(c.pagamento ?? "");
-    setServices(
-      c.servicos.length
-        ? c.servicos.map((s) => ({
-            id: s.id,
-            type: s.type as ServiceType,
-            description: s.description,
-            value: String(s.value),
-          }))
-        : [{ id: "1", type: "voo", description: "", value: "" }]
-    );
-    setValoresCusto(c.valoresCusto ?? []);
-    setValoresVenda(c.valoresVenda ?? []);
-    setVendaCustos(c.vendaCustos ?? []);
-    setVendaVendas(c.vendaVendas ?? []);
-    setVendaObservacoes(c.vendaObservacoes ?? "");
-    setDataVenda(c.dataVenda ?? "");
+    getCotacao(editId).then((c) => {
+      if (!c) return;
+      setClienteId(c.cliente.id);
+      setEmail(c.cliente.email ?? "");
+      setTelefone(c.cliente.telefone ?? "");
+      setTag(c.tag ?? "");
+      setOrigem(c.origem ?? "");
+      setDestino(c.destino ?? "");
+      setIda(c.ida ?? "");
+      setVolta(c.volta ?? "");
+      setAdultos(c.adultos);
+      setCriancas(c.criancas);
+      setObservacoes(c.observacoes ?? "");
+      setStatus(c.status);
+      setValidade(c.validade ?? "");
+      setPagamento(c.pagamento ?? "");
+      setServices(
+        c.servicos.length
+          ? c.servicos.map((s) => ({
+              id: s.id,
+              type: s.type as ServiceType,
+              description: s.description,
+              value: String(s.value),
+            }))
+          : [{ id: "1", type: "voo", description: "", value: "" }]
+      );
+      setValoresCusto(c.valoresCusto ?? []);
+      setValoresVenda(c.valoresVenda ?? []);
+      setVendaCustos(c.vendaCustos ?? []);
+      setVendaVendas(c.vendaVendas ?? []);
+      setVendaObservacoes(c.vendaObservacoes ?? "");
+      setDataVenda(c.dataVenda ?? "");
+    });
   }, [editId]);
+
 
   // Valores helpers
   const addValorCusto = () => setValoresCusto((l) => [...l, { id: crypto.randomUUID(), valor: 0 }]);
@@ -169,7 +171,7 @@ function NovaCotacao() {
     [services]
   );
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const cliente = clientes.find((c) => c.id === clienteId);
     if (!cliente) {
@@ -180,7 +182,7 @@ function NovaCotacao() {
       toast.error("Informe o destino da viagem");
       return;
     }
-    const existing = editId ? getCotacao(editId) : undefined;
+    const existing = editId ? await getCotacao(editId) : undefined;
     const cotacao: Cotacao = {
       id: existing?.id ?? crypto.randomUUID(),
       code: existing?.code ?? genCode(),
@@ -206,10 +208,15 @@ function NovaCotacao() {
       vendaObservacoes,
       dataVenda,
     };
-    saveCotacao(cotacao);
+    const saved = await saveCotacao(cotacao);
+    if (!saved) {
+      toast.error("Não foi possível salvar a cotação");
+      return;
+    }
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
-    navigate({ to: "/cotacoes/$id", params: { id: cotacao.id } });
+    navigate({ to: "/cotacoes/$id", params: { id: saved.id } });
   };
+
 
   return (
     <div className="min-h-screen bg-background flex">
