@@ -55,23 +55,25 @@ function NovoCliente() {
 
   useEffect(() => {
     if (!editId) return;
-    const c = getCliente(editId);
-    if (!c) return;
-    setForm({
-      nome: c.nome || "",
-      email: c.email || "",
-      telefone: c.telefone || "",
-      dataNascimento: c.dataNascimento || "",
-      sexo: (c.sexo as "" | "masculino" | "feminino" | "outro") || "",
-      tipos: c.tipos && c.tipos.length ? c.tipos : (c.tipo ? [c.tipo] : []),
-      rg: c.rg || "",
-      cpf: c.cpf || "",
-      passaporte: c.passaporte || "",
-      passaporteExpedicao: c.passaporteExpedicao || "",
-      passaporteVencimento: c.passaporteVencimento || "",
-      vistoEmissao: c.vistoEmissao || "",
+    getCliente(editId).then((c) => {
+      if (!c) return;
+      setForm({
+        nome: c.nome || "",
+        email: c.email || "",
+        telefone: c.telefone || "",
+        dataNascimento: c.dataNascimento || "",
+        sexo: (c.sexo as "" | "masculino" | "feminino" | "outro") || "",
+        tipos: c.tipos && c.tipos.length ? c.tipos : (c.tipo ? [c.tipo] : []),
+        rg: c.rg || "",
+        cpf: c.cpf || "",
+        passaporte: c.passaporte || "",
+        passaporteExpedicao: c.passaporteExpedicao || "",
+        passaporteVencimento: c.passaporteVencimento || "",
+        vistoEmissao: c.vistoEmissao || "",
+      });
     });
   }, [editId]);
+
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
