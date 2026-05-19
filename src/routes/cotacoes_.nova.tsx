@@ -24,6 +24,8 @@ import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
+import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
+import { Users } from "lucide-react";
 
 import { toast } from "sonner";
 
