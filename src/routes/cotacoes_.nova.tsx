@@ -171,7 +171,7 @@ function NovaCotacao() {
     [services]
   );
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const cliente = clientes.find((c) => c.id === clienteId);
     if (!cliente) {
@@ -182,7 +182,7 @@ function NovaCotacao() {
       toast.error("Informe o destino da viagem");
       return;
     }
-    const existing = editId ? getCotacao(editId) : undefined;
+    const existing = editId ? await getCotacao(editId) : undefined;
     const cotacao: Cotacao = {
       id: existing?.id ?? crypto.randomUUID(),
       code: existing?.code ?? genCode(),
@@ -208,10 +208,15 @@ function NovaCotacao() {
       vendaObservacoes,
       dataVenda,
     };
-    saveCotacao(cotacao);
+    const saved = await saveCotacao(cotacao);
+    if (!saved) {
+      toast.error("Não foi possível salvar a cotação");
+      return;
+    }
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
-    navigate({ to: "/cotacoes/$id", params: { id: cotacao.id } });
+    navigate({ to: "/cotacoes/$id", params: { id: saved.id } });
   };
+
 
   return (
     <div className="min-h-screen bg-background flex">
