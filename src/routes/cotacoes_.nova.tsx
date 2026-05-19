@@ -94,39 +94,41 @@ function NovaCotacao() {
   // Load existing cotacao when editing
   useEffect(() => {
     if (!editId) return;
-    const c = getCotacao(editId);
-    if (!c) return;
-    setClienteId(c.cliente.id);
-    setEmail(c.cliente.email ?? "");
-    setTelefone(c.cliente.telefone ?? "");
-    setTag(c.tag ?? "");
-    setOrigem(c.origem ?? "");
-    setDestino(c.destino ?? "");
-    setIda(c.ida ?? "");
-    setVolta(c.volta ?? "");
-    setAdultos(c.adultos);
-    setCriancas(c.criancas);
-    setObservacoes(c.observacoes ?? "");
-    setStatus(c.status);
-    setValidade(c.validade ?? "");
-    setPagamento(c.pagamento ?? "");
-    setServices(
-      c.servicos.length
-        ? c.servicos.map((s) => ({
-            id: s.id,
-            type: s.type as ServiceType,
-            description: s.description,
-            value: String(s.value),
-          }))
-        : [{ id: "1", type: "voo", description: "", value: "" }]
-    );
-    setValoresCusto(c.valoresCusto ?? []);
-    setValoresVenda(c.valoresVenda ?? []);
-    setVendaCustos(c.vendaCustos ?? []);
-    setVendaVendas(c.vendaVendas ?? []);
-    setVendaObservacoes(c.vendaObservacoes ?? "");
-    setDataVenda(c.dataVenda ?? "");
+    getCotacao(editId).then((c) => {
+      if (!c) return;
+      setClienteId(c.cliente.id);
+      setEmail(c.cliente.email ?? "");
+      setTelefone(c.cliente.telefone ?? "");
+      setTag(c.tag ?? "");
+      setOrigem(c.origem ?? "");
+      setDestino(c.destino ?? "");
+      setIda(c.ida ?? "");
+      setVolta(c.volta ?? "");
+      setAdultos(c.adultos);
+      setCriancas(c.criancas);
+      setObservacoes(c.observacoes ?? "");
+      setStatus(c.status);
+      setValidade(c.validade ?? "");
+      setPagamento(c.pagamento ?? "");
+      setServices(
+        c.servicos.length
+          ? c.servicos.map((s) => ({
+              id: s.id,
+              type: s.type as ServiceType,
+              description: s.description,
+              value: String(s.value),
+            }))
+          : [{ id: "1", type: "voo", description: "", value: "" }]
+      );
+      setValoresCusto(c.valoresCusto ?? []);
+      setValoresVenda(c.valoresVenda ?? []);
+      setVendaCustos(c.vendaCustos ?? []);
+      setVendaVendas(c.vendaVendas ?? []);
+      setVendaObservacoes(c.vendaObservacoes ?? "");
+      setDataVenda(c.dataVenda ?? "");
+    });
   }, [editId]);
+
 
   // Valores helpers
   const addValorCusto = () => setValoresCusto((l) => [...l, { id: crypto.randomUUID(), valor: 0 }]);
