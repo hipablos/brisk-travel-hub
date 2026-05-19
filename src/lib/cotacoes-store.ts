@@ -87,6 +87,8 @@ export type Cotacao = {
   vendaVendas?: VendaLinha[];
   vendaObservacoes?: string;
   dataVenda?: string;
+  vooIda?: any;
+  vooVolta?: any;
 };
 
 // ---------- Helpers ----------
