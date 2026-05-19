@@ -131,6 +131,8 @@ function NovaCotacao() {
       setVendaVendas(c.vendaVendas ?? []);
       setVendaObservacoes(c.vendaObservacoes ?? "");
       setDataVenda(c.dataVenda ?? "");
+      if (c.vooIda) setVooIda(c.vooIda as Voo);
+      setVooVolta((c.vooVolta as Voo) ?? null);
     });
   }, [editId]);
 
