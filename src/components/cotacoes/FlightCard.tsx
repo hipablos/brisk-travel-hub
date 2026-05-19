@@ -14,6 +14,8 @@ import {
   Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Armchair, UtensilsCrossed, BellRing, Minus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
+import type { Airport } from "@/lib/airports";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -40,6 +42,8 @@ export type Voo = {
   id: string;
   origem?: string;
   destino?: string;
+  origemInfo?: Airport;
+  destinoInfo?: Airport;
   data?: string;
   horaSaida?: string;
   horaChegada?: string;
@@ -196,11 +200,21 @@ export function FlightCard({ direction, voo, onChange, onRemove }: Props) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                   <div className="space-y-1.5">
                     <Label>Aeroporto / Cidade de origem</Label>
-                    <Input value={voo.origem ?? ""} onChange={(e) => onChange({ origem: e.target.value })} placeholder="GRU - São Paulo" />
+                    <AirportAutocomplete
+                      value={voo.origem}
+                      onChange={(v) => onChange({ origem: v, origemInfo: undefined })}
+                      onSelect={(a, formatted) => onChange({ origem: formatted, origemInfo: a })}
+                      placeholder="Ex.: GRU, São Paulo, Guarulhos"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label>Aeroporto / Cidade de destino</Label>
-                    <Input value={voo.destino ?? ""} onChange={(e) => onChange({ destino: e.target.value })} placeholder="MIA - Miami" />
+                    <AirportAutocomplete
+                      value={voo.destino}
+                      onChange={(v) => onChange({ destino: v, destinoInfo: undefined })}
+                      onSelect={(a, formatted) => onChange({ destino: formatted, destinoInfo: a })}
+                      placeholder="Ex.: MIA, Miami, JFK"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label>Data do voo</Label>
