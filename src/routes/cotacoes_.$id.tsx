@@ -38,13 +38,15 @@ function VisualizarCotacao() {
   const [cotacao, setCotacao] = useState<Cotacao | undefined>();
 
   useEffect(() => {
-    const c = getCotacao(id);
-    if (!c) {
-      navigate({ to: "/cotacoes" });
-      return;
-    }
-    setCotacao(c);
+    getCotacao(id).then((c) => {
+      if (!c) {
+        navigate({ to: "/cotacoes" });
+        return;
+      }
+      setCotacao(c);
+    });
   }, [id, navigate]);
+
 
   if (!cotacao) return null;
 
