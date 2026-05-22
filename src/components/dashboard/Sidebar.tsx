@@ -4,7 +4,7 @@ import {
   LayoutDashboard, FileText, Calendar, CheckSquare, Plane, Hotel, Car,
   MapPin, Ship, Shield, ShoppingCart, Wallet, ArrowDownCircle, ArrowUpCircle,
   ArrowLeftRight, GitMerge, BarChart3, TrendingUp, Coins, FolderClosed,
-  FileBarChart, Users, ChevronDown, LogOut, X,
+  FileBarChart, Users, CreditCard, ChevronDown, LogOut, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
