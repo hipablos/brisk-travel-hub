@@ -89,6 +89,19 @@ export type Cotacao = {
   dataVenda?: string;
   vooIda?: any;
   vooVolta?: any;
+  formasPagamentoIds?: string[];
+};
+
+export type FormaPagamento = {
+  id: string;
+  nome: string;
+  parcelas: number;
+  intervaloDias: number;
+  desconto: number;
+  acrescimo: number;
+  observacao?: string;
+  ativo: boolean;
+  createdAt: string;
 };
 
 // ---------- Helpers ----------
