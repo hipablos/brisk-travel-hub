@@ -281,7 +281,7 @@ function FlightCard({ voo, cotacaoId }: { voo: VooItem; cotacaoId: string }) {
             </SelectContent>
           </Select>
           <Button asChild variant="ghost" size="icon" title="Visualizar reserva (PDF)">
-            <Link to="/reserva_/$id" params={{ id: cotacaoId }}>
+            <Link to="/reserva/$id" params={{ id: cotacaoId }}>
               <FileText className="size-4" />
             </Link>
           </Button>
