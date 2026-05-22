@@ -549,7 +549,89 @@ function NovaCotacao() {
                       </div>
                     </div>
                   </section>
+
+                  <section className="bg-card border border-border/50 rounded-xl p-6 space-y-6">
+                    <div>
+                      <Label>Valor de Comparação</Label>
+                      <div className="flex items-center gap-2 mt-1.5 max-w-xs">
+                        <span className="px-3 h-9 flex items-center rounded-md border border-border/40 bg-muted text-sm text-muted-foreground">R$</span>
+                        <Input
+                          placeholder="0,00"
+                          value={valorComparacao}
+                          onChange={(e) => setValorComparacao(e.target.value)}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Valor "de" para mostrar economia ao cliente no PDF.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-2">Forma(s) de Pagamento</h3>
+                      {formasPagamento.length === 0 ? (
+                        <div className="text-xs text-muted-foreground border border-dashed border-border rounded-md p-3">
+                          Nenhuma forma cadastrada.{" "}
+                          <Link to="/formas-pagamento" className="text-primary underline">Cadastrar</Link>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          {formasPagamento.filter((f) => f.ativo).map((f) => {
+                            const checked = formasPagamentoIds.includes(f.id);
+                            const calc = computeFormaTotal(totalVendas || total, f);
+                            return (
+                              <label
+                                key={f.id}
+                                className="flex items-start gap-2 py-1 cursor-pointer text-sm"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={(e) =>
+                                    setFormasPagamentoIds((ids) =>
+                                      e.target.checked ? [...ids, f.id] : ids.filter((x) => x !== f.id)
+                                    )
+                                  }
+                                  className="mt-1"
+                                />
+                                <div className="flex-1">
+                                  <span className="text-foreground">{f.nome}</span>
+                                  <span className="text-muted-foreground ml-2 text-xs">
+                                    {f.parcelas > 1
+                                      ? `${f.parcelas}x de R$ ${formatBRL(calc.valorParcela)} (Total R$ ${formatBRL(calc.final)})`
+                                      : `R$ ${formatBRL(calc.final)}`}
+                                    {f.desconto > 0 && <span className="text-emerald-600"> · -{f.desconto}%</span>}
+                                    {f.acrescimo > 0 && <span className="text-rose-600"> · +{f.acrescimo}%</span>}
+                                  </span>
+                                </div>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label>Instruções para Pagamento</Label>
+                      <Textarea
+                        className="mt-1.5"
+                        rows={3}
+                        value={instrucoesPagamento}
+                        onChange={(e) => setInstrucoesPagamento(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Link para Pagamento</Label>
+                      <Input
+                        className="mt-1.5"
+                        placeholder="Adicione o link de pagamento para exibição no orçamento"
+                        value={linkPagamento}
+                        onChange={(e) => setLinkPagamento(e.target.value)}
+                      />
+                    </div>
+                  </section>
                 </TabsContent>
+
 
                 <TabsContent value="venda" className="space-y-6 mt-0">
                   <section className="bg-card border border-border/50 rounded-xl p-6">
