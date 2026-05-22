@@ -231,6 +231,9 @@ function NovaCotacao() {
       vendaVendas,
       vendaObservacoes,
       dataVenda,
+      valorComparacao: parseFloat(valorComparacao.replace(",", ".")) || undefined,
+      instrucoesPagamento: instrucoesPagamento || undefined,
+      linkPagamento: linkPagamento || undefined,
     };
     const saved = await saveCotacao(cotacao);
     if (!saved) {
