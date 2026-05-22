@@ -7,6 +7,7 @@ import { ArrowLeft, Printer, Download, Plane, Briefcase, Luggage } from "lucide-
 import { BriskLogo } from "@/components/BriskLogo";
 import { getCotacao, type Cotacao } from "@/lib/cotacoes-store";
 import { getAirlineBrand } from "@/lib/airlines";
+import { AirlineLogo } from "@/components/AirlineLogo";
 
 export const Route = createFileRoute("/reserva_/$id")({
   component: ReservaPage,
@@ -39,33 +40,8 @@ function splitAirport(s?: string) {
   return { city: s, iata: "", name: "" };
 }
 
-function AirlineLogo({ companhia }: { companhia?: string }) {
-  const brand = getAirlineBrand(companhia);
-  if (!brand) {
-    return <div className="text-2xl font-extrabold text-slate-700">{companhia || "Companhia Aérea"}</div>;
-  }
-  if (brand.key === "gol") {
-    return (
-      <div className="text-5xl font-extrabold tracking-tight leading-none">
-        <span style={{ color: brand.color }}>G</span>
-        <span style={{ color: brand.color }}>O</span>
-        <span style={{ color: brand.accent }}>L</span>
-      </div>
-    );
-  }
-  if (brand.key === "latam") {
-    return (
-      <div className="text-4xl font-extrabold tracking-tight leading-none" style={{ color: brand.color }}>
-        LATAM
-      </div>
-    );
-  }
-  return (
-    <div className="text-4xl font-extrabold italic tracking-tight leading-none" style={{ color: brand.color }}>
-      AZUL
-    </div>
-  );
-}
+
+
 
 function ReservaPage() {
   const { id } = Route.useParams();
@@ -150,10 +126,12 @@ function ReservaPage() {
               {/* Passageiros */}
               <section className="pt-2">
                 <h3 className="text-base font-bold text-slate-900 mb-3">Passageiros: {totalPax}</h3>
-                <PaxBlock nome={cotacao.cliente?.nome || "—"} idaVoo={vooIda} voltaVoo={vooVolta} />
-                {Array.from({ length: Math.max(0, totalPax - 1) }).map((_, i) => (
-                  <PaxBlock key={i} nome={`Passageiro ${i + 2}`} idaVoo={vooIda} voltaVoo={vooVolta} />
-                ))}
+                {Array.from({ length: totalPax }).map((_, i) => {
+                  const nome = (cotacao as any).passageirosNomes?.[i]
+                    || (i === 0 ? cotacao.cliente?.nome : `Passageiro ${i + 1}`)
+                    || `Passageiro ${i + 1}`;
+                  return <PaxBlock key={i} nome={nome} idaVoo={vooIda} voltaVoo={vooVolta} />;
+                })}
                 <p className="text-xs text-slate-500 mt-3">
                   *Além da bagagem especificada acima, cada passageiro pode levar consigo uma bolsa, mochila ou sacola (considerado item pessoal).
                 </p>
