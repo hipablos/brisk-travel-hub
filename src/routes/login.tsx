@@ -1,3 +1,4 @@
+import { BriskLogo } from "@/components/BriskLogo";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Plane, Mail, Lock, User as UserIcon, Loader2 } from "lucide-react";

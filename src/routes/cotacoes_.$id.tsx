@@ -1,3 +1,4 @@
+import { BriskLogo } from "@/components/BriskLogo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
