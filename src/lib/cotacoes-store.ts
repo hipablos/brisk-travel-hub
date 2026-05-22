@@ -314,3 +314,88 @@ export function useAllLabels() {
   }, []);
   return [...PRESET_LABELS, ...custom];
 }
+
+// ---------- Formas de Pagamento ----------
+function rowToForma(row: any): FormaPagamento {
+  return {
+    id: row.id,
+    nome: row.nome,
+    parcelas: row.parcelas ?? 1,
+    intervaloDias: row.intervalo_dias ?? 30,
+    desconto: Number(row.desconto ?? 0),
+    acrescimo: Number(row.acrescimo ?? 0),
+    observacao: row.observacao ?? undefined,
+    ativo: !!row.ativo,
+    createdAt: row.created_at,
+  };
+}
+
+export async function fetchFormasPagamento(): Promise<FormaPagamento[]> {
+  const { data, error } = await supabase
+    .from("formas_pagamento")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) { console.error("[formas] fetch error:", error); return []; }
+  return (data ?? []).map(rowToForma);
+}
+
+export async function saveFormaPagamento(f: Omit<FormaPagamento, "createdAt"> & { createdAt?: string }): Promise<FormaPagamento | null> {
+  const uid = await currentUserId();
+  if (!uid) return null;
+  const payload = {
+    user_id: uid,
+    nome: f.nome,
+    parcelas: f.parcelas,
+    intervalo_dias: f.intervaloDias,
+    desconto: f.desconto,
+    acrescimo: f.acrescimo,
+    observacao: f.observacao ?? null,
+    ativo: f.ativo,
+  };
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(f.id);
+  if (isUuid) {
+    const { data: existing } = await supabase.from("formas_pagamento").select("id").eq("id", f.id).maybeSingle();
+    if (existing) {
+      const { data, error } = await supabase.from("formas_pagamento").update(payload).eq("id", f.id).select().single();
+      if (error) { console.error("[formas] update error:", error); return null; }
+      return rowToForma(data);
+    }
+  }
+  const { data, error } = await supabase.from("formas_pagamento").insert(payload).select().single();
+  if (error) { console.error("[formas] insert error:", error); return null; }
+  return rowToForma(data);
+}
+
+export async function deleteFormaPagamento(id: string) {
+  const { error } = await supabase.from("formas_pagamento").delete().eq("id", id);
+  if (error) console.error("[formas] delete error:", error);
+}
+
+export async function toggleFormaPagamentoAtivo(id: string, ativo: boolean) {
+  const { error } = await supabase.from("formas_pagamento").update({ ativo }).eq("id", id);
+  if (error) console.error("[formas] toggle error:", error);
+}
+
+export function useFormasPagamento() {
+  const [list, setList] = useState<FormaPagamento[]>([]);
+  useEffect(() => {
+    let mounted = true;
+    const reload = () => fetchFormasPagamento().then((d) => mounted && setList(d));
+    reload();
+    const channel = supabase
+      .channel(`formas-changes-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "formas_pagamento" }, reload)
+      .subscribe();
+    return () => { mounted = false; supabase.removeChannel(channel); };
+  }, []);
+  return list;
+}
+
+export function computeFormaTotal(baseTotal: number, f: FormaPagamento) {
+  const desc = baseTotal * (f.desconto / 100);
+  const acr = baseTotal * (f.acrescimo / 100);
+  const final = baseTotal - desc + acr;
+  const parcelas = Math.max(1, f.parcelas);
+  const valorParcela = final / parcelas;
+  return { final, desconto: desc, acrescimo: acr, parcelas, valorParcela };
+}
