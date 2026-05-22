@@ -40,33 +40,8 @@ function splitAirport(s?: string) {
   return { city: s, iata: "", name: "" };
 }
 
-function AirlineLogo({ companhia }: { companhia?: string }) {
-  const brand = getAirlineBrand(companhia);
-  if (!brand) {
-    return <div className="text-2xl font-extrabold text-slate-700">{companhia || "Companhia Aérea"}</div>;
-  }
-  if (brand.key === "gol") {
-    return (
-      <div className="text-5xl font-extrabold tracking-tight leading-none">
-        <span style={{ color: brand.color }}>G</span>
-        <span style={{ color: brand.color }}>O</span>
-        <span style={{ color: brand.accent }}>L</span>
-      </div>
-    );
-  }
-  if (brand.key === "latam") {
-    return (
-      <div className="text-4xl font-extrabold tracking-tight leading-none" style={{ color: brand.color }}>
-        LATAM
-      </div>
-    );
-  }
-  return (
-    <div className="text-4xl font-extrabold italic tracking-tight leading-none" style={{ color: brand.color }}>
-      AZUL
-    </div>
-  );
-}
+
+
 
 function ReservaPage() {
   const { id } = Route.useParams();
