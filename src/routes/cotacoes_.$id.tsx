@@ -174,104 +174,85 @@ function VisualizarCotacao() {
               {vooIda && <VooBlock direction="ida" voo={vooIda} />}
               {vooVolta && <VooBlock direction="volta" voo={vooVolta} />}
 
-              {/* Serviços */}
-              {cotacao.servicos.length > 0 && (
-                <section>
-                  <h3 className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold mb-3">Serviços Inclusos</h3>
-                  <div className="space-y-2">
-                    {cotacao.servicos.map((s) => {
-                      const Icon = iconMap[s.type] || MapPin;
-                      return (
-                        <div key={s.id} className="flex items-center justify-between border border-slate-200 rounded-lg px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="size-9 rounded-lg bg-[oklch(0.22_0.08_255)]/10 grid place-items-center text-[oklch(0.22_0.08_255)]">
-                              <Icon className="size-4" />
-                            </div>
-                            <div>
-                              <div className="text-[10px] text-slate-500 uppercase font-semibold tracking-wider">{labelMap[s.type]}</div>
-                              <div className="text-sm font-medium text-slate-900">{s.description || "—"}</div>
-                            </div>
-                          </div>
-                          <div className="font-bold text-slate-900">R$ {formatBRL(s.value)}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
+              {/* Valor e Forma de Pagamento */}
+              <section className="border-t border-slate-200 pt-5">
+                <h3 className="flex items-center gap-2 text-base font-bold text-[oklch(0.22_0.08_255)] mb-3">
+                  <FileText className="size-4" /> Valor e Forma de Pagamento
+                </h3>
 
-              {/* Total */}
-              <section className="border-t border-slate-200 pt-5 flex items-center justify-between">
-                <div>
-                  <div className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">Total da Proposta</div>
-                  <div className="text-xs text-slate-500 mt-1">
-                    {cotacao.servicos.length} {cotacao.servicos.length === 1 ? "serviço" : "serviços"}
+                {/* Lista de serviços/valores — uma linha por item, com descrição à esquerda e valor à direita */}
+                <div className="space-y-1 text-sm">
+                  {cotacao.servicos.map((s) => (
+                    <div key={s.id} className="flex items-baseline justify-between">
+                      <span className="text-slate-700">{s.description || labelMap[s.type] || "Serviço"}</span>
+                      <span className="font-medium text-slate-900">R$ {formatBRL(s.value)}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-baseline justify-between pt-2 mt-1 border-t border-slate-200">
+                    <span className="font-bold text-slate-900">Total</span>
+                    <span className="font-bold text-slate-900">R$ {formatBRL(cotacao.total)}</span>
                   </div>
                 </div>
-                <div className="text-3xl font-extrabold text-[oklch(0.22_0.08_255)]">R$ {formatBRL(cotacao.total)}</div>
-              </section>
 
-              {/* Formas de Pagamento */}
-              {(() => {
-                const ids = cotacao.formasPagamentoIds ?? [];
-                const selected = formasPagamento.filter((f) => ids.includes(f.id));
-                if (selected.length === 0) return null;
-                return (
-                  <section className="border-t border-slate-200 pt-5">
-                    <h3 className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold mb-3">
-                      Formas de Pagamento Disponíveis
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {selected.map((f) => {
-                        const calc = computeFormaTotal(cotacao.total, f);
-                        return (
-                          <div key={f.id} className="border border-slate-200 rounded-lg p-4 bg-slate-50/50">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="font-bold text-slate-900">{f.nome}</div>
-                              {f.desconto > 0 && (
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
-                                  {f.desconto}% OFF
-                                </span>
-                              )}
-                              {f.acrescimo > 0 && (
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
-                                  +{f.acrescimo}%
-                                </span>
+                {/* Formas de pagamento — estilo simples, alinhado à esquerda */}
+                {(() => {
+                  const ids = cotacao.formasPagamentoIds ?? [];
+                  const selected = formasPagamento.filter((f) => ids.includes(f.id));
+                  if (selected.length === 0) return null;
+                  return (
+                    <div className="mt-5">
+                      <div className="font-bold text-slate-900 text-sm">Forma(s) de Pagamento</div>
+                      <p className="text-xs italic text-slate-500 mt-0.5 mb-3">
+                        Os valores foram simulados automaticamente e podem ter pequenas variações de acordo com a plataforma de pagamento.
+                      </p>
+                      <div className="space-y-3 text-sm">
+                        {selected.map((f) => {
+                          const calc = computeFormaTotal(cotacao.total, f);
+                          return (
+                            <div key={f.id} className="text-left">
+                              <div className="text-slate-700">{f.nome}</div>
+                              <div className="font-bold text-slate-900">
+                                R$ {formatBRL(calc.final)}
+                                {f.parcelas > 1 && (
+                                  <span className="font-normal text-slate-700"> ({f.parcelas}x de R$ {formatBRL(calc.valorParcela)})</span>
+                                )}
+                              </div>
+                              {f.observacao && (
+                                <div className="text-xs text-slate-500 italic">{f.observacao}</div>
                               )}
                             </div>
-                            {f.parcelas > 1 ? (
-                              <>
-                                <div className="text-xs text-slate-500">Em até {f.parcelas}x de</div>
-                                <div className="text-xl font-extrabold text-[oklch(0.22_0.08_255)]">
-                                  R$ {formatBRL(calc.valorParcela)}
-                                </div>
-                                <div className="text-xs text-slate-500 mt-0.5">
-                                  Total: R$ {formatBRL(calc.final)}
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="text-xs text-slate-500">À vista</div>
-                                <div className="text-xl font-extrabold text-[oklch(0.22_0.08_255)]">
-                                  R$ {formatBRL(calc.final)}
-                                </div>
-                                {f.desconto > 0 && (
-                                  <div className="text-xs text-emerald-600 mt-0.5">
-                                    Você economiza R$ {formatBRL(calc.desconto)}
-                                  </div>
-                                )}
-                              </>
-                            )}
-                            {f.observacao && (
-                              <div className="text-xs text-slate-500 mt-2 italic">{f.observacao}</div>
-                            )}
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
+
+                      {cotacao.valorComparacao && cotacao.valorComparacao > 0 && (
+                        <div className="mt-4 text-sm">
+                          <span className="text-slate-500 line-through mr-2">R$ {formatBRL(cotacao.valorComparacao)}</span>
+                          <span className="text-emerald-600 font-semibold">
+                            Você economiza R$ {formatBRL(cotacao.valorComparacao - cotacao.total)}
+                          </span>
+                        </div>
+                      )}
+
+                      {cotacao.instrucoesPagamento && (
+                        <div className="mt-4">
+                          <div className="font-bold text-slate-900 text-sm">Instruções para Pagamento</div>
+                          <p className="text-sm text-slate-700 whitespace-pre-wrap mt-1">{cotacao.instrucoesPagamento}</p>
+                        </div>
+                      )}
+
+                      {cotacao.linkPagamento && (
+                        <div className="mt-3 text-sm">
+                          <a href={cotacao.linkPagamento} target="_blank" rel="noreferrer" className="text-[oklch(0.22_0.08_255)] underline font-medium">
+                            Link para Pagamento
+                          </a>
+                        </div>
+                      )}
                     </div>
-                  </section>
-                );
-              })()}
+                  );
+                })()}
+              </section>
+
 
               {cotacao.observacoes && (
                 <section className="border-t border-slate-200 pt-5">

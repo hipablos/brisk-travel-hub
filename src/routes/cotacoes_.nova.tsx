@@ -98,6 +98,9 @@ function NovaCotacao() {
   const [vendaVendas, setVendaVendas] = useState<VendaLinha[]>([]);
   const [vendaObservacoes, setVendaObservacoes] = useState("");
   const [dataVenda, setDataVenda] = useState("");
+  const [valorComparacao, setValorComparacao] = useState<string>("");
+  const [instrucoesPagamento, setInstrucoesPagamento] = useState("");
+  const [linkPagamento, setLinkPagamento] = useState("");
 
   // Load existing cotacao when editing
   useEffect(() => {
@@ -135,6 +138,9 @@ function NovaCotacao() {
       setVendaVendas(c.vendaVendas ?? []);
       setVendaObservacoes(c.vendaObservacoes ?? "");
       setDataVenda(c.dataVenda ?? "");
+      setValorComparacao(c.valorComparacao ? String(c.valorComparacao) : "");
+      setInstrucoesPagamento(c.instrucoesPagamento ?? "");
+      setLinkPagamento(c.linkPagamento ?? "");
       if (c.vooIda) setVooIda(c.vooIda as Voo);
       setVooVolta((c.vooVolta as Voo) ?? null);
     });
@@ -225,6 +231,9 @@ function NovaCotacao() {
       vendaVendas,
       vendaObservacoes,
       dataVenda,
+      valorComparacao: parseFloat(valorComparacao.replace(",", ".")) || undefined,
+      instrucoesPagamento: instrucoesPagamento || undefined,
+      linkPagamento: linkPagamento || undefined,
     };
     const saved = await saveCotacao(cotacao);
     if (!saved) {
@@ -540,7 +549,89 @@ function NovaCotacao() {
                       </div>
                     </div>
                   </section>
+
+                  <section className="bg-card border border-border/50 rounded-xl p-6 space-y-6">
+                    <div>
+                      <Label>Valor de Comparação</Label>
+                      <div className="flex items-center gap-2 mt-1.5 max-w-xs">
+                        <span className="px-3 h-9 flex items-center rounded-md border border-border/40 bg-muted text-sm text-muted-foreground">R$</span>
+                        <Input
+                          placeholder="0,00"
+                          value={valorComparacao}
+                          onChange={(e) => setValorComparacao(e.target.value)}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Valor "de" para mostrar economia ao cliente no PDF.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-2">Forma(s) de Pagamento</h3>
+                      {formasPagamento.length === 0 ? (
+                        <div className="text-xs text-muted-foreground border border-dashed border-border rounded-md p-3">
+                          Nenhuma forma cadastrada.{" "}
+                          <Link to="/formas-pagamento" className="text-primary underline">Cadastrar</Link>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          {formasPagamento.filter((f) => f.ativo).map((f) => {
+                            const checked = formasPagamentoIds.includes(f.id);
+                            const calc = computeFormaTotal(totalVendas || total, f);
+                            return (
+                              <label
+                                key={f.id}
+                                className="flex items-start gap-2 py-1 cursor-pointer text-sm"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={(e) =>
+                                    setFormasPagamentoIds((ids) =>
+                                      e.target.checked ? [...ids, f.id] : ids.filter((x) => x !== f.id)
+                                    )
+                                  }
+                                  className="mt-1"
+                                />
+                                <div className="flex-1">
+                                  <span className="text-foreground">{f.nome}</span>
+                                  <span className="text-muted-foreground ml-2 text-xs">
+                                    {f.parcelas > 1
+                                      ? `${f.parcelas}x de R$ ${formatBRL(calc.valorParcela)} (Total R$ ${formatBRL(calc.final)})`
+                                      : `R$ ${formatBRL(calc.final)}`}
+                                    {f.desconto > 0 && <span className="text-emerald-600"> · -{f.desconto}%</span>}
+                                    {f.acrescimo > 0 && <span className="text-rose-600"> · +{f.acrescimo}%</span>}
+                                  </span>
+                                </div>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label>Instruções para Pagamento</Label>
+                      <Textarea
+                        className="mt-1.5"
+                        rows={3}
+                        value={instrucoesPagamento}
+                        onChange={(e) => setInstrucoesPagamento(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Link para Pagamento</Label>
+                      <Input
+                        className="mt-1.5"
+                        placeholder="Adicione o link de pagamento para exibição no orçamento"
+                        value={linkPagamento}
+                        onChange={(e) => setLinkPagamento(e.target.value)}
+                      />
+                    </div>
+                  </section>
                 </TabsContent>
+
 
                 <TabsContent value="venda" className="space-y-6 mt-0">
                   <section className="bg-card border border-border/50 rounded-xl p-6">
@@ -703,50 +794,13 @@ function NovaCotacao() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5 mb-4">
-                  <Label>Formas de Pagamento</Label>
-                  {formasPagamento.length === 0 ? (
-                    <div className="text-xs text-muted-foreground border border-dashed border-border rounded-md p-3">
-                      Nenhuma forma cadastrada.{" "}
-                      <Link to="/formas-pagamento" className="text-primary underline">Cadastrar</Link>
-                    </div>
-                  ) : (
-                    <div className="space-y-1.5 max-h-64 overflow-y-auto border border-border/50 rounded-md p-2">
-                      {formasPagamento.filter((f) => f.ativo).map((f) => {
-                        const checked = formasPagamentoIds.includes(f.id);
-                        const calc = computeFormaTotal(total, f);
-                        return (
-                          <label
-                            key={f.id}
-                            className={cn(
-                              "flex items-start gap-2 p-2 rounded cursor-pointer text-xs transition-colors",
-                              checked ? "bg-secondary/10" : "hover:bg-muted/50"
-                            )}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={(e) =>
-                                setFormasPagamentoIds((ids) =>
-                                  e.target.checked ? [...ids, f.id] : ids.filter((x) => x !== f.id)
-                                )
-                              }
-                              className="mt-0.5"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="font-medium text-foreground">{f.nome}</div>
-                              <div className="text-muted-foreground">
-                                {f.parcelas > 1 ? `${f.parcelas}x de R$ ${formatBRL(calc.valorParcela)}` : `R$ ${formatBRL(calc.final)}`}
-                                {f.desconto > 0 && <span className="text-emerald-600"> · -{f.desconto}%</span>}
-                                {f.acrescimo > 0 && <span className="text-rose-600"> · +{f.acrescimo}%</span>}
-                              </div>
-                            </div>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                {formasPagamentoIds.length > 0 && (
+                  <div className="mb-4 text-xs text-muted-foreground">
+                    {formasPagamentoIds.length} forma{formasPagamentoIds.length > 1 ? "s" : ""} de pagamento selecionada{formasPagamentoIds.length > 1 ? "s" : ""} (aba Valores)
+                  </div>
+                )}
+
+
 
                 <div className="border-t border-border/50 pt-4 space-y-2">
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
