@@ -7,6 +7,7 @@ import { ArrowLeft, Printer, Download, Plane, Briefcase, Luggage } from "lucide-
 import { BriskLogo } from "@/components/BriskLogo";
 import { getCotacao, type Cotacao } from "@/lib/cotacoes-store";
 import { getAirlineBrand } from "@/lib/airlines";
+import { AirlineLogo } from "@/components/AirlineLogo";
 
 export const Route = createFileRoute("/reserva_/$id")({
   component: ReservaPage,
