@@ -126,10 +126,12 @@ function ReservaPage() {
               {/* Passageiros */}
               <section className="pt-2">
                 <h3 className="text-base font-bold text-slate-900 mb-3">Passageiros: {totalPax}</h3>
-                <PaxBlock nome={cotacao.cliente?.nome || "—"} idaVoo={vooIda} voltaVoo={vooVolta} />
-                {Array.from({ length: Math.max(0, totalPax - 1) }).map((_, i) => (
-                  <PaxBlock key={i} nome={`Passageiro ${i + 2}`} idaVoo={vooIda} voltaVoo={vooVolta} />
-                ))}
+                {Array.from({ length: totalPax }).map((_, i) => {
+                  const nome = (cotacao as any).passageirosNomes?.[i]
+                    || (i === 0 ? cotacao.cliente?.nome : `Passageiro ${i + 1}`)
+                    || `Passageiro ${i + 1}`;
+                  return <PaxBlock key={i} nome={nome} idaVoo={vooIda} voltaVoo={vooVolta} />;
+                })}
                 <p className="text-xs text-slate-500 mt-3">
                   *Além da bagagem especificada acima, cada passageiro pode levar consigo uma bolsa, mochila ou sacola (considerado item pessoal).
                 </p>
