@@ -280,8 +280,8 @@ function FlightCard({ voo, cotacaoId }: { voo: VooItem; cotacaoId: string }) {
               <SelectItem value="off">Não notificar</SelectItem>
             </SelectContent>
           </Select>
-          <Button asChild variant="ghost" size="icon" title="Visualizar orçamento (PDF)">
-            <Link to="/cotacoes_/$id" params={{ id: cotacaoId }}>
+          <Button asChild variant="ghost" size="icon" title="Visualizar reserva (PDF)">
+            <Link to="/reserva_/$id" params={{ id: cotacaoId }}>
               <FileText className="size-4" />
             </Link>
           </Button>

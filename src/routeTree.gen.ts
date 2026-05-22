@@ -16,6 +16,7 @@ import { Route as FormasPagamentoRouteImport } from './routes/formas-pagamento'
 import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReservaIdRouteImport } from './routes/reserva_.$id'
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
@@ -55,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReservaIdRoute = ReservaIdRouteImport.update({
+  id: '/reserva_/$id',
+  path: '/reserva/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CotacoesNovaRoute = CotacoesNovaRouteImport.update({
   id: '/cotacoes_/nova',
   path: '/cotacoes/nova',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
+  '/reserva/$id': typeof ReservaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
+  '/reserva/$id': typeof ReservaIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/clientes_/novo': typeof ClientesNovoRoute
   '/cotacoes_/$id': typeof CotacoesIdRoute
   '/cotacoes_/nova': typeof CotacoesNovaRoute
+  '/reserva_/$id': typeof ReservaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/clientes/novo'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
+    | '/reserva/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/clientes/novo'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
+    | '/reserva/$id'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/clientes_/novo'
     | '/cotacoes_/$id'
     | '/cotacoes_/nova'
+    | '/reserva_/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +170,7 @@ export interface RootRouteChildren {
   ClientesNovoRoute: typeof ClientesNovoRoute
   CotacoesIdRoute: typeof CotacoesIdRoute
   CotacoesNovaRoute: typeof CotacoesNovaRoute
+  ReservaIdRoute: typeof ReservaIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reserva_/$id': {
+      id: '/reserva_/$id'
+      path: '/reserva/$id'
+      fullPath: '/reserva/$id'
+      preLoaderRoute: typeof ReservaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cotacoes_/nova': {
       id: '/cotacoes_/nova'
       path: '/cotacoes/nova'
@@ -246,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesNovoRoute: ClientesNovoRoute,
   CotacoesIdRoute: CotacoesIdRoute,
   CotacoesNovaRoute: CotacoesNovaRoute,
+  ReservaIdRoute: ReservaIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
