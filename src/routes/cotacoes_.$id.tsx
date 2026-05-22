@@ -8,7 +8,7 @@ import {
   Phone, Mail, Instagram, FileText, Clock, ArrowRight,
   ShoppingBag, Briefcase, Luggage, UtensilsCrossed, Armchair, BellRing, PlaneTakeoff, PlaneLanding,
 } from "lucide-react";
-import { getCotacao, formatBRL, STATUS_LABELS, type Cotacao } from "@/lib/cotacoes-store";
+import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 
 export const Route = createFileRoute("/cotacoes_/$id")({
   component: VisualizarCotacao,
