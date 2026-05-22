@@ -65,6 +65,7 @@ function VisualizarCotacao() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [cotacao, setCotacao] = useState<Cotacao | undefined>();
+  const formasPagamento = useFormasPagamento();
 
   useEffect(() => {
     getCotacao(id).then((c) => {
