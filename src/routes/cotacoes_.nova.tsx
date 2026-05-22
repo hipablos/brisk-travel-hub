@@ -118,6 +118,7 @@ function NovaCotacao() {
       setStatus(c.status);
       setValidade(c.validade ?? "");
       setPagamento(c.pagamento ?? "");
+      setFormasPagamentoIds(c.formasPagamentoIds ?? []);
       setServices(
         c.servicos.length
           ? c.servicos.map((s) => ({
