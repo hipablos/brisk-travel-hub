@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table";
 import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
+  useFormasPagamento, computeFormaTotal,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
