@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { BriskLogo } from "@/components/BriskLogo";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 type Item = { icon: React.ComponentType<{ className?: string }>; label: string; badge?: string; href?: string };
@@ -77,15 +78,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <div className="px-6 py-6 border-b border-sidebar-border flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="size-9 rounded-lg bg-gradient-to-br from-secondary to-secondary/70 grid place-items-center">
-            <Plane className="size-5 text-primary" />
-          </div>
-          <div>
-            <div className="font-bold text-sidebar-foreground tracking-tight">Brisk</div>
-            <div className="text-[10px] text-muted-foreground -mt-0.5 tracking-widest">VIAGENS</div>
-          </div>
-        </div>
+        <BriskLogo variant="white" className="h-10 w-auto" />
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">

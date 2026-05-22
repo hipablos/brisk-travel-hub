@@ -1,3 +1,4 @@
+import { BriskLogo } from "@/components/BriskLogo";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Plane, Mail, Lock, User as UserIcon, Loader2 } from "lucide-react";
@@ -135,13 +136,7 @@ function LoginPage() {
       <div className="hidden lg:flex flex-col justify-between w-1/2 p-12 relative overflow-hidden"
         style={{ background: "var(--gradient-brand)" }}>
         <div className="relative z-10 flex items-center gap-3">
-          <div className="size-11 rounded-xl bg-secondary grid place-items-center">
-            <Plane className="size-6 text-primary" />
-          </div>
-          <div>
-            <div className="text-xl font-bold text-primary-foreground">Brisk</div>
-            <div className="text-xs tracking-[0.3em] text-secondary -mt-1">VIAGENS</div>
-          </div>
+          <BriskLogo variant="white" className="h-14 w-auto" />
         </div>
         <div className="relative z-10 space-y-4">
           <h1 className="text-4xl font-bold text-primary-foreground leading-tight">
@@ -163,13 +158,7 @@ function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="size-10 rounded-lg bg-secondary grid place-items-center">
-              <Plane className="size-5 text-primary" />
-            </div>
-            <div>
-              <div className="font-bold">Brisk</div>
-              <div className="text-[10px] tracking-widest text-muted-foreground -mt-0.5">VIAGENS</div>
-            </div>
+            <BriskLogo variant="color" className="h-10 w-auto" />
           </div>
 
           {forgotOpen ? (

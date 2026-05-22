@@ -1,3 +1,4 @@
+import { BriskLogo } from "@/components/BriskLogo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Lock, Loader2, Plane } from "lucide-react";
@@ -32,14 +33,9 @@ function ResetPasswordPage() {
   return (
     <div className="min-h-screen grid place-items-center bg-background p-6">
       <div className="w-full max-w-md space-y-6">
-        <div className="flex items-center gap-2">
-          <div className="size-10 rounded-lg bg-secondary grid place-items-center">
-            <Plane className="size-5 text-primary" />
-          </div>
-          <div>
-            <div className="font-bold">Brisk Viagens</div>
-            <div className="text-xs text-muted-foreground">Redefinir senha</div>
-          </div>
+        <div className="flex items-center gap-3">
+          <BriskLogo variant="color" className="h-10 w-auto" />
+          <div className="text-xs text-muted-foreground">Redefinir senha</div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
