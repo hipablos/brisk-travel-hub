@@ -17,6 +17,7 @@ import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReservaIdRouteImport } from './routes/reserva_.$id'
+import { Route as ReservaEditarIdRouteImport } from './routes/reserva-editar_.$id'
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
@@ -61,6 +62,11 @@ const ReservaIdRoute = ReservaIdRouteImport.update({
   path: '/reserva/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReservaEditarIdRoute = ReservaEditarIdRouteImport.update({
+  id: '/reserva-editar_/$id',
+  path: '/reserva-editar/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CotacoesNovaRoute = CotacoesNovaRouteImport.update({
   id: '/cotacoes_/nova',
   path: '/cotacoes/nova',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
+  '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
+  '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
 }
 export interface FileRoutesById {
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/clientes_/novo': typeof ClientesNovoRoute
   '/cotacoes_/$id': typeof CotacoesIdRoute
   '/cotacoes_/nova': typeof CotacoesNovaRoute
+  '/reserva-editar_/$id': typeof ReservaEditarIdRoute
   '/reserva_/$id': typeof ReservaIdRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/clientes/novo'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
+    | '/reserva-editar/$id'
     | '/reserva/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/clientes/novo'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
+    | '/reserva-editar/$id'
     | '/reserva/$id'
   id:
     | '__root__'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/clientes_/novo'
     | '/cotacoes_/$id'
     | '/cotacoes_/nova'
+    | '/reserva-editar_/$id'
     | '/reserva_/$id'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +182,7 @@ export interface RootRouteChildren {
   ClientesNovoRoute: typeof ClientesNovoRoute
   CotacoesIdRoute: typeof CotacoesIdRoute
   CotacoesNovaRoute: typeof CotacoesNovaRoute
+  ReservaEditarIdRoute: typeof ReservaEditarIdRoute
   ReservaIdRoute: typeof ReservaIdRoute
 }
 
@@ -231,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReservaIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reserva-editar_/$id': {
+      id: '/reserva-editar_/$id'
+      path: '/reserva-editar/$id'
+      fullPath: '/reserva-editar/$id'
+      preLoaderRoute: typeof ReservaEditarIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cotacoes_/nova': {
       id: '/cotacoes_/nova'
       path: '/cotacoes/nova'
@@ -266,8 +286,19 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesNovoRoute: ClientesNovoRoute,
   CotacoesIdRoute: CotacoesIdRoute,
   CotacoesNovaRoute: CotacoesNovaRoute,
+  ReservaEditarIdRoute: ReservaEditarIdRoute,
   ReservaIdRoute: ReservaIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
