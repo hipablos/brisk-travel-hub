@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Save, Plane } from "lucide-react";
 import { getCotacao, saveCotacao, type Cotacao } from "@/lib/cotacoes-store";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/reserva-editar_/$id")({
   component: ReservaEditarPage,
