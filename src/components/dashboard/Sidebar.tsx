@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { BriskLogo } from "@/components/BriskLogo";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 type Item = { icon: React.ComponentType<{ className?: string }>; label: string; badge?: string; href?: string };

@@ -111,13 +111,7 @@ function VisualizarCotacao() {
             {/* Header */}
             <div className="px-8 pt-6 pb-5 border-b border-slate-200 flex items-start justify-between gap-6">
               <div className="flex items-center gap-3">
-                <div className="size-14 rounded-xl bg-[oklch(0.22_0.08_255)] text-white grid place-items-center">
-                  <Plane className="size-7 -rotate-45 text-yellow-400" />
-                </div>
-                <div>
-                  <div className="text-2xl font-extrabold tracking-tight text-[oklch(0.22_0.08_255)] leading-none">brisk</div>
-                  <div className="text-xs font-semibold tracking-[0.2em] text-slate-500 mt-0.5">VIAGENS</div>
-                </div>
+                <BriskLogo variant="color" className="h-14 w-auto" />
               </div>
               <div className="text-center flex-1">
                 <h2 className="text-xl font-bold text-[oklch(0.22_0.08_255)] uppercase tracking-wide">Orçamento de Viagem</h2>
