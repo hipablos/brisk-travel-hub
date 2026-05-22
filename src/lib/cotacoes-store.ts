@@ -90,6 +90,9 @@ export type Cotacao = {
   vooIda?: any;
   vooVolta?: any;
   formasPagamentoIds?: string[];
+  valorComparacao?: number;
+  instrucoesPagamento?: string;
+  linkPagamento?: string;
 };
 
 export type FormaPagamento = {
