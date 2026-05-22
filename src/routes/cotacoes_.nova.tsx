@@ -77,6 +77,7 @@ function NovaCotacao() {
   const [criancas, setCriancas] = useState(0);
   const [observacoes, setObservacoes] = useState("");
   const [status, setStatus] = useState<CotacaoStatus>("aguardando");
+  const [validade, setValidade] = useState("");
   const [pagamento, setPagamento] = useState("");
   const [formasPagamentoIds, setFormasPagamentoIds] = useState<string[]>([]);
   const formasPagamento = useFormasPagamento();
