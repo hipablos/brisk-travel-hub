@@ -98,6 +98,9 @@ function NovaCotacao() {
   const [vendaVendas, setVendaVendas] = useState<VendaLinha[]>([]);
   const [vendaObservacoes, setVendaObservacoes] = useState("");
   const [dataVenda, setDataVenda] = useState("");
+  const [valorComparacao, setValorComparacao] = useState<string>("");
+  const [instrucoesPagamento, setInstrucoesPagamento] = useState("");
+  const [linkPagamento, setLinkPagamento] = useState("");
 
   // Load existing cotacao when editing
   useEffect(() => {
