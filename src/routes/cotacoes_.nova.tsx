@@ -217,6 +217,7 @@ function NovaCotacao() {
       observacoes,
       validade,
       pagamento,
+      formasPagamentoIds,
       total,
       valoresCusto,
       valoresVenda,
