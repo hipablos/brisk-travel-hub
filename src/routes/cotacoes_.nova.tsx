@@ -138,6 +138,9 @@ function NovaCotacao() {
       setVendaVendas(c.vendaVendas ?? []);
       setVendaObservacoes(c.vendaObservacoes ?? "");
       setDataVenda(c.dataVenda ?? "");
+      setValorComparacao(c.valorComparacao ? String(c.valorComparacao) : "");
+      setInstrucoesPagamento(c.instrucoesPagamento ?? "");
+      setLinkPagamento(c.linkPagamento ?? "");
       if (c.vooIda) setVooIda(c.vooIda as Voo);
       setVooVolta((c.vooVolta as Voo) ?? null);
     });
