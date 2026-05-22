@@ -285,8 +285,8 @@ function FlightCard({ voo, cotacaoId }: { voo: VooItem; cotacaoId: string }) {
               <FileText className="size-4" />
             </Link>
           </Button>
-          <Button asChild variant="ghost" size="icon" title="Editar cotação">
-            <Link to="/cotacoes_/$id" params={{ id: cotacaoId }}>
+          <Button asChild variant="ghost" size="icon" title="Editar reserva">
+            <Link to="/reserva-editar/$id" params={{ id: cotacaoId }}>
               <Pencil className="size-4" />
             </Link>
           </Button>
