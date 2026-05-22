@@ -4,7 +4,7 @@ import {
   LayoutDashboard, FileText, Calendar, CheckSquare, Plane, Hotel, Car,
   MapPin, Ship, Shield, ShoppingCart, Wallet, ArrowDownCircle, ArrowUpCircle,
   ArrowLeftRight, GitMerge, BarChart3, TrendingUp, Coins, FolderClosed,
-  FileBarChart, Users, ChevronDown, LogOut, X,
+  FileBarChart, Users, CreditCard, ChevronDown, LogOut, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -50,7 +50,10 @@ const groups: Group[] = [
   },
   { title: "Documentos", items: [{ icon: FolderClosed, label: "Arquivos" }] },
   { title: "Relatórios", items: [{ icon: FileBarChart, label: "Geral" }] },
-  { title: "Cadastros", items: [{ icon: Users, label: "Clientes", href: "/clientes" }] },
+  { title: "Cadastros", items: [
+    { icon: Users, label: "Clientes", href: "/clientes" },
+    { icon: CreditCard, label: "Formas de Pagamento", href: "/formas-pagamento" },
+  ] },
 ];
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {

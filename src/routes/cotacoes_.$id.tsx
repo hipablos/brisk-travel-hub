@@ -8,7 +8,7 @@ import {
   Phone, Mail, Instagram, FileText, Clock, ArrowRight,
   ShoppingBag, Briefcase, Luggage, UtensilsCrossed, Armchair, BellRing, PlaneTakeoff, PlaneLanding,
 } from "lucide-react";
-import { getCotacao, formatBRL, STATUS_LABELS, type Cotacao } from "@/lib/cotacoes-store";
+import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 
 export const Route = createFileRoute("/cotacoes_/$id")({
   component: VisualizarCotacao,
@@ -65,6 +65,7 @@ function VisualizarCotacao() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [cotacao, setCotacao] = useState<Cotacao | undefined>();
+  const formasPagamento = useFormasPagamento();
 
   useEffect(() => {
     getCotacao(id).then((c) => {
@@ -209,6 +210,68 @@ function VisualizarCotacao() {
                 </div>
                 <div className="text-3xl font-extrabold text-[oklch(0.22_0.08_255)]">R$ {formatBRL(cotacao.total)}</div>
               </section>
+
+              {/* Formas de Pagamento */}
+              {(() => {
+                const ids = cotacao.formasPagamentoIds ?? [];
+                const selected = formasPagamento.filter((f) => ids.includes(f.id));
+                if (selected.length === 0) return null;
+                return (
+                  <section className="border-t border-slate-200 pt-5">
+                    <h3 className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold mb-3">
+                      Formas de Pagamento Disponíveis
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {selected.map((f) => {
+                        const calc = computeFormaTotal(cotacao.total, f);
+                        return (
+                          <div key={f.id} className="border border-slate-200 rounded-lg p-4 bg-slate-50/50">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="font-bold text-slate-900">{f.nome}</div>
+                              {f.desconto > 0 && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                                  {f.desconto}% OFF
+                                </span>
+                              )}
+                              {f.acrescimo > 0 && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
+                                  +{f.acrescimo}%
+                                </span>
+                              )}
+                            </div>
+                            {f.parcelas > 1 ? (
+                              <>
+                                <div className="text-xs text-slate-500">Em até {f.parcelas}x de</div>
+                                <div className="text-xl font-extrabold text-[oklch(0.22_0.08_255)]">
+                                  R$ {formatBRL(calc.valorParcela)}
+                                </div>
+                                <div className="text-xs text-slate-500 mt-0.5">
+                                  Total: R$ {formatBRL(calc.final)}
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="text-xs text-slate-500">À vista</div>
+                                <div className="text-xl font-extrabold text-[oklch(0.22_0.08_255)]">
+                                  R$ {formatBRL(calc.final)}
+                                </div>
+                                {f.desconto > 0 && (
+                                  <div className="text-xs text-emerald-600 mt-0.5">
+                                    Você economiza R$ {formatBRL(calc.desconto)}
+                                  </div>
+                                )}
+                              </>
+                            )}
+                            {f.observacao && (
+                              <div className="text-xs text-slate-500 mt-2 italic">{f.observacao}</div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
+              })()}
 
               {cotacao.observacoes && (
                 <section className="border-t border-slate-200 pt-5">

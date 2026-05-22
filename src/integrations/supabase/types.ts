@@ -71,6 +71,48 @@ export type Database = {
         }
         Relationships: []
       }
+      formas_pagamento: {
+        Row: {
+          acrescimo: number
+          ativo: boolean
+          created_at: string
+          desconto: number
+          id: string
+          intervalo_dias: number
+          nome: string
+          observacao: string | null
+          parcelas: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          acrescimo?: number
+          ativo?: boolean
+          created_at?: string
+          desconto?: number
+          id?: string
+          intervalo_dias?: number
+          nome: string
+          observacao?: string | null
+          parcelas?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          acrescimo?: number
+          ativo?: boolean
+          created_at?: string
+          desconto?: number
+          id?: string
+          intervalo_dias?: number
+          nome?: string
+          observacao?: string | null
+          parcelas?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       labels_custom: {
         Row: {
           color: string

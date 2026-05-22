@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table";
 import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
+  useFormasPagamento, computeFormaTotal,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
@@ -78,6 +79,8 @@ function NovaCotacao() {
   const [status, setStatus] = useState<CotacaoStatus>("aguardando");
   const [validade, setValidade] = useState("");
   const [pagamento, setPagamento] = useState("");
+  const [formasPagamentoIds, setFormasPagamentoIds] = useState<string[]>([]);
+  const formasPagamento = useFormasPagamento();
 
   const [services, setServices] = useState<ServiceItem[]>([
     { id: "1", type: "voo", description: "", value: "" },
@@ -115,6 +118,7 @@ function NovaCotacao() {
       setStatus(c.status);
       setValidade(c.validade ?? "");
       setPagamento(c.pagamento ?? "");
+      setFormasPagamentoIds(c.formasPagamentoIds ?? []);
       setServices(
         c.servicos.length
           ? c.servicos.map((s) => ({
@@ -213,6 +217,7 @@ function NovaCotacao() {
       observacoes,
       validade,
       pagamento,
+      formasPagamentoIds,
       total,
       valoresCusto,
       valoresVenda,
@@ -699,16 +704,48 @@ function NovaCotacao() {
                 </div>
 
                 <div className="space-y-1.5 mb-4">
-                  <Label>Forma de Pagamento</Label>
-                  <Select value={pagamento} onValueChange={setPagamento}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PIX">PIX</SelectItem>
-                      <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-                      <SelectItem value="Boleto">Boleto</SelectItem>
-                      <SelectItem value="Transferência">Transferência</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label>Formas de Pagamento</Label>
+                  {formasPagamento.length === 0 ? (
+                    <div className="text-xs text-muted-foreground border border-dashed border-border rounded-md p-3">
+                      Nenhuma forma cadastrada.{" "}
+                      <Link to="/formas-pagamento" className="text-primary underline">Cadastrar</Link>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5 max-h-64 overflow-y-auto border border-border/50 rounded-md p-2">
+                      {formasPagamento.filter((f) => f.ativo).map((f) => {
+                        const checked = formasPagamentoIds.includes(f.id);
+                        const calc = computeFormaTotal(total, f);
+                        return (
+                          <label
+                            key={f.id}
+                            className={cn(
+                              "flex items-start gap-2 p-2 rounded cursor-pointer text-xs transition-colors",
+                              checked ? "bg-secondary/10" : "hover:bg-muted/50"
+                            )}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={(e) =>
+                                setFormasPagamentoIds((ids) =>
+                                  e.target.checked ? [...ids, f.id] : ids.filter((x) => x !== f.id)
+                                )
+                              }
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-foreground">{f.nome}</div>
+                              <div className="text-muted-foreground">
+                                {f.parcelas > 1 ? `${f.parcelas}x de R$ ${formatBRL(calc.valorParcela)}` : `R$ ${formatBRL(calc.final)}`}
+                                {f.desconto > 0 && <span className="text-emerald-600"> · -{f.desconto}%</span>}
+                                {f.acrescimo > 0 && <span className="text-rose-600"> · +{f.acrescimo}%</span>}
+                              </div>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-t border-border/50 pt-4 space-y-2">
