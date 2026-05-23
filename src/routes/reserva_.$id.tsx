@@ -19,6 +19,32 @@ export const Route = createFileRoute("/reserva_/$id")({
   }),
 });
 
+type Trecho = {
+  numeroVoo?: string;
+  horaSaida?: string;
+  horaChegada?: string;
+  origem?: string;
+  destino?: string;
+  data?: string;
+};
+
+function getTrechos(voo: any): Trecho[] {
+  if (!voo) return [];
+  if (Array.isArray(voo.trechos) && voo.trechos.length > 0) return voo.trechos as Trecho[];
+  // Fallback legacy: derive single segment from top-level fields
+  if (voo.origem || voo.destino || voo.horaSaida || voo.horaChegada || voo.numeroVoo) {
+    return [{
+      numeroVoo: voo.numeroVoo,
+      horaSaida: voo.horaSaida,
+      horaChegada: voo.horaChegada,
+      origem: voo.origem,
+      destino: voo.destino,
+      data: voo.data,
+    }];
+  }
+  return [];
+}
+
 function fmtLongDate(s?: string) {
   if (!s) return "—";
   const d = new Date(s);
@@ -34,14 +60,10 @@ function fmtShortDate(s?: string) {
 }
 function splitAirport(s?: string) {
   if (!s) return { city: "—", iata: "", name: "" };
-  // "São Paulo (GRU) — Guarulhos Intl, Brasil"
   const m = s.match(/^(.*?)\(([A-Z]{3})\)\s*[—\-·]?\s*(.*)$/);
   if (m) return { city: m[1].trim(), iata: m[2].trim(), name: m[3].split(",")[0].trim() };
   return { city: s, iata: "", name: "" };
 }
-
-
-
 
 function ReservaPage() {
   const { id } = Route.useParams();
@@ -59,11 +81,12 @@ function ReservaPage() {
 
   const vooIda = cotacao.vooIda as any;
   const vooVolta = cotacao.vooVolta as any;
-  // Use main airline brand for header (prefer ida)
   const headerBrand = getAirlineBrand(vooIda?.companhia) ?? getAirlineBrand(vooVolta?.companhia);
   const headerLocalizador = vooIda?.localizador || vooVolta?.localizador || `BRK-${cotacao.code.toUpperCase()}`;
 
   const totalPax = (cotacao.adultos ?? 0) + (cotacao.criancas ?? 0);
+  const trechosIda = getTrechos(vooIda);
+  const trechosVolta = getTrechos(vooVolta);
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -94,13 +117,23 @@ function ReservaPage() {
 
           {/* Documento */}
           <div id="reserva-doc" className="bg-white text-slate-800 rounded-xl shadow-lg overflow-hidden print:shadow-none print:rounded-none border border-slate-200">
+            {/* Cabeçalho da agência (antigo rodapé) */}
+            <div className="px-8 py-4 border-b border-slate-200 flex items-center justify-between gap-6 print-bg">
+              <BriskLogo variant="blue" className="h-8 w-auto" />
+              <div className="text-right text-[11px] text-slate-700 leading-relaxed">
+                <div>CNPJ 64.827.486/0001-19</div>
+                <div>(85) 99647-7568 · briskviagens@gmail.com</div>
+                <div>@briskviagens</div>
+              </div>
+            </div>
+
             {/* Header — airline logo + localizador + link reserva */}
             <div className="px-8 pt-6 pb-5 flex items-center justify-between gap-6 border-b border-slate-200">
-              <AirlineLogo companhia={vooIda?.companhia ?? vooVolta?.companhia} />
+              <AirlineLogo companhia={vooIda?.companhia ?? vooVolta?.companhia} className="h-20 w-auto" />
               <div className="flex items-center gap-4">
                 <div className="text-center">
                   <div className="text-xs font-semibold text-slate-700">Localizador</div>
-                  <div className="mt-1 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded text-[oklch(0.22_0.08_255)] font-bold tracking-wider">
+                  <div className="mt-1 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded text-[oklch(0.22_0.08_255)] font-bold tracking-wider print-bg">
                     {headerLocalizador}
                   </div>
                 </div>
@@ -109,7 +142,7 @@ function ReservaPage() {
                     href={headerBrand.bookingUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-5 py-2.5 rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-sm font-semibold transition-colors"
+                    className="px-5 py-2.5 rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-sm font-semibold transition-colors print-bg"
                   >
                     Visualizar reserva
                   </a>
@@ -120,8 +153,12 @@ function ReservaPage() {
             <div className="px-8 py-6 space-y-6">
               <h2 className="text-base font-bold text-slate-900">Informações do voo</h2>
 
-              {vooIda && <ItinerarioBlock direction="ida" voo={vooIda} />}
-              {vooVolta && <ItinerarioBlock direction="volta" voo={vooVolta} />}
+              {trechosIda.length > 0 && (
+                <ItinerarioBlock direction="ida" trechos={trechosIda} data={vooIda?.data ?? trechosIda[0]?.data} />
+              )}
+              {trechosVolta.length > 0 && (
+                <ItinerarioBlock direction="volta" trechos={trechosVolta} data={vooVolta?.data ?? trechosVolta[0]?.data} />
+              )}
 
               {/* Passageiros */}
               <section className="pt-2">
@@ -137,83 +174,80 @@ function ReservaPage() {
                 </p>
               </section>
             </div>
-
-            {/* Footer — Brisk azul à esquerda + dados de contato à direita */}
-            <div className="px-8 py-5 border-t border-slate-200 flex items-end justify-between gap-6">
-              <BriskLogo variant="blue" className="h-7 w-auto opacity-90" />
-              <div className="text-right text-[11px] text-slate-700 leading-relaxed">
-                <div>64.827.486/0001-19</div>
-                <div>(85) 99647-7568</div>
-                <div>briskviagens@gmail.com</div>
-                <div>briskviagens</div>
-              </div>
-            </div>
           </div>
         </main>
       </div>
 
       <style>{`
+        .print-bg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         @media print {
           body { background: white; }
           @page { margin: 1cm; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
       `}</style>
     </div>
   );
 }
 
-function ItinerarioBlock({ direction, voo }: { direction: "ida" | "volta"; voo: any }) {
+function ItinerarioBlock({ direction, trechos, data }: { direction: "ida" | "volta"; trechos: Trecho[]; data?: string }) {
   const isIda = direction === "ida";
-  const origem = splitAirport(voo?.origem);
-  const destino = splitAirport(voo?.destino);
-
   return (
     <section>
       {/* Header bar */}
-      <div className="bg-[oklch(0.18_0.08_255)] text-white rounded-t flex items-center justify-between px-4 py-2.5">
+      <div className="bg-[oklch(0.18_0.08_255)] text-white rounded-t flex items-center justify-between px-4 py-2.5 print-bg">
         <div className="flex items-center gap-2 font-semibold text-sm">
           <Plane className="size-4" />
           Itinerário de {isIda ? "IDA" : "VOLTA"}
         </div>
-        <div className="text-sm font-semibold">{fmtLongDate(voo?.data)}</div>
-        <div className="text-sm font-semibold">1 Trecho</div>
+        <div className="text-sm font-semibold">{fmtLongDate(data)}</div>
+        <div className="text-sm font-semibold">{trechos.length} {trechos.length === 1 ? "Trecho" : "Trechos"}</div>
       </div>
 
-      {/* Segment row */}
-      <div className="bg-slate-50 border border-t-0 border-slate-200 rounded-b px-4 py-4 grid grid-cols-12 items-center gap-3">
-        <div className="col-span-2">
-          <div className="text-2xl font-bold text-slate-900 leading-none">{voo?.horaSaida || "—"}</div>
-          <div className="text-xs text-slate-500 mt-1">{fmtShortDate(voo?.data)}</div>
-        </div>
-        <div className="col-span-3 text-sm text-slate-700">
-          <div>{origem.name ? `Aer. ${origem.name}` : "Aeroporto"}</div>
-          <div className="text-slate-500">{origem.city}</div>
-        </div>
-        <div className="col-span-2 flex flex-col items-center justify-center">
-          <div className="flex items-center gap-2 text-2xl font-extrabold text-slate-900">
-            <span>{origem.iata}</span>
-            <Plane className="size-5 text-slate-700" />
-            <span>{destino.iata}</span>
-          </div>
-          <div className="text-xs text-slate-500 mt-0.5">{voo?.numeroVoo || ""}</div>
-        </div>
-        <div className="col-span-3 text-sm text-slate-700 text-right">
-          <div>{destino.name ? `Aer. ${destino.name}` : "Aeroporto"}</div>
-          <div className="text-slate-500">{destino.city}</div>
-        </div>
-        <div className="col-span-2 text-right">
-          <div className="text-2xl font-bold text-slate-900 leading-none">{voo?.horaChegada || "—"}</div>
-          <div className="text-xs text-slate-500 mt-1">{fmtShortDate(voo?.data)}</div>
-        </div>
+      <div className="space-y-2 mt-2">
+        {trechos.map((t, i) => <TrechoRow key={i} t={t} />)}
       </div>
     </section>
+  );
+}
+
+function TrechoRow({ t }: { t: Trecho }) {
+  const origem = splitAirport(t.origem);
+  const destino = splitAirport(t.destino);
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded px-4 py-4 grid grid-cols-12 items-center gap-3 print-bg">
+      <div className="col-span-2">
+        <div className="text-2xl font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.horaSaida || "—"}</div>
+        <div className="text-xs text-slate-500 mt-1">{fmtShortDate(t.data)}</div>
+      </div>
+      <div className="col-span-3 text-sm text-slate-700">
+        <div>{origem.name ? `Aer. ${origem.name}` : "Aeroporto"}</div>
+        <div className="text-slate-500">{origem.city}</div>
+      </div>
+      <div className="col-span-2 flex flex-col items-center justify-center">
+        <div className="flex items-center gap-2 text-xl font-extrabold text-[oklch(0.22_0.08_255)]">
+          <span>{origem.iata}</span>
+          <Plane className="size-5 text-slate-700" />
+          <span>{destino.iata}</span>
+        </div>
+        <div className="text-xs text-slate-500 mt-0.5">{t.numeroVoo || ""}</div>
+      </div>
+      <div className="col-span-3 text-sm text-slate-700 text-right">
+        <div>{destino.name ? `Aer. ${destino.name}` : "Aeroporto"}</div>
+        <div className="text-slate-500">{destino.city}</div>
+      </div>
+      <div className="col-span-2 text-right">
+        <div className="text-2xl font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.horaChegada || "—"}</div>
+        <div className="text-xs text-slate-500 mt-1">{fmtShortDate(t.data)}</div>
+      </div>
+    </div>
   );
 }
 
 function PaxBlock({ nome, idaVoo, voltaVoo }: { nome: string; idaVoo: any; voltaVoo: any }) {
   return (
     <div className="mb-4 border border-slate-200 rounded overflow-hidden">
-      <div className="bg-slate-50 px-4 py-2 flex items-center justify-between">
+      <div className="bg-slate-50 px-4 py-2 flex items-center justify-between print-bg">
         <div className="font-bold text-slate-900 uppercase text-sm">{nome}</div>
       </div>
       <div className="grid grid-cols-2 divide-x divide-slate-200">
