@@ -124,8 +124,8 @@ function VisualizarCotacao() {
               <div className="text-center flex-1">
                 <h2 className="text-base font-bold text-[oklch(0.22_0.08_255)] uppercase tracking-wide">Orçamento de Viagem</h2>
                 <div className="mt-0.5 text-[10px] text-slate-500">
-                  Cotação <span className="font-semibold text-slate-700">#{cotacao.code}</span> · Emitida em <span className="font-semibold text-slate-700">{fmtDate(cotacao.createdAt)}</span>
-                  {cotacao.validade && <> · Válida até <span className="font-semibold text-slate-700">{fmtDate(cotacao.validade)}</span></>}
+                  Emitido em <span className="font-semibold text-slate-700">{fmtDate(cotacao.createdAt)}</span>
+                  {cotacao.validade && <> · Válido até <span className="font-semibold text-slate-700">{fmtDate(cotacao.validade)}</span></>}
                 </div>
               </div>
               <div className="text-right text-[10px] text-slate-600 space-y-0 min-w-[180px]">
