@@ -326,16 +326,16 @@ function NovaCotacao() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label>Cliente *</Label>
-                    <Select value={clienteId} onValueChange={setClienteId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={clientes.length ? "Selecione o cliente" : "Nenhum cliente — cadastre acima"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {clientes.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <ClienteAutocomplete
+                      clientes={clientes}
+                      value={clientes.find((c) => c.id === clienteId)?.nome}
+                      onSelect={(c) => {
+                        setClienteId(c.id);
+                        if (c.email) setEmail(c.email);
+                        if (c.telefone) setTelefone(c.telefone);
+                      }}
+                      placeholder={clientes.length ? "Digite o nome do cliente..." : "Nenhum cliente — cadastre acima"}
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label>E-mail</Label>
@@ -470,9 +470,22 @@ function NovaCotacao() {
                 </div>
               </section>
 
-              <section className="bg-card border border-border/50 rounded-xl p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-3">Observações</h2>
-                <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Notas internas sobre a cotação..." rows={4} />
+              <section className="bg-card border border-border/50 rounded-xl p-6 space-y-5">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground mb-2">Termos e Condições</h2>
+                  <p className="text-xs text-muted-foreground mb-2">Aparece no PDF da cotação enviada ao cliente.</p>
+                  <Textarea value={termos} onChange={(e) => setTermos(e.target.value)} rows={5} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground mb-2">Outras Informações</h2>
+                  <p className="text-xs text-muted-foreground mb-2">Aparece no PDF da cotação enviada ao cliente.</p>
+                  <Textarea value={outrasInformacoes} onChange={(e) => setOutrasInformacoes(e.target.value)} rows={5} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground mb-2">Observações internas</h2>
+                  <p className="text-xs text-muted-foreground mb-2">Não aparece no PDF — uso interno.</p>
+                  <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Notas internas sobre a cotação..." rows={3} />
+                </div>
               </section>
                 </TabsContent>
 
@@ -842,6 +855,9 @@ function NovaCotacao() {
 
                 <Button type="submit" className="w-full mt-6 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
                   <Save className="size-4" /> Salvar Cotação
+                </Button>
+                <Button type="button" onClick={handleVisualizarPDF} variant="outline" className="w-full mt-2 gap-2">
+                  <Eye className="size-4" /> Visualizar PDF
                 </Button>
               </section>
             </aside>
