@@ -249,10 +249,17 @@ function VisualizarCotacao() {
               </section>
 
 
-              {cotacao.observacoes && (
+              {cotacao.termos && (
                 <section className="border-t border-slate-200 pt-5">
-                  <h3 className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold mb-2">Observações</h3>
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{cotacao.observacoes}</p>
+                  <h3 className="text-sm font-bold text-slate-900 mb-2">Termos e Condições</h3>
+                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{cotacao.termos}</p>
+                </section>
+              )}
+
+              {cotacao.outrasInformacoes && (
+                <section className="border-t border-slate-200 pt-5">
+                  <h3 className="text-sm font-bold text-slate-900 mb-2">Outras Informações</h3>
+                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{cotacao.outrasInformacoes}</p>
                 </section>
               )}
 
