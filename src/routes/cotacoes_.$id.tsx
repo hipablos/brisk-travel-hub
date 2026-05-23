@@ -117,60 +117,58 @@ function VisualizarCotacao() {
           </div>
 
           {/* Documento */}
-          <div id="cotacao-doc" className="bg-white text-slate-800 rounded-xl shadow-lg overflow-hidden print:shadow-none print:rounded-none border border-slate-200">
+          <div id="cotacao-doc" className="bg-white text-slate-800 rounded-xl shadow-lg overflow-hidden print:shadow-none print:rounded-none border border-slate-200 print:border-0">
             {/* Header */}
-            <div className="px-8 pt-6 pb-5 border-b border-slate-200 flex items-start justify-between gap-6">
-              <div className="flex items-center gap-3">
-                <BriskLogo variant="color" className="h-14 w-auto" />
-              </div>
+            <div className="px-6 pt-4 pb-3 border-b border-slate-200 flex items-center justify-between gap-4">
+              <BriskLogo variant="color" className="h-10 w-auto" />
               <div className="text-center flex-1">
-                <h2 className="text-xl font-bold text-[oklch(0.22_0.08_255)] uppercase tracking-wide">Orçamento de Viagem</h2>
-                <div className="mt-1 text-xs text-slate-500">
+                <h2 className="text-base font-bold text-[oklch(0.22_0.08_255)] uppercase tracking-wide">Orçamento de Viagem</h2>
+                <div className="mt-0.5 text-[10px] text-slate-500">
                   Cotação <span className="font-semibold text-slate-700">#{cotacao.code}</span> · Emitida em <span className="font-semibold text-slate-700">{fmtDate(cotacao.createdAt)}</span>
                   {cotacao.validade && <> · Válida até <span className="font-semibold text-slate-700">{fmtDate(cotacao.validade)}</span></>}
                 </div>
               </div>
-              <div className="text-right text-xs text-slate-600 space-y-0.5 min-w-[200px]">
-                <div className="font-bold text-slate-800 text-sm">BRISK VIAGENS</div>
-                <div className="flex items-center justify-end gap-1.5"><FileText className="size-3" /> 64.827.486/0001-19</div>
-                <div className="flex items-center justify-end gap-1.5"><Phone className="size-3" /> (85) 99647-7568</div>
-                <div className="flex items-center justify-end gap-1.5"><Mail className="size-3" /> briskviagens@gmail.com</div>
-                <div className="flex items-center justify-end gap-1.5"><Instagram className="size-3" /> briskviagens</div>
+              <div className="text-right text-[10px] text-slate-600 space-y-0 min-w-[180px]">
+                <div className="font-bold text-slate-800 text-xs">BRISK VIAGENS</div>
+                <div className="flex items-center justify-end gap-1"><FileText className="size-2.5" /> 64.827.486/0001-19</div>
+                <div className="flex items-center justify-end gap-1"><Phone className="size-2.5" /> (85) 99647-7568</div>
+                <div className="flex items-center justify-end gap-1"><Mail className="size-2.5" /> briskviagens@gmail.com</div>
+                <div className="flex items-center justify-end gap-1"><Instagram className="size-2.5" /> briskviagens</div>
               </div>
             </div>
 
-            <div className="px-8 py-6 space-y-6">
-              {/* Status badge */}
+            <div className="px-6 py-4 space-y-4">
+              {/* Cliente + Status */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">Cliente</h3>
-                  <div className="mt-1 text-base font-bold text-slate-900">{cotacao.cliente.nome}</div>
-                  <div className="text-xs text-slate-500 mt-0.5 space-x-3">
+                  <h3 className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Cliente</h3>
+                  <div className="mt-0.5 text-sm font-bold text-slate-900">{cotacao.cliente.nome}</div>
+                  <div className="text-[11px] text-slate-500 space-x-3">
                     {cotacao.cliente.email && <span>{cotacao.cliente.email}</span>}
                     {cotacao.cliente.telefone && <span>{cotacao.cliente.telefone}</span>}
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-yellow-400 text-slate-900 text-[10px] font-bold uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-full bg-yellow-400 text-slate-900 text-[9px] font-bold uppercase tracking-wider">
                   {STATUS_LABELS[cotacao.status]}
                 </span>
               </div>
 
               {/* Passageiros + dados gerais */}
-              <section className="grid grid-cols-3 gap-4 text-sm border-y border-slate-200 py-4">
+              <section className="grid grid-cols-3 gap-3 text-xs border-y border-slate-200 py-2.5">
                 <div>
-                  <div className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">Passageiros</div>
-                  <div className="mt-1 font-semibold text-slate-800">
+                  <div className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Passageiros</div>
+                  <div className="mt-0.5 font-semibold text-slate-800">
                     {cotacao.adultos} {cotacao.adultos === 1 ? "Adulto" : "Adultos"}
                     {cotacao.criancas > 0 && `, ${cotacao.criancas} ${cotacao.criancas === 1 ? "Criança" : "Crianças"}`}
                   </div>
                 </div>
                 <div>
-                  <div className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">Identificador</div>
-                  <div className="mt-1 font-semibold text-slate-800">{cotacao.tag || "—"}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Identificador</div>
+                  <div className="mt-0.5 font-semibold text-slate-800">{cotacao.tag || "—"}</div>
                 </div>
                 <div>
-                  <div className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">Pagamento</div>
-                  <div className="mt-1 font-semibold text-slate-800">{cotacao.pagamento || "A combinar"}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Pagamento</div>
+                  <div className="mt-0.5 font-semibold text-slate-800">{cotacao.pagamento || "A combinar"}</div>
                 </div>
               </section>
 
@@ -179,37 +177,35 @@ function VisualizarCotacao() {
               {vooVolta && <VooBlock direction="volta" voo={vooVolta} />}
 
               {/* Valor e Forma de Pagamento */}
-              <section className="border-t border-slate-200 pt-5">
-                <h3 className="flex items-center gap-2 text-base font-bold text-[oklch(0.22_0.08_255)] mb-3">
-                  <FileText className="size-4" /> Valor e Forma de Pagamento
+              <section className="border-t border-slate-200 pt-3">
+                <h3 className="flex items-center gap-1.5 text-sm font-bold text-[oklch(0.22_0.08_255)] mb-2">
+                  <FileText className="size-3.5" /> Valor e Forma de Pagamento
                 </h3>
 
-                {/* Lista de serviços/valores — uma linha por item, com descrição à esquerda e valor à direita */}
-                <div className="space-y-1 text-sm">
+                <div className="space-y-0.5 text-xs">
                   {cotacao.servicos.map((s) => (
                     <div key={s.id} className="flex items-baseline justify-between">
                       <span className="text-slate-700">{s.description || labelMap[s.type] || "Serviço"}</span>
                       <span className="font-medium text-slate-900">R$ {formatBRL(s.value)}</span>
                     </div>
                   ))}
-                  <div className="flex items-baseline justify-between pt-2 mt-1 border-t border-slate-200">
-                    <span className="font-bold text-slate-900">Total</span>
-                    <span className="font-bold text-slate-900">R$ {formatBRL(cotacao.total)}</span>
+                  <div className="flex items-baseline justify-between pt-1.5 mt-1 border-t border-slate-200">
+                    <span className="font-bold text-slate-900 text-sm">Total</span>
+                    <span className="font-bold text-slate-900 text-sm">R$ {formatBRL(cotacao.total)}</span>
                   </div>
                 </div>
 
-                {/* Formas de pagamento — estilo simples, alinhado à esquerda */}
                 {(() => {
                   const ids = cotacao.formasPagamentoIds ?? [];
                   const selected = formasPagamento.filter((f) => ids.includes(f.id));
                   if (selected.length === 0) return null;
                   return (
-                    <div className="mt-5">
-                      <div className="font-bold text-slate-900 text-sm">Forma(s) de Pagamento</div>
-                      <p className="text-xs italic text-slate-500 mt-0.5 mb-3">
+                    <div className="mt-3">
+                      <div className="font-bold text-slate-900 text-xs">Forma(s) de Pagamento</div>
+                      <p className="text-[10px] italic text-slate-500 mt-0.5 mb-2">
                         Os valores foram simulados automaticamente e podem ter pequenas variações de acordo com a plataforma de pagamento.
                       </p>
-                      <div className="space-y-3 text-sm">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
                         {selected.map((f) => {
                           const calc = computeFormaTotal(cotacao.total, f);
                           return (
@@ -222,7 +218,7 @@ function VisualizarCotacao() {
                                 )}
                               </div>
                               {f.observacao && (
-                                <div className="text-xs text-slate-500 italic">{f.observacao}</div>
+                                <div className="text-[10px] text-slate-500 italic">{f.observacao}</div>
                               )}
                             </div>
                           );
@@ -230,7 +226,7 @@ function VisualizarCotacao() {
                       </div>
 
                       {cotacao.valorComparacao && cotacao.valorComparacao > 0 && (
-                        <div className="mt-4 text-sm">
+                        <div className="mt-2 text-xs">
                           <span className="text-slate-500 line-through mr-2">R$ {formatBRL(cotacao.valorComparacao)}</span>
                           <span className="text-emerald-600 font-semibold">
                             Você economiza R$ {formatBRL(cotacao.valorComparacao - cotacao.total)}
@@ -239,14 +235,14 @@ function VisualizarCotacao() {
                       )}
 
                       {cotacao.instrucoesPagamento && (
-                        <div className="mt-4">
-                          <div className="font-bold text-slate-900 text-sm">Instruções para Pagamento</div>
-                          <p className="text-sm text-slate-700 whitespace-pre-wrap mt-1">{cotacao.instrucoesPagamento}</p>
+                        <div className="mt-2">
+                          <div className="font-bold text-slate-900 text-xs">Instruções para Pagamento</div>
+                          <p className="text-xs text-slate-700 whitespace-pre-wrap mt-0.5">{cotacao.instrucoesPagamento}</p>
                         </div>
                       )}
 
                       {cotacao.linkPagamento && (
-                        <div className="mt-3 text-sm">
+                        <div className="mt-1.5 text-xs">
                           <a href={cotacao.linkPagamento} target="_blank" rel="noreferrer" className="text-[oklch(0.22_0.08_255)] underline font-medium">
                             Link para Pagamento
                           </a>
@@ -257,23 +253,22 @@ function VisualizarCotacao() {
                 })()}
               </section>
 
-
               {cotacao.termos && (
-                <section className="border-t border-slate-200 pt-5">
-                  <h3 className="text-sm font-bold text-slate-900 mb-2">Termos e Condições</h3>
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{cotacao.termos}</p>
+                <section className="border-t border-slate-200 pt-3">
+                  <h3 className="text-xs font-bold text-slate-900 mb-1">Termos e Condições</h3>
+                  <p className="text-[11px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.termos}</p>
                 </section>
               )}
 
               {cotacao.outrasInformacoes && (
-                <section className="border-t border-slate-200 pt-5">
-                  <h3 className="text-sm font-bold text-slate-900 mb-2">Outras Informações</h3>
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{cotacao.outrasInformacoes}</p>
+                <section className="border-t border-slate-200 pt-3">
+                  <h3 className="text-xs font-bold text-slate-900 mb-1">Outras Informações</h3>
+                  <p className="text-[11px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.outrasInformacoes}</p>
                 </section>
               )}
 
               {/* Footer */}
-              <section className="border-t border-slate-200 pt-5 text-center text-xs text-slate-500">
+              <section className="border-t border-slate-200 pt-2 text-center text-[10px] text-slate-500">
                 <p className="font-semibold text-slate-700">Brisk Viagens</p>
                 <p>Obrigado pela preferência! Entre em contato para confirmar sua reserva.</p>
               </section>
@@ -284,8 +279,20 @@ function VisualizarCotacao() {
 
       <style>{`
         @media print {
-          body { background: white; }
-          @page { margin: 1cm; }
+          html, body { background: #ffffff !important; }
+          body * { visibility: hidden !important; }
+          #cotacao-doc, #cotacao-doc * { visibility: visible !important; }
+          #cotacao-doc {
+            position: absolute !important;
+            top: 0; left: 0;
+            width: 100% !important;
+            margin: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            background: #ffffff !important;
+            font-size: 10.5px !important;
+          }
+          @page { margin: 0.5cm; size: A4; }
         }
       `}</style>
     </div>
