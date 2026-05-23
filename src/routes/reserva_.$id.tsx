@@ -116,33 +116,30 @@ function ReservaPage() {
           </div>
 
           {/* Documento */}
-          <div id="reserva-doc" className="bg-white text-slate-800 rounded-xl shadow-lg overflow-hidden print:shadow-none print:rounded-none border border-slate-200">
-            {/* Cabeçalho da agência (antigo rodapé) */}
-            <div className="px-8 py-4 border-b border-slate-200 flex items-center justify-between gap-6 print-bg">
-              <BriskLogo variant="blue" className="h-8 w-auto" />
-              <div className="text-right text-[11px] text-slate-700 leading-relaxed">
+          <div id="reserva-doc" className="bg-white text-slate-800 rounded-lg shadow-sm overflow-hidden print:shadow-none print:rounded-none print:border-0 border border-slate-200">
+            {/* Cabeçalho da agência */}
+            <div className="px-5 py-2.5 border-b border-slate-200 flex items-center justify-between gap-4 print-bg">
+              <BriskLogo variant="blue" className="h-6 w-auto" />
+              <div className="text-right text-[10px] text-slate-600 leading-tight">
                 <div>CNPJ 64.827.486/0001-19</div>
-                <div>(85) 99647-7568 · briskviagens@gmail.com</div>
-                <div>@briskviagens</div>
+                <div>(85) 99647-7568 · briskviagens@gmail.com · @briskviagens</div>
               </div>
             </div>
 
-            {/* Header — airline logo + localizador + link reserva */}
-            <div className="px-8 pt-6 pb-5 flex items-center justify-between gap-6 border-b border-slate-200">
-              <AirlineLogo companhia={vooIda?.companhia ?? vooVolta?.companhia} className="h-20 w-auto" />
-              <div className="flex items-center gap-4">
-                <div className="text-center">
-                  <div className="text-xs font-semibold text-slate-700">Localizador</div>
-                  <div className="mt-1 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded text-[oklch(0.22_0.08_255)] font-bold tracking-wider print-bg">
-                    {headerLocalizador}
-                  </div>
+            {/* Header — airline logo + localizador + link reserva (alinhados horizontalmente) */}
+            <div className="px-5 py-3 flex items-center justify-between gap-3 border-b border-slate-200">
+              <AirlineLogo companhia={vooIda?.companhia ?? vooVolta?.companhia} className="h-10 w-auto" />
+              <div className="flex items-stretch gap-2">
+                <div className="flex items-center gap-2 px-3 rounded bg-blue-50 border border-blue-100 print-bg">
+                  <span className="text-[9px] font-semibold text-slate-600 uppercase tracking-wide">Localizador</span>
+                  <span className="text-sm font-bold tracking-wider text-[oklch(0.22_0.08_255)]">{headerLocalizador}</span>
                 </div>
                 {headerBrand && (
                   <a
                     href={headerBrand.bookingUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-5 py-2.5 rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-sm font-semibold transition-colors print-bg"
+                    className="px-3 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-xs font-semibold transition-colors print-bg"
                   >
                     Visualizar reserva
                   </a>
@@ -150,8 +147,8 @@ function ReservaPage() {
               </div>
             </div>
 
-            <div className="px-8 py-6 space-y-6">
-              <h2 className="text-base font-bold text-slate-900">Informações do voo</h2>
+            <div className="px-5 py-4 space-y-3">
+              <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Informações do voo</h2>
 
               {trechosIda.length > 0 && (
                 <ItinerarioBlock direction="ida" trechos={trechosIda} data={vooIda?.data ?? trechosIda[0]?.data} />
@@ -161,17 +158,14 @@ function ReservaPage() {
               )}
 
               {/* Passageiros */}
-              <section className="pt-2">
-                <h3 className="text-base font-bold text-slate-900 mb-3">Passageiros: {totalPax}</h3>
+              <section className="pt-1">
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">Passageiros: {totalPax}</h3>
                 {Array.from({ length: totalPax }).map((_, i) => {
                   const nome = (cotacao as any).passageirosNomes?.[i]
                     || (i === 0 ? cotacao.cliente?.nome : `Passageiro ${i + 1}`)
                     || `Passageiro ${i + 1}`;
                   return <PaxBlock key={i} nome={nome} idaVoo={vooIda} voltaVoo={vooVolta} />;
                 })}
-                <p className="text-xs text-slate-500 mt-3">
-                  *Além da bagagem especificada acima, cada passageiro pode levar consigo uma bolsa, mochila ou sacola (considerado item pessoal).
-                </p>
               </section>
             </div>
           </div>
@@ -181,9 +175,10 @@ function ReservaPage() {
       <style>{`
         .print-bg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         @media print {
-          body { background: white; }
-          @page { margin: 1cm; }
+          html, body { background: white !important; }
+          @page { margin: 0.6cm; size: A4; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          #reserva-doc { border: none !important; box-shadow: none !important; font-size: 11px; }
         }
       `}</style>
     </div>
