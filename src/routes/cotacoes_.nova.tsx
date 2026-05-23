@@ -23,10 +23,12 @@ import {
 import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
   useFormasPagamento, computeFormaTotal,
+  DEFAULT_TERMOS, DEFAULT_OUTRAS_INFORMACOES,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
-import { Users } from "lucide-react";
+import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
+import { Users, Eye } from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -75,6 +77,8 @@ function NovaCotacao() {
   const [volta, setVolta] = useState("");
   const [adultos, setAdultos] = useState(2);
   const [criancas, setCriancas] = useState(0);
+  const [termos, setTermos] = useState(DEFAULT_TERMOS);
+  const [outrasInformacoes, setOutrasInformacoes] = useState(DEFAULT_OUTRAS_INFORMACOES);
   const [observacoes, setObservacoes] = useState("");
   const [status, setStatus] = useState<CotacaoStatus>("aguardando");
   const [validade, setValidade] = useState("");
@@ -118,6 +122,8 @@ function NovaCotacao() {
       setAdultos(c.adultos);
       setCriancas(c.criancas);
       setObservacoes(c.observacoes ?? "");
+      setTermos(c.termos ?? DEFAULT_TERMOS);
+      setOutrasInformacoes(c.outrasInformacoes ?? DEFAULT_OUTRAS_INFORMACOES);
       setStatus(c.status);
       setValidade(c.validade ?? "");
       setPagamento(c.pagamento ?? "");
@@ -188,20 +194,19 @@ function NovaCotacao() {
     [services]
   );
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const buildCotacao = async (): Promise<Cotacao | null> => {
     const cliente = clientes.find((c) => c.id === clienteId);
     if (!cliente) {
       toast.error("Selecione ou cadastre um cliente");
-      return;
+      return null;
     }
     const destinoFinal = (destino || vooIda.destino || "").trim();
     if (!destinoFinal) {
       toast.error("Informe o destino do voo de ida");
-      return;
+      return null;
     }
     const existing = editId ? await getCotacao(editId) : undefined;
-    const cotacao: Cotacao = {
+    return {
       id: existing?.id ?? crypto.randomUUID(),
       code: existing?.code ?? genCode(),
       createdAt: existing?.createdAt ?? new Date().toISOString(),
@@ -221,6 +226,8 @@ function NovaCotacao() {
         value: parseFloat(s.value.replace(",", ".")) || 0,
       })),
       observacoes,
+      termos,
+      outrasInformacoes,
       validade,
       pagamento,
       formasPagamentoIds,
@@ -234,14 +241,32 @@ function NovaCotacao() {
       valorComparacao: parseFloat(valorComparacao.replace(",", ".")) || undefined,
       instrucoesPagamento: instrucoesPagamento || undefined,
       linkPagamento: linkPagamento || undefined,
+      passageirosNomes: existing?.passageirosNomes,
     };
+  };
+
+  const handleSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const cotacao = await buildCotacao();
+    if (!cotacao) return;
     const saved = await saveCotacao(cotacao);
     if (!saved) {
       toast.error("Não foi possível salvar a cotação");
       return;
     }
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
-    navigate({ to: "/cotacoes/$id", params: { id: saved.id } });
+    // Não navega mais automaticamente para o PDF
+    if (!editing) {
+      navigate({ to: "/cotacoes/nova", search: { id: saved.id } });
+    }
+    return saved;
+  };
+
+  const handleVisualizarPDF = async () => {
+    const saved = await handleSave();
+    if (saved) {
+      navigate({ to: "/cotacoes/$id", params: { id: saved.id } });
+    }
   };
 
 
@@ -301,16 +326,16 @@ function NovaCotacao() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label>Cliente *</Label>
-                    <Select value={clienteId} onValueChange={setClienteId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={clientes.length ? "Selecione o cliente" : "Nenhum cliente — cadastre acima"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {clientes.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <ClienteAutocomplete
+                      clientes={clientes}
+                      value={clientes.find((c) => c.id === clienteId)?.nome}
+                      onSelect={(c) => {
+                        setClienteId(c.id);
+                        if (c.email) setEmail(c.email);
+                        if (c.telefone) setTelefone(c.telefone);
+                      }}
+                      placeholder={clientes.length ? "Digite o nome do cliente..." : "Nenhum cliente — cadastre acima"}
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label>E-mail</Label>
@@ -445,9 +470,22 @@ function NovaCotacao() {
                 </div>
               </section>
 
-              <section className="bg-card border border-border/50 rounded-xl p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-3">Observações</h2>
-                <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Notas internas sobre a cotação..." rows={4} />
+              <section className="bg-card border border-border/50 rounded-xl p-6 space-y-5">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground mb-2">Termos e Condições</h2>
+                  <p className="text-xs text-muted-foreground mb-2">Aparece no PDF da cotação enviada ao cliente.</p>
+                  <Textarea value={termos} onChange={(e) => setTermos(e.target.value)} rows={5} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground mb-2">Outras Informações</h2>
+                  <p className="text-xs text-muted-foreground mb-2">Aparece no PDF da cotação enviada ao cliente.</p>
+                  <Textarea value={outrasInformacoes} onChange={(e) => setOutrasInformacoes(e.target.value)} rows={5} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground mb-2">Observações internas</h2>
+                  <p className="text-xs text-muted-foreground mb-2">Não aparece no PDF — uso interno.</p>
+                  <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Notas internas sobre a cotação..." rows={3} />
+                </div>
               </section>
                 </TabsContent>
 
@@ -817,6 +855,9 @@ function NovaCotacao() {
 
                 <Button type="submit" className="w-full mt-6 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
                   <Save className="size-4" /> Salvar Cotação
+                </Button>
+                <Button type="button" onClick={handleVisualizarPDF} variant="outline" className="w-full mt-2 gap-2">
+                  <Eye className="size-4" /> Visualizar PDF
                 </Button>
               </section>
             </aside>

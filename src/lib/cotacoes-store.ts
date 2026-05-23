@@ -93,7 +93,20 @@ export type Cotacao = {
   valorComparacao?: number;
   instrucoesPagamento?: string;
   linkPagamento?: string;
+  termos?: string;
+  outrasInformacoes?: string;
+  passageirosNomes?: string[];
 };
+
+export const DEFAULT_TERMOS = `• Esta proposta é válida apenas para a data e horário indicados, sujeita à confirmação de disponibilidade e preço no momento da emissão.
+• Após a emissão, alterações e cancelamentos seguem as regras tarifárias da companhia aérea e podem gerar custos adicionais.
+• Documentos pessoais (RG/passaporte/visto) são de responsabilidade exclusiva do passageiro.
+• A Brisk Viagens atua como intermediária entre o cliente e os fornecedores dos serviços contratados.`;
+
+export const DEFAULT_OUTRAS_INFORMACOES = `• Pagamento via PIX, cartão de crédito ou link de pagamento.
+• Bagagens conforme regras da companhia aérea contratada.
+• Check-in online disponível a partir de 48h antes do voo.
+• Em caso de dúvidas, fale conosco pelo WhatsApp (85) 99647-7568.`;
 
 export type FormaPagamento = {
   id: string;

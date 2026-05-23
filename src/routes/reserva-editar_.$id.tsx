@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Save, Plane, Plus, Trash2 } from "lucide-react";
+import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import { getCotacao, saveCotacao, type Cotacao } from "@/lib/cotacoes-store";
 import { toast } from "sonner";
 
@@ -31,29 +32,79 @@ type VooData = {
   localizador?: string;
   data?: string;
   assento?: string;
-  bagagens?: { maoCabine?: number; despachada23?: number; despachada32?: number };
+  bagagens?: { pessoal?: number; maoCabine?: number; despachada23?: number; despachada32?: number };
   trechos?: Trecho[];
 };
 
-function hydrateVoo(raw: any): VooData {
+// Constrói os trechos a partir do voo da cotação,
+// considerando escalas, origem/destino e horários.
+function hydrateVoo(raw: any, fallbackOrigem?: string, fallbackDestino?: string, fallbackData?: string): VooData {
   const v = raw ?? {};
   let trechos: Trecho[] = Array.isArray(v.trechos) ? [...v.trechos] : [];
-  if (trechos.length === 0 && (v.origem || v.destino || v.horaSaida || v.horaChegada || v.numeroVoo)) {
-    trechos = [{
-      numeroVoo: v.numeroVoo,
-      horaSaida: v.horaSaida,
-      horaChegada: v.horaChegada,
-      origem: v.origem,
-      destino: v.destino,
-      data: v.data,
-    }];
+
+  // Se já há trechos definidos, mantém.
+  if (trechos.length === 0) {
+    const escalas = Array.isArray(v.escalas) ? v.escalas : [];
+    const origemOriginal = v.origem ?? fallbackOrigem;
+    const destinoOriginal = v.destino ?? fallbackDestino;
+    const data = v.data ?? fallbackData;
+
+    if (escalas.length > 0) {
+      // Trecho 1: origem original → primeira escala (destino dela)
+      // Trechos seguintes: escala anterior (origem) → próxima escala (destino)
+      // Último trecho: última escala (origem) → destino original
+      const arr: Trecho[] = [];
+      let prevOrigem = origemOriginal;
+      for (let i = 0; i < escalas.length; i++) {
+        const esc = escalas[i];
+        arr.push({
+          numeroVoo: i === 0 ? v.numeroVoo : esc.numeroVoo,
+          horaSaida: i === 0 ? v.horaSaida : (escalas[i - 1]?.saida ?? esc.saida),
+          horaChegada: esc.chegada,
+          origem: prevOrigem,
+          destino: esc.destino ?? esc.origem,
+          data,
+        });
+        prevOrigem = esc.origem ?? esc.destino;
+      }
+      // Último trecho até o destino final
+      const lastEsc = escalas[escalas.length - 1];
+      arr.push({
+        numeroVoo: lastEsc?.numeroVoo,
+        horaSaida: lastEsc?.saida,
+        horaChegada: v.horaChegada,
+        origem: prevOrigem,
+        destino: destinoOriginal,
+        data,
+      });
+      trechos = arr;
+    } else if (origemOriginal || destinoOriginal || v.horaSaida || v.horaChegada || v.numeroVoo) {
+      trechos = [{
+        numeroVoo: v.numeroVoo,
+        horaSaida: v.horaSaida,
+        horaChegada: v.horaChegada,
+        origem: origemOriginal,
+        destino: destinoOriginal,
+        data,
+      }];
+    }
   }
+
+  // Default de bagagens: 1 mochila + 1 mala de mão se nada definido
+  const bag = v.bagagens ?? {};
+  const bagagens = {
+    pessoal: bag.pessoal ?? 1,
+    maoCabine: bag.maoCabine ?? 1,
+    despachada23: bag.despachada23 ?? 0,
+    despachada32: bag.despachada32 ?? 0,
+  };
+
   return {
     companhia: v.companhia,
     localizador: v.localizador,
-    data: v.data,
+    data: v.data ?? fallbackData,
     assento: v.assento,
-    bagagens: v.bagagens,
+    bagagens,
     trechos,
   };
 }
@@ -71,10 +122,10 @@ function ReservaEditarPage() {
     getCotacao(id).then((c) => {
       if (!c) { navigate({ to: "/voos" }); return; }
       setCotacao(c);
-      setVooIda(hydrateVoo(c.vooIda));
-      setVooVolta(hydrateVoo(c.vooVolta));
+      setVooIda(hydrateVoo(c.vooIda, c.origem, c.destino, c.ida));
+      setVooVolta(hydrateVoo(c.vooVolta, c.destino, c.origem, c.volta));
       const total = (c.adultos ?? 0) + (c.criancas ?? 0);
-      const nomes = (c as any).passageirosNomes ?? [];
+      const nomes = c.passageirosNomes ?? [];
       const arr = Array.from({ length: total }, (_, i) => nomes[i] ?? (i === 0 ? c.cliente?.nome ?? "" : ""));
       setPassageiros(arr);
     });
@@ -88,7 +139,7 @@ function ReservaEditarPage() {
       ...cotacao,
       vooIda,
       vooVolta,
-      ...({ passageirosNomes: passageiros } as any),
+      passageirosNomes: passageiros,
     };
     await saveCotacao(updated);
     setSaving(false);
@@ -110,6 +161,7 @@ function ReservaEditarPage() {
               <div>
                 <div className="text-sm text-muted-foreground">Reserva #{cotacao.code}</div>
                 <h1 className="text-2xl font-bold text-foreground">Editar Reserva</h1>
+                <p className="text-xs text-muted-foreground mt-1">Dados preenchidos automaticamente a partir da cotação. Revise, edite o localizador e os voos conforme necessário.</p>
               </div>
             </div>
             <Button onClick={handleSave} disabled={saving} className="gap-2">
@@ -119,7 +171,7 @@ function ReservaEditarPage() {
 
           <div className="bg-card border border-border/60 rounded-xl p-6 space-y-6">
             <section>
-              <h2 className="font-semibold mb-3">Passageiros</h2>
+              <h2 className="font-semibold mb-3 text-foreground">Passageiros</h2>
               <div className="space-y-2">
                 {passageiros.map((p, i) => (
                   <div key={i}>
@@ -143,18 +195,16 @@ function ReservaEditarPage() {
               titulo="Voo de IDA"
               voo={vooIda}
               onChange={setVooIda}
-              origemDefault={cotacao.origem}
-              destinoDefault={cotacao.destino}
               dataDefault={cotacao.ida}
             />
-            <VooForm
-              titulo="Voo de VOLTA"
-              voo={vooVolta}
-              onChange={setVooVolta}
-              origemDefault={cotacao.destino}
-              destinoDefault={cotacao.origem}
-              dataDefault={cotacao.volta}
-            />
+            {(cotacao.volta || (vooVolta.trechos ?? []).length > 0) && (
+              <VooForm
+                titulo="Voo de VOLTA"
+                voo={vooVolta}
+                onChange={setVooVolta}
+                dataDefault={cotacao.volta}
+              />
+            )}
           </div>
         </main>
       </div>
@@ -163,17 +213,15 @@ function ReservaEditarPage() {
 }
 
 function VooForm({
-  titulo, voo, onChange, origemDefault, destinoDefault, dataDefault,
+  titulo, voo, onChange, dataDefault,
 }: {
   titulo: string;
   voo: VooData;
   onChange: (v: VooData) => void;
-  origemDefault?: string;
-  destinoDefault?: string;
   dataDefault?: string;
 }) {
   const set = (patch: Partial<VooData>) => onChange({ ...voo, ...patch });
-  const setBag = (k: "maoCabine" | "despachada23" | "despachada32", v: number) =>
+  const setBag = (k: "pessoal" | "maoCabine" | "despachada23" | "despachada32", v: number) =>
     onChange({ ...voo, bagagens: { ...(voo.bagagens ?? {}), [k]: v } });
 
   const trechos = voo.trechos ?? [];
@@ -201,7 +249,7 @@ function VooForm({
 
   return (
     <section className="border-t border-border/60 pt-5">
-      <h2 className="font-semibold mb-3 flex items-center gap-2"><Plane className="size-4 text-primary" /> {titulo}</h2>
+      <h2 className="font-semibold mb-3 flex items-center gap-2 text-foreground"><Plane className="size-4 text-primary" /> {titulo}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
         <div>
           <Label className="text-xs">Companhia</Label>
@@ -221,18 +269,26 @@ function VooForm({
           <Input value={voo.assento ?? ""} onChange={(e) => set({ assento: e.target.value })} placeholder="12A, 12B" />
         </div>
         <div>
+          <Label className="text-xs">Item pessoal / mochila</Label>
+          <Input type="number" min={0} value={voo.bagagens?.pessoal ?? 1} onChange={(e) => setBag("pessoal", Number(e.target.value))} />
+        </div>
+        <div>
           <Label className="text-xs">Bagagem de mão (10kg)</Label>
-          <Input type="number" min={0} value={voo.bagagens?.maoCabine ?? 0} onChange={(e) => setBag("maoCabine", Number(e.target.value))} />
+          <Input type="number" min={0} value={voo.bagagens?.maoCabine ?? 1} onChange={(e) => setBag("maoCabine", Number(e.target.value))} />
         </div>
         <div>
           <Label className="text-xs">Bagagem despachada (23kg)</Label>
           <Input type="number" min={0} value={voo.bagagens?.despachada23 ?? 0} onChange={(e) => setBag("despachada23", Number(e.target.value))} />
         </div>
+        <div>
+          <Label className="text-xs">Bagagem despachada (32kg)</Label>
+          <Input type="number" min={0} value={voo.bagagens?.despachada32 ?? 0} onChange={(e) => setBag("despachada32", Number(e.target.value))} />
+        </div>
       </div>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-semibold">Trechos ({trechos.length})</Label>
+          <Label className="text-sm font-semibold text-foreground">Trechos ({trechos.length})</Label>
           <Button type="button" variant="outline" size="sm" onClick={addTrecho} className="gap-2">
             <Plus className="size-3.5" /> Adicionar trecho
           </Button>
@@ -269,18 +325,20 @@ function VooForm({
               </div>
               <div className="md:col-span-2">
                 <Label className="text-xs">Origem</Label>
-                <Input
-                  value={t.origem ?? (i === 0 ? origemDefault ?? "" : "")}
-                  onChange={(e) => updateTrecho(i, { origem: e.target.value })}
-                  placeholder="Fortaleza (FOR) — Pinto Martins, Brasil"
+                <AirportAutocomplete
+                  value={t.origem}
+                  onChange={(v) => updateTrecho(i, { origem: v })}
+                  onSelect={(_a, formatted) => updateTrecho(i, { origem: formatted })}
+                  placeholder="Ex.: FOR, Fortaleza, Pinto Martins"
                 />
               </div>
               <div className="md:col-span-2">
                 <Label className="text-xs">Destino</Label>
-                <Input
-                  value={t.destino ?? (i === trechos.length - 1 ? destinoDefault ?? "" : "")}
-                  onChange={(e) => updateTrecho(i, { destino: e.target.value })}
-                  placeholder="Salvador (SSA) — Dep. Luís Eduardo Magalhães, Brasil"
+                <AirportAutocomplete
+                  value={t.destino}
+                  onChange={(v) => updateTrecho(i, { destino: v })}
+                  onSelect={(_a, formatted) => updateTrecho(i, { destino: formatted })}
+                  placeholder="Ex.: SSA, Salvador, Luís Eduardo Magalhães"
                 />
               </div>
             </div>
