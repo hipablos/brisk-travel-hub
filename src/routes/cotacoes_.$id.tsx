@@ -30,18 +30,27 @@ const labelMap: Record<string, string> = {
   experiencia: "Experiência", cruzeiro: "Cruzeiro", seguro: "Seguro",
 };
 
-function fmtDate(s?: string) {
-  if (!s) return "—";
+function parseLocalDate(s?: string): Date | null {
+  if (!s) return null;
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]);
+  const dmy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (dmy) {
+    let y = +dmy[3]; if (y < 100) y += 2000;
+    return new Date(y, +dmy[2] - 1, +dmy[1]);
+  }
   const d = new Date(s);
-  if (isNaN(d.getTime())) return s;
-  return d.toLocaleDateString("pt-BR");
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function fmtDate(s?: string) {
+  const d = parseLocalDate(s);
+  return d ? d.toLocaleDateString("pt-BR") : (s ?? "—");
 }
 
 function fmtShortDate(s?: string) {
-  if (!s) return "";
-  const d = new Date(s);
-  if (isNaN(d.getTime())) return s;
-  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  const d = parseLocalDate(s);
+  return d ? d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : (s ?? "");
 }
 
 function classeLabel(c?: string) {
