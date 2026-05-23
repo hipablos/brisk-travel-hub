@@ -164,7 +164,7 @@ function ReservaPage() {
                   const nome = (cotacao as any).passageirosNomes?.[i]
                     || (i === 0 ? cotacao.cliente?.nome : `Passageiro ${i + 1}`)
                     || `Passageiro ${i + 1}`;
-                  return <PaxBlock key={i} nome={nome} idaVoo={vooIda} voltaVoo={vooVolta} />;
+                  return <PaxBlock key={i} nome={nome} idaVoo={vooIda} voltaVoo={trechosVolta.length > 0 ? vooVolta : null} />;
                 })}
               </section>
             </div>
