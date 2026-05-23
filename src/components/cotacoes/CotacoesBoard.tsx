@@ -108,6 +108,18 @@ function KanbanCard({
               >
                 <Pencil className="size-3.5" />
               </Link>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!confirm(`Excluir a cotação ${card.code}? Esta ação não pode ser desfeita.`)) return;
+                  await deleteCotacao(card.id);
+                  toast.success("Cotação excluída");
+                }}
+                className="p-1 hover:text-destructive"
+                title="Excluir cotação"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
             </>
           ) : (
             <>
