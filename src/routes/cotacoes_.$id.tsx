@@ -279,9 +279,17 @@ function VisualizarCotacao() {
 
       <style>{`
         @media print {
-          html, body { background: #ffffff !important; }
+          html, body {
+            background: #ffffff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           body * { visibility: hidden !important; }
-          #cotacao-doc, #cotacao-doc * { visibility: visible !important; }
+          #cotacao-doc, #cotacao-doc * {
+            visibility: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           #cotacao-doc {
             position: absolute !important;
             top: 0; left: 0;
