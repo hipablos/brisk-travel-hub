@@ -292,6 +292,21 @@ function NovaCotacao() {
             </div>
             <div className="flex items-center gap-2">
               <Button asChild variant="outline"><Link to="/cotacoes">Cancelar</Link></Button>
+              {editing && editId && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  className="gap-2"
+                  onClick={async () => {
+                    if (!confirm("Excluir esta cotação? Esta ação não pode ser desfeita.")) return;
+                    await deleteCotacao(editId);
+                    toast.success("Cotação excluída");
+                    navigate({ to: "/cotacoes" });
+                  }}
+                >
+                  <Trash2 className="size-4" /> Excluir
+                </Button>
+              )}
               <Button onClick={handleSave} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
                 <Save className="size-4" /> Salvar Cotação
               </Button>
