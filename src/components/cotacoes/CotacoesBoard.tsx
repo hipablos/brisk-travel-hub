@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
-import { Hash, Eye, Pencil, MoreVertical, MessageSquare, GripVertical } from "lucide-react";
+import { Hash, Eye, Pencil, MoreVertical, MessageSquare, GripVertical, Trash2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, type CotacaoStatus } from "@/lib/cotacoes-store";
+import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
 import { LabelsPopover } from "./LabelsPopover";
 import { toast } from "sonner";
 
@@ -108,6 +108,18 @@ function KanbanCard({
               >
                 <Pencil className="size-3.5" />
               </Link>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!confirm(`Excluir a cotação ${card.code}? Esta ação não pode ser desfeita.`)) return;
+                  await deleteCotacao(card.id);
+                  toast.success("Cotação excluída");
+                }}
+                className="p-1 hover:text-destructive"
+                title="Excluir cotação"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
             </>
           ) : (
             <>
