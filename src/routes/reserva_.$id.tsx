@@ -175,10 +175,21 @@ function ReservaPage() {
       <style>{`
         .print-bg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         @media print {
-          html, body { background: white !important; }
+          html, body { background: #ffffff !important; }
+          body * { visibility: hidden !important; }
+          #reserva-doc, #reserva-doc * { visibility: visible !important; }
+          #reserva-doc {
+            position: absolute !important;
+            left: 0; top: 0;
+            width: 100% !important;
+            margin: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            background: #ffffff !important;
+            font-size: 11px;
+          }
           @page { margin: 0.6cm; size: A4; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          #reserva-doc { border: none !important; box-shadow: none !important; font-size: 11px; }
         }
       `}</style>
     </div>
