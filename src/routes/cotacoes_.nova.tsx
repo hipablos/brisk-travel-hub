@@ -23,10 +23,12 @@ import {
 import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
   useFormasPagamento, computeFormaTotal,
+  DEFAULT_TERMOS, DEFAULT_OUTRAS_INFORMACOES,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
-import { Users } from "lucide-react";
+import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
+import { Users, Eye } from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -75,6 +77,8 @@ function NovaCotacao() {
   const [volta, setVolta] = useState("");
   const [adultos, setAdultos] = useState(2);
   const [criancas, setCriancas] = useState(0);
+  const [termos, setTermos] = useState(DEFAULT_TERMOS);
+  const [outrasInformacoes, setOutrasInformacoes] = useState(DEFAULT_OUTRAS_INFORMACOES);
   const [observacoes, setObservacoes] = useState("");
   const [status, setStatus] = useState<CotacaoStatus>("aguardando");
   const [validade, setValidade] = useState("");
@@ -118,6 +122,8 @@ function NovaCotacao() {
       setAdultos(c.adultos);
       setCriancas(c.criancas);
       setObservacoes(c.observacoes ?? "");
+      setTermos(c.termos ?? DEFAULT_TERMOS);
+      setOutrasInformacoes(c.outrasInformacoes ?? DEFAULT_OUTRAS_INFORMACOES);
       setStatus(c.status);
       setValidade(c.validade ?? "");
       setPagamento(c.pagamento ?? "");
@@ -188,20 +194,19 @@ function NovaCotacao() {
     [services]
   );
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const buildCotacao = async (): Promise<Cotacao | null> => {
     const cliente = clientes.find((c) => c.id === clienteId);
     if (!cliente) {
       toast.error("Selecione ou cadastre um cliente");
-      return;
+      return null;
     }
     const destinoFinal = (destino || vooIda.destino || "").trim();
     if (!destinoFinal) {
       toast.error("Informe o destino do voo de ida");
-      return;
+      return null;
     }
     const existing = editId ? await getCotacao(editId) : undefined;
-    const cotacao: Cotacao = {
+    return {
       id: existing?.id ?? crypto.randomUUID(),
       code: existing?.code ?? genCode(),
       createdAt: existing?.createdAt ?? new Date().toISOString(),
@@ -221,6 +226,8 @@ function NovaCotacao() {
         value: parseFloat(s.value.replace(",", ".")) || 0,
       })),
       observacoes,
+      termos,
+      outrasInformacoes,
       validade,
       pagamento,
       formasPagamentoIds,
@@ -234,14 +241,32 @@ function NovaCotacao() {
       valorComparacao: parseFloat(valorComparacao.replace(",", ".")) || undefined,
       instrucoesPagamento: instrucoesPagamento || undefined,
       linkPagamento: linkPagamento || undefined,
+      passageirosNomes: existing?.passageirosNomes,
     };
+  };
+
+  const handleSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const cotacao = await buildCotacao();
+    if (!cotacao) return;
     const saved = await saveCotacao(cotacao);
     if (!saved) {
       toast.error("Não foi possível salvar a cotação");
       return;
     }
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
-    navigate({ to: "/cotacoes/$id", params: { id: saved.id } });
+    // Não navega mais automaticamente para o PDF
+    if (!editing) {
+      navigate({ to: "/cotacoes/nova", search: { id: saved.id } });
+    }
+    return saved;
+  };
+
+  const handleVisualizarPDF = async () => {
+    const saved = await handleSave();
+    if (saved) {
+      navigate({ to: "/cotacoes/$id", params: { id: saved.id } });
+    }
   };
 
 
