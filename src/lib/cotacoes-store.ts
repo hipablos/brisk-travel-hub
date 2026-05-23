@@ -196,6 +196,11 @@ export async function setCotacaoStatus(id: string, status: CotacaoStatus) {
   if (error) console.error("[cotacoes] setStatus error:", error);
 }
 
+export async function deleteCotacao(id: string) {
+  const { error } = await supabase.from("cotacoes").delete().eq("id", id);
+  if (error) console.error("[cotacoes] delete error:", error);
+}
+
 export async function updateCotacaoLabels(id: string, labels: string[]) {
   const c = await getCotacao(id);
   if (!c) return;
