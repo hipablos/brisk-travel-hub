@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/table";
 import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
-  useFormasPagamento, computeFormaTotal,
+  useFormasPagamento, computeFormaTotal, deleteCotacao,
   DEFAULT_TERMOS, DEFAULT_OUTRAS_INFORMACOES,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
