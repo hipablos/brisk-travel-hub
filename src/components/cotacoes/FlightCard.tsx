@@ -109,11 +109,17 @@ function Counter({
   );
 }
 
-export function FlightCard({ direction, voo, onChange, onRemove }: Props) {
+export function FlightCard({ direction, voo: rawVoo, onChange, onRemove }: Props) {
+  const voo = {
+    ...rawVoo,
+    escalas: rawVoo.escalas ?? [],
+    bagagens: rawVoo.bagagens ?? { pessoal: 0, maoCabine: 0, despachada23: 0, despachada32: 0 },
+  };
   const [open, setOpen] = useState(false);
   const isIda = direction === "ida";
   const Icon = isIda ? PlaneTakeoff : PlaneLanding;
   const title = isIda ? "Voo de Ida" : "Voo de Volta";
+
 
   const addEscala = () => {
     onChange({ escalas: [...voo.escalas, { id: crypto.randomUUID() }] });
