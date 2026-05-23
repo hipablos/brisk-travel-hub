@@ -65,7 +65,8 @@ export function novoVoo(): Voo {
     id: crypto.randomUUID(),
     tipo: "direto",
     escalas: [],
-    bagagens: { pessoal: 0, maoCabine: 0, despachada23: 0, despachada32: 0 },
+    // Padrão: 1 mochila (item pessoal) + 1 mala de mão
+    bagagens: { pessoal: 1, maoCabine: 1, despachada23: 0, despachada32: 0 },
     refeicao: false,
     assento: false,
     alertaCheckin: false,
@@ -304,8 +305,24 @@ export function FlightCard({ direction, voo, onChange, onRemove }: Props) {
                       </Button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                      <div className="space-y-1"><Label className="text-xs">Origem</Label><Input value={e.origem ?? ""} onChange={(ev) => updEscala(e.id, { origem: ev.target.value })} /></div>
-                      <div className="space-y-1"><Label className="text-xs">Destino</Label><Input value={e.destino ?? ""} onChange={(ev) => updEscala(e.id, { destino: ev.target.value })} /></div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Destino (fim do trecho anterior)</Label>
+                        <AirportAutocomplete
+                          value={e.destino}
+                          onChange={(v) => updEscala(e.id, { destino: v, origem: v })}
+                          onSelect={(_a, formatted) => updEscala(e.id, { destino: formatted, origem: formatted })}
+                          placeholder="Ex.: SSA, Salvador"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Origem (início do próximo trecho)</Label>
+                        <AirportAutocomplete
+                          value={e.origem}
+                          onChange={(v) => updEscala(e.id, { origem: v })}
+                          onSelect={(_a, formatted) => updEscala(e.id, { origem: formatted })}
+                          placeholder="Preenchido automaticamente"
+                        />
+                      </div>
                       <div className="space-y-1"><Label className="text-xs">Companhia</Label><Input value={e.companhia ?? ""} onChange={(ev) => updEscala(e.id, { companhia: ev.target.value })} /></div>
                       <div className="space-y-1"><Label className="text-xs">Nº do voo</Label><Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} /></div>
                       <div className="space-y-1"><Label className="text-xs">Chegada</Label><Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} /></div>
