@@ -10,6 +10,7 @@ import {
   ShoppingBag, Briefcase, Luggage, UtensilsCrossed, Armchair, BellRing, PlaneTakeoff, PlaneLanding,
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
+import { dateOnlyToBR, normalizeDateOnly } from "@/lib/dates";
 
 export const Route = createFileRoute("/cotacoes_/$id")({
   component: VisualizarCotacao,
@@ -30,27 +31,17 @@ const labelMap: Record<string, string> = {
   experiencia: "Experiência", cruzeiro: "Cruzeiro", seguro: "Seguro",
 };
 
-function parseLocalDate(s?: string): Date | null {
-  if (!s) return null;
-  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]);
-  const dmy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
-  if (dmy) {
-    let y = +dmy[3]; if (y < 100) y += 2000;
-    return new Date(y, +dmy[2] - 1, +dmy[1]);
-  }
-  const d = new Date(s);
-  return isNaN(d.getTime()) ? null : d;
-}
-
 function fmtDate(s?: string) {
-  const d = parseLocalDate(s);
-  return d ? d.toLocaleDateString("pt-BR") : (s ?? "—");
+  const br = dateOnlyToBR(s);
+  if (br !== "—") return br;
+  if (!s) return "—";
+  const created = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+  return created ? `${created[3]}/${created[2]}/${created[1]}` : s;
 }
 
 function fmtShortDate(s?: string) {
-  const d = parseLocalDate(s);
-  return d ? d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : (s ?? "");
+  const br = dateOnlyToBR(normalizeDateOnly(s));
+  return br === "—" ? (s ?? "") : br.slice(0, 5);
 }
 
 function classeLabel(c?: string) {
