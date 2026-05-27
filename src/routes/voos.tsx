@@ -113,6 +113,8 @@ function VoosPage() {
           codigoVoo: vVolta?.numeroVoo || "—",
         });
       }
+    }
+
 
     return items.sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
   }, [cotacoes]);
