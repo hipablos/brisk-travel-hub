@@ -28,6 +28,7 @@ import {
 } from "@/lib/cotacoes-store";
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
+import { VendaLinhaDialog } from "@/components/cotacoes/VendaLinhaDialog";
 import { Users, Eye } from "lucide-react";
 
 import { toast } from "sonner";
@@ -180,6 +181,10 @@ function NovaCotacao() {
   const updVendaVenda = (id: string, p: Partial<VendaLinha>) =>
     setVendaVendas((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
   const delVendaVenda = (id: string) => setVendaVendas((l) => l.filter((x) => x.id !== id));
+
+  // Dialog states para Adicionar Custo / Adicionar Venda
+  const [custoDialog, setCustoDialog] = useState<{ open: boolean; edit: VendaLinha | null }>({ open: false, edit: null });
+  const [vendaDialog, setVendaDialog] = useState<{ open: boolean; edit: VendaLinha | null }>({ open: false, edit: null });
 
   const addService = (type: ServiceType) => {
     setServices((s) => [...s, { id: crypto.randomUUID(), type, description: "", value: "" }]);
@@ -687,6 +692,28 @@ function NovaCotacao() {
 
 
                 <TabsContent value="venda" className="space-y-6 mt-0">
+                  {(status === "aprovado" || status === "aguardando_cliente") && vendaCustos.length === 0 && vendaVendas.length === 0 && (
+                    <section className="rounded-xl border border-secondary/40 bg-gradient-to-br from-secondary/10 to-secondary/5 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                      <div>
+                        <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                          <DollarSign className="size-4 text-secondary" />
+                          Cotação aprovada — pronta para lançamento financeiro
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Lance os custos e recebimentos para registrar esta venda no financeiro.
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        size="lg"
+                        className="gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-md"
+                        onClick={() => setVendaDialog({ open: true, edit: null })}
+                      >
+                        <Plus className="size-4" /> Lançar Venda
+                      </Button>
+                    </section>
+                  )}
+
                   <section className="bg-card border border-border/50 rounded-xl p-6">
                     <div className="flex flex-wrap items-center gap-2 mb-4">
                       <Button type="button" variant="outline" size="sm" className="gap-2"><Star className="size-4" />Avaliação</Button>
@@ -704,120 +731,234 @@ function NovaCotacao() {
                         </div>
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Lucro</Label>
+                        <Label>Total Vendas</Label>
                         <div className="h-9 px-3 rounded-md border border-border/40 bg-secondary/5 flex items-center font-semibold text-secondary">
-                          R$ {formatBRL(lucro)}
+                          R$ {formatBRL(vendaVendas.reduce((s, v) => s + (v.valor || 0), 0))}
                         </div>
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Lucro com Comissões</Label>
+                        <Label>Lucro</Label>
                         <div className="h-9 px-3 rounded-md border border-border/40 bg-secondary/5 flex items-center font-semibold text-secondary">
-                          R$ {formatBRL(lucro)}
+                          R$ {formatBRL(
+                            vendaVendas.reduce((s, v) => s + (v.valor || 0), 0) -
+                            vendaCustos.reduce((s, v) => s + (v.valor || 0), 0)
+                          )}
                         </div>
                       </div>
                     </div>
                   </section>
 
+                  {/* CUSTOS */}
                   <section className="bg-card border border-border/50 rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-semibold text-foreground">Valores de Custo</h2>
-                      <Button type="button" size="sm" variant="outline" className="gap-2" onClick={addVendaCusto}>
-                        <Plus className="size-4" /> Incluir
+                      <div>
+                        <h2 className="text-lg font-semibold text-foreground">Custos</h2>
+                        <p className="text-xs text-muted-foreground">
+                          {vendaCustos.length} lançamento{vendaCustos.length === 1 ? "" : "s"} ·
+                          Total R$ {formatBRL(vendaCustos.reduce((s, v) => s + (v.valor || 0), 0))}
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="gap-2"
+                        onClick={() => setCustoDialog({ open: true, edit: null })}
+                      >
+                        <Plus className="size-4" /> Adicionar Custo
                       </Button>
                     </div>
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Fornecedor</TableHead>
-                            <TableHead>Conta</TableHead>
-                            <TableHead>Categoria</TableHead>
-                            <TableHead>Descrição</TableHead>
-                            <TableHead>Forma</TableHead>
-                            <TableHead>Parcela</TableHead>
-                            <TableHead>Vencimento</TableHead>
-                            <TableHead>Pagamento</TableHead>
-                            <TableHead className="text-right">Valor</TableHead>
-                            <TableHead className="text-center">Pago</TableHead>
-                            <TableHead className="w-12"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {vendaCustos.length === 0 && (
-                            <TableRow><TableCell colSpan={11} className="text-center text-muted-foreground py-6">Nenhum custo lançado.</TableCell></TableRow>
-                          )}
-                          {vendaCustos.map((v) => (
-                            <TableRow key={v.id}>
-                              <TableCell><Input value={v.parte ?? ""} onChange={(e) => updVendaCusto(v.id, { parte: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.conta ?? ""} onChange={(e) => updVendaCusto(v.id, { conta: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.categoria ?? ""} onChange={(e) => updVendaCusto(v.id, { categoria: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.descricao ?? ""} onChange={(e) => updVendaCusto(v.id, { descricao: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.forma ?? ""} onChange={(e) => updVendaCusto(v.id, { forma: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.parcela ?? ""} onChange={(e) => updVendaCusto(v.id, { parcela: e.target.value })} /></TableCell>
-                              <TableCell><Input type="date" value={v.vencimento ?? ""} onChange={(e) => updVendaCusto(v.id, { vencimento: e.target.value })} /></TableCell>
-                              <TableCell><Input type="date" value={v.pagamento ?? ""} onChange={(e) => updVendaCusto(v.id, { pagamento: e.target.value })} /></TableCell>
-                              <TableCell><Input type="number" step="0.01" className="text-right" value={v.valor || ""} onChange={(e) => updVendaCusto(v.id, { valor: parseFloat(e.target.value) || 0 })} /></TableCell>
-                              <TableCell className="text-center"><Switch checked={v.pago} onCheckedChange={(c) => updVendaCusto(v.id, { pago: c })} /></TableCell>
-                              <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => delVendaCusto(v.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="size-4" /></Button></TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+
+                    {vendaCustos.length === 0 ? (
+                      <div className="rounded-lg border border-dashed border-border/60 px-6 py-10 text-center">
+                        <p className="text-sm text-muted-foreground">Nenhum custo lançado.</p>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="mt-2 gap-2 text-secondary"
+                          onClick={() => setCustoDialog({ open: true, edit: null })}
+                        >
+                          <Plus className="size-4" /> Adicionar primeiro custo
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {vendaCustos.map((v) => (
+                          <div
+                            key={v.id}
+                            className="group flex items-center gap-3 rounded-lg border border-border/50 bg-background/40 px-4 py-3 hover:border-border transition-colors"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-medium text-sm text-foreground truncate">
+                                  {v.descricao || v.categoria || "Custo sem descrição"}
+                                </span>
+                                {v.pago && (
+                                  <span className="text-[10px] uppercase font-semibold tracking-wide text-secondary bg-secondary/10 px-1.5 py-0.5 rounded">
+                                    Pago
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                                {[v.parte, v.forma, v.vencimento].filter(Boolean).join(" · ") || "—"}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-semibold text-sm text-foreground">R$ {formatBRL(v.valor || 0)}</div>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCustoDialog({ open: true, edit: v })}
+                              >
+                                Editar
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => delVendaCusto(v.id)}
+                                className="text-muted-foreground hover:text-destructive"
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </section>
 
+                  {/* VENDAS */}
                   <section className="bg-card border border-border/50 rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-semibold text-foreground">Valores de Venda</h2>
-                      <Button type="button" size="sm" variant="outline" className="gap-2" onClick={addVendaVenda}>
-                        <Plus className="size-4" /> Incluir
+                      <div>
+                        <h2 className="text-lg font-semibold text-foreground">Valores de Venda</h2>
+                        <p className="text-xs text-muted-foreground">
+                          {vendaVendas.length} lançamento{vendaVendas.length === 1 ? "" : "s"} ·
+                          Total R$ {formatBRL(vendaVendas.reduce((s, v) => s + (v.valor || 0), 0))}
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                        onClick={() => setVendaDialog({ open: true, edit: null })}
+                      >
+                        <Plus className="size-4" /> Adicionar Venda
                       </Button>
                     </div>
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Cliente</TableHead>
-                            <TableHead>Conta</TableHead>
-                            <TableHead>Categoria</TableHead>
-                            <TableHead>Descrição</TableHead>
-                            <TableHead>Forma</TableHead>
-                            <TableHead>Parcela</TableHead>
-                            <TableHead>Vencimento</TableHead>
-                            <TableHead>Pagamento</TableHead>
-                            <TableHead className="text-right">Valor</TableHead>
-                            <TableHead className="text-center">Pago</TableHead>
-                            <TableHead className="w-12"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {vendaVendas.length === 0 && (
-                            <TableRow><TableCell colSpan={11} className="text-center text-muted-foreground py-6">Nenhuma venda lançada.</TableCell></TableRow>
-                          )}
-                          {vendaVendas.map((v) => (
-                            <TableRow key={v.id}>
-                              <TableCell><Input value={v.parte ?? ""} onChange={(e) => updVendaVenda(v.id, { parte: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.conta ?? ""} onChange={(e) => updVendaVenda(v.id, { conta: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.categoria ?? ""} onChange={(e) => updVendaVenda(v.id, { categoria: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.descricao ?? ""} onChange={(e) => updVendaVenda(v.id, { descricao: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.forma ?? ""} onChange={(e) => updVendaVenda(v.id, { forma: e.target.value })} /></TableCell>
-                              <TableCell><Input value={v.parcela ?? ""} onChange={(e) => updVendaVenda(v.id, { parcela: e.target.value })} /></TableCell>
-                              <TableCell><Input type="date" value={v.vencimento ?? ""} onChange={(e) => updVendaVenda(v.id, { vencimento: e.target.value })} /></TableCell>
-                              <TableCell><Input type="date" value={v.pagamento ?? ""} onChange={(e) => updVendaVenda(v.id, { pagamento: e.target.value })} /></TableCell>
-                              <TableCell><Input type="number" step="0.01" className="text-right" value={v.valor || ""} onChange={(e) => updVendaVenda(v.id, { valor: parseFloat(e.target.value) || 0 })} /></TableCell>
-                              <TableCell className="text-center"><Switch checked={v.pago} onCheckedChange={(c) => updVendaVenda(v.id, { pago: c })} /></TableCell>
-                              <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => delVendaVenda(v.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="size-4" /></Button></TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+
+                    {vendaVendas.length === 0 ? (
+                      <div className="rounded-lg border border-dashed border-border/60 px-6 py-10 text-center">
+                        <p className="text-sm text-muted-foreground">Nenhuma venda lançada.</p>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="mt-2 gap-2 text-secondary"
+                          onClick={() => setVendaDialog({ open: true, edit: null })}
+                        >
+                          <Plus className="size-4" /> Adicionar primeira venda
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {vendaVendas.map((v) => (
+                          <div
+                            key={v.id}
+                            className="group flex items-center gap-3 rounded-lg border border-border/50 bg-background/40 px-4 py-3 hover:border-border transition-colors"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-medium text-sm text-foreground truncate">
+                                  {v.descricao || v.categoria || "Venda sem descrição"}
+                                </span>
+                                {v.pago && (
+                                  <span className="text-[10px] uppercase font-semibold tracking-wide text-secondary bg-secondary/10 px-1.5 py-0.5 rounded">
+                                    Recebido
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                                {[v.parte, v.forma, v.parcela, v.vencimento].filter(Boolean).join(" · ") || "—"}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-semibold text-sm text-secondary">R$ {formatBRL(v.valor || 0)}</div>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setVendaDialog({ open: true, edit: v })}
+                              >
+                                Editar
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => delVendaVenda(v.id)}
+                                className="text-muted-foreground hover:text-destructive"
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </section>
 
                   <section className="bg-card border border-border/50 rounded-xl p-6">
                     <h2 className="text-lg font-semibold text-foreground mb-3">Observação</h2>
                     <Textarea value={vendaObservacoes} onChange={(e) => setVendaObservacoes(e.target.value)} placeholder="Observações sobre a venda..." rows={4} />
                   </section>
+
+                  <VendaLinhaDialog
+                    open={custoDialog.open}
+                    onOpenChange={(o) => setCustoDialog((s) => ({ ...s, open: o }))}
+                    kind="custo"
+                    initial={custoDialog.edit}
+                    onSave={(linha) => {
+                      if (custoDialog.edit) {
+                        updVendaCusto(custoDialog.edit.id, linha);
+                      } else {
+                        setVendaCustos((l) => [...l, linha]);
+                      }
+                    }}
+                    suggestions={{
+                      partes: Array.from(new Set(vendaCustos.map((v) => v.parte).filter(Boolean) as string[])),
+                      contas: Array.from(new Set(vendaCustos.map((v) => v.conta).filter(Boolean) as string[])),
+                      categorias: Array.from(new Set(vendaCustos.map((v) => v.categoria).filter(Boolean) as string[])),
+                    }}
+                  />
+                  <VendaLinhaDialog
+                    open={vendaDialog.open}
+                    onOpenChange={(o) => setVendaDialog((s) => ({ ...s, open: o }))}
+                    kind="venda"
+                    initial={vendaDialog.edit}
+                    onSave={(linha) => {
+                      if (vendaDialog.edit) {
+                        updVendaVenda(vendaDialog.edit.id, linha);
+                      } else {
+                        setVendaVendas((l) => [...l, linha]);
+                      }
+                    }}
+                    suggestions={{
+                      partes: Array.from(new Set([
+                        ...vendaVendas.map((v) => v.parte).filter(Boolean) as string[],
+                        ...clientes.map((c) => c.nome),
+                      ])),
+                      contas: Array.from(new Set(vendaVendas.map((v) => v.conta).filter(Boolean) as string[])),
+                      categorias: Array.from(new Set(vendaVendas.map((v) => v.categoria).filter(Boolean) as string[])),
+                    }}
+                  />
                 </TabsContent>
               </Tabs>
             </div>
