@@ -146,6 +146,7 @@ function NovaCotacao() {
       setVendaVendas(c.vendaVendas ?? []);
       setVendaObservacoes(c.vendaObservacoes ?? "");
       setDataVenda(c.dataVenda ?? "");
+      setLocalizador(c.localizador ?? "");
       setValorComparacao(c.valorComparacao ? String(c.valorComparacao) : "");
       setInstrucoesPagamento(c.instrucoesPagamento ?? "");
       setLinkPagamento(c.linkPagamento ?? "");
