@@ -245,6 +245,7 @@ function NovaCotacao() {
       vendaVendas,
       vendaObservacoes,
       dataVenda,
+      localizador: localizador || undefined,
       valorComparacao: parseFloat(valorComparacao.replace(",", ".")) || undefined,
       instrucoesPagamento: instrucoesPagamento || undefined,
       linkPagamento: linkPagamento || undefined,
