@@ -353,67 +353,62 @@ function VooBlock({ direction, voo }: { direction: "ida" | "volta"; voo: any }) 
     : [{ from: origem, to: destino, dep: voo?.horaSaida, arr: voo?.horaChegada, conexao: undefined }];
 
   return (
-    <section>
-      {/* Título com seta */}
-      <div className="flex items-center gap-2 mb-3">
-        <Icon className="size-4 text-[oklch(0.22_0.08_255)]" />
-        <h3 className="text-base font-bold text-[oklch(0.22_0.08_255)]">{title}</h3>
-      </div>
-
-      {/* Linha companhia + bagagens (estilo da referência) */}
-      <div className="flex items-center justify-between flex-wrap gap-4 px-1 pb-3">
-        <div>
-          <div className="text-sm font-bold text-slate-900">{voo?.companhia || "Companhia aérea"}</div>
-          <div className="text-xs text-slate-500">{classeLabel(voo?.classe) || "—"}</div>
+    <section className="space-y-1.5">
+      {/* Cabeçalho compacto: título + companhia + bagagens, tudo em uma linha */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-baseline gap-2 min-w-0">
+          <Icon className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
+          <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">{title}</h3>
+          <span className="text-slate-300">·</span>
+          <span className="text-[12px] font-semibold text-slate-900 truncate">{voo?.companhia || "Companhia aérea"}</span>
+          {classeLabel(voo?.classe) && (
+            <span className="text-[10px] text-slate-500">({classeLabel(voo?.classe)})</span>
+          )}
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3">
           <BagIcon icon={ShoppingBag} active={bag.pessoal > 0}
-            label={bag.pessoal > 0 ? `${bag.pessoal} bolsa${bag.pessoal > 1 ? "s" : ""} / mochila` : "Sem item pessoal"} />
+            label={bag.pessoal > 0 ? `${bag.pessoal} pessoal` : "—"} />
           <BagIcon icon={Briefcase} active={bag.maoCabine > 0}
-            label={bag.maoCabine > 0 ? `${bag.maoCabine} bagagem${bag.maoCabine > 1 ? "s" : ""} de mão` : "Sem bagagem de mão"} />
+            label={bag.maoCabine > 0 ? `${bag.maoCabine} mão` : "—"} />
           <BagIcon icon={Luggage} active={despachadas > 0}
             label={despachadas > 0
-              ? `${despachadas} despachada${despachadas > 1 ? "s" : ""}${bag.despachada23 ? ` · ${bag.despachada23}×23kg` : ""}${bag.despachada32 ? ` · ${bag.despachada32}×32kg` : ""}`
-              : "Sem bagagem despachada"} />
+              ? `${despachadas} desp.${bag.despachada23 ? ` ${bag.despachada23}×23` : ""}${bag.despachada32 ? ` ${bag.despachada32}×32` : ""}`
+              : "—"} />
         </div>
       </div>
 
-      {/* Card principal */}
-      <div className="border border-slate-200 rounded-lg overflow-hidden">
-        <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 text-sm">
-          <span className="text-slate-500">Voo de </span>
+      {/* Card principal compacto */}
+      <div className="border border-slate-200 rounded-md overflow-hidden">
+        <div className="bg-slate-50 px-3 py-1.5 border-b border-slate-200 text-[11px] flex items-center gap-1.5">
           <strong className="text-slate-900">{origem}</strong>
-          <span className="text-slate-500"> para </span>
+          <ArrowRight className="size-3 text-slate-400" />
           <strong className="text-slate-900">{destino}</strong>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 px-4 py-3 text-sm">
-          <InfoCol label="Partida" value={`${fmtShortDate(voo?.data)} ${voo?.horaSaida ? voo.horaSaida.replace(":", "h") : ""}`} />
-          <InfoCol label="Chegada" value={`${fmtShortDate(voo?.data)} ${voo?.horaChegada ? voo.horaChegada.replace(":", "h") : ""}`} />
+        <div className="grid grid-cols-5 gap-2 px-3 py-2 items-center">
+          <InfoCol label="Partida" value={`${fmtShortDate(voo?.data)} ${voo?.horaSaida ? voo.horaSaida.replace(":", "h") : ""}`.trim()} />
+          <InfoCol label="Chegada" value={`${fmtShortDate(voo?.data)} ${voo?.horaChegada ? voo.horaChegada.replace(":", "h") : ""}`.trim()} />
           <InfoCol label="Duração" value={voo?.duracao || "—"} />
-          <InfoCol label="Paradas" value={escalas.length === 0 ? "Voo direto" : `${escalas.length} ${escalas.length === 1 ? "Parada" : "Paradas"}`} />
+          <InfoCol label="Paradas" value={escalas.length === 0 ? "Direto" : `${escalas.length} ${escalas.length === 1 ? "parada" : "paradas"}`} />
           <InfoCol label="Voo" value={voo?.numeroVoo || "—"} />
         </div>
 
         {/* Segmentos / escalas */}
         {escalas.length > 0 && (
-          <div className="border-t border-slate-200 bg-white px-4 py-3 space-y-2">
+          <div className="border-t border-slate-200 bg-white px-3 py-1.5 space-y-1">
             {segments.map((seg, i) => (
               <div key={i}>
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 flex-wrap text-slate-700">
+                <div className="flex items-center justify-between gap-2 text-[10px]">
+                  <div className="flex items-center gap-1.5 flex-wrap text-slate-700">
                     <strong className="text-slate-900">{seg.from}</strong>
-                    <span className="text-slate-500">{fmtShortDate(voo?.data)}</span>
-                    <span className="inline-flex items-center gap-1 text-slate-500"><Clock className="size-3" /> {seg.dep ? seg.dep.replace(":", "h") : "—"}</span>
-                    <ArrowRight className="size-3 text-slate-400" />
+                    <span className="inline-flex items-center gap-0.5 text-slate-500"><Clock className="size-2.5" /> {seg.dep ? seg.dep.replace(":", "h") : "—"}</span>
+                    <ArrowRight className="size-2.5 text-slate-400" />
                     <strong className="text-slate-900">{seg.to}</strong>
-                    <span className="text-slate-500">{fmtShortDate(voo?.data)}</span>
-                    <span className="inline-flex items-center gap-1 text-slate-500"><Clock className="size-3" /> {seg.arr ? seg.arr.replace(":", "h") : "—"}</span>
+                    <span className="inline-flex items-center gap-0.5 text-slate-500"><Clock className="size-2.5" /> {seg.arr ? seg.arr.replace(":", "h") : "—"}</span>
                   </div>
                   {seg.conexao && i < segments.length - 1 && (
-                    <span className="text-xs text-slate-500">Conexão de <strong className="text-slate-700">{seg.conexao}</strong></span>
+                    <span className="text-slate-500">Conexão <strong className="text-slate-700">{seg.conexao}</strong></span>
                   )}
                 </div>
-                {i < segments.length - 1 && <div className="my-2 border-t border-dashed border-slate-200" />}
               </div>
             ))}
           </div>
@@ -421,11 +416,11 @@ function VooBlock({ direction, voo }: { direction: "ida" | "volta"; voo: any }) 
 
         {/* Extras */}
         {(voo?.refeicao || voo?.assento || voo?.alertaCheckin || voo?.localizador) && (
-          <div className="border-t border-slate-200 px-4 py-2.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-slate-600">
+          <div className="border-t border-slate-200 px-3 py-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-slate-600">
             {voo?.localizador && <span><strong className="text-slate-800">Localizador:</strong> {voo.localizador}</span>}
-            {voo?.refeicao && <span className="inline-flex items-center gap-1.5"><UtensilsCrossed className="size-3.5 text-emerald-600" /> Refeição inclusa</span>}
-            {voo?.assento && <span className="inline-flex items-center gap-1.5"><Armchair className="size-3.5 text-emerald-600" /> Assento marcado</span>}
-            {voo?.alertaCheckin && <span className="inline-flex items-center gap-1.5"><BellRing className="size-3.5 text-emerald-600" /> Alerta de check-in</span>}
+            {voo?.refeicao && <span className="inline-flex items-center gap-1"><UtensilsCrossed className="size-3 text-emerald-600" /> Refeição</span>}
+            {voo?.assento && <span className="inline-flex items-center gap-1"><Armchair className="size-3 text-emerald-600" /> Assento marcado</span>}
+            {voo?.alertaCheckin && <span className="inline-flex items-center gap-1"><BellRing className="size-3 text-emerald-600" /> Alerta check-in</span>}
           </div>
         )}
       </div>
@@ -435,18 +430,18 @@ function VooBlock({ direction, voo }: { direction: "ida" | "volta"; voo: any }) 
 
 function InfoCol({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <div className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">{label}</div>
-      <div className="text-sm font-bold text-slate-900 mt-0.5">{value || "—"}</div>
+    <div className="min-w-0">
+      <div className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold leading-tight">{label}</div>
+      <div className="text-[11px] font-bold text-slate-900 leading-tight truncate">{value || "—"}</div>
     </div>
   );
 }
 
 function BagIcon({ icon: Icon, label, active }: { icon: React.ComponentType<{ className?: string }>; label: string; active: boolean }) {
   return (
-    <div className={`flex flex-col items-center gap-1 text-center ${active ? "text-emerald-600" : "text-rose-500"}`}>
-      <Icon className="size-5" />
-      <span className="text-[10px] font-medium leading-tight max-w-[110px]">{label}</span>
+    <div className={`inline-flex items-center gap-1 ${active ? "text-emerald-600" : "text-slate-300"}`}>
+      <Icon className="size-3.5" />
+      <span className="text-[10px] font-medium leading-none whitespace-nowrap">{label}</span>
     </div>
   );
 }
