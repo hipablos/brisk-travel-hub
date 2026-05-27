@@ -182,6 +182,10 @@ function NovaCotacao() {
     setVendaVendas((l) => l.map((x) => (x.id === id ? { ...x, ...p } : x)));
   const delVendaVenda = (id: string) => setVendaVendas((l) => l.filter((x) => x.id !== id));
 
+  // Dialog states para Adicionar Custo / Adicionar Venda
+  const [custoDialog, setCustoDialog] = useState<{ open: boolean; edit: VendaLinha | null }>({ open: false, edit: null });
+  const [vendaDialog, setVendaDialog] = useState<{ open: boolean; edit: VendaLinha | null }>({ open: false, edit: null });
+
   const addService = (type: ServiceType) => {
     setServices((s) => [...s, { id: crypto.randomUUID(), type, description: "", value: "" }]);
   };
