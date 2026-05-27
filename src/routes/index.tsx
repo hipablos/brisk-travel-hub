@@ -7,6 +7,7 @@ import { TasksCard } from "@/components/dashboard/TasksCard";
 import { BudgetsChart } from "@/components/dashboard/BudgetsChart";
 import { TopClients } from "@/components/dashboard/TopClients";
 import { StatCards } from "@/components/dashboard/StatCards";
+import { RecentCotacoes } from "@/components/dashboard/RecentCotacoes";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -35,6 +36,7 @@ function Dashboard() {
             <BudgetsChart />
             <TopClients />
           </div>
+          <RecentCotacoes />
         </main>
       </div>
     </div>
