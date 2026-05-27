@@ -272,7 +272,7 @@ function LoginPage() {
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input id="s-password" type="password" value={sPassword}
                         onChange={(e) => setSPassword(e.target.value)}
-                        className="pl-9" placeholder="Mínimo 6 caracteres" autoComplete="new-password" />
+                        className="pl-9" placeholder="Mínimo 4 caracteres" autoComplete="new-password" />
                     </div>
                     {sErrors.password && <p className="text-xs text-destructive">{sErrors.password}</p>}
                   </div>
