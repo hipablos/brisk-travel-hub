@@ -8,6 +8,7 @@ import { BriskLogo } from "@/components/BriskLogo";
 import { getCotacao, type Cotacao } from "@/lib/cotacoes-store";
 import { getAirlineBrand } from "@/lib/airlines";
 import { AirlineLogo } from "@/components/AirlineLogo";
+import { dateOnlyToBR, weekdayName } from "@/lib/dates";
 
 export const Route = createFileRoute("/reserva_/$id")({
   component: ReservaPage,
@@ -47,16 +48,14 @@ function getTrechos(voo: any): Trecho[] {
 
 function fmtLongDate(s?: string) {
   if (!s) return "—";
-  const d = new Date(s);
-  if (isNaN(d.getTime())) return s;
-  const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-  return `${dias[d.getDay()]}, ${d.toLocaleDateString("pt-BR")}`;
+  const br = dateOnlyToBR(s);
+  if (br === "—") return s;
+  return `${weekdayName(s)}, ${br}`;
 }
 function fmtShortDate(s?: string) {
   if (!s) return "";
-  const d = new Date(s);
-  if (isNaN(d.getTime())) return s;
-  return d.toLocaleDateString("pt-BR");
+  const br = dateOnlyToBR(s);
+  return br === "—" ? s : br;
 }
 function splitAirport(s?: string) {
   if (!s) return { city: "—", iata: "", name: "" };
