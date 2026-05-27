@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
+import { dateOnlyToBR } from "@/lib/dates";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -168,7 +169,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove }: Props
               </h2>
               <p className="text-xs text-muted-foreground truncate">
                 {voo.origem || voo.destino
-                  ? `${voo.origem || "—"} → ${voo.destino || "—"}${voo.data ? ` · ${voo.data}` : ""}`
+                  ? `${voo.origem || "—"} → ${voo.destino || "—"}${voo.data ? ` · ${dateOnlyToBR(voo.data)}` : ""}`
                   : "Clique para preencher os dados do voo"}
               </p>
             </div>
