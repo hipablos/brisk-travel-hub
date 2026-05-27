@@ -1,10 +1,9 @@
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
-  LayoutDashboard, FileText, Calendar, CheckSquare, Plane, Hotel, Car,
-  MapPin, Ship, Shield, ShoppingCart, Wallet, ArrowDownCircle, ArrowUpCircle,
-  ArrowLeftRight, GitMerge, BarChart3, TrendingUp, Coins, FolderClosed,
-  FileBarChart, Users, CreditCard, ChevronDown, LogOut, X,
+  LayoutDashboard, FileText, Calendar, Plane, Hotel,
+  MapPin, ShoppingCart, ChevronDown, LogOut,
+  Users, CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -19,9 +18,8 @@ const groups: Group[] = [
     title: "Principal",
     items: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/" },
-      { icon: FileText, label: "Cotações", badge: "3", href: "/cotacoes" },
+      { icon: FileText, label: "Cotações", href: "/cotacoes" },
       { icon: Calendar, label: "Calendário" },
-      { icon: CheckSquare, label: "Tarefas" },
     ],
   },
   {
@@ -29,33 +27,21 @@ const groups: Group[] = [
     items: [
       { icon: Plane, label: "Voos", href: "/voos" },
       { icon: Hotel, label: "Hospedagens" },
-      { icon: Car, label: "Transportes" },
       { icon: MapPin, label: "Experiências Turísticas" },
-      { icon: Ship, label: "Cruzeiros" },
-      { icon: Shield, label: "Seguros" },
     ],
   },
   {
     title: "Financeiro",
     items: [
       { icon: ShoppingCart, label: "Vendas", href: "/financeiro/vendas" },
-      { icon: Wallet, label: "Fluxo de Caixa" },
-      { icon: ArrowDownCircle, label: "Receitas" },
-      { icon: ArrowUpCircle, label: "Despesas" },
-      { icon: ArrowLeftRight, label: "Transferência" },
-      { icon: GitMerge, label: "Conciliação" },
-      { icon: BarChart3, label: "Resumo Mensal" },
-      { icon: TrendingUp, label: "Receita/Despesa" },
-      { icon: Coins, label: "Milhas" },
     ],
   },
-  { title: "Documentos", items: [{ icon: FolderClosed, label: "Arquivos" }] },
-  { title: "Relatórios", items: [{ icon: FileBarChart, label: "Geral" }] },
   { title: "Cadastros", items: [
     { icon: Users, label: "Clientes", href: "/clientes" },
     { icon: CreditCard, label: "Formas de Pagamento", href: "/formas-pagamento" },
   ] },
 ];
+
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation();
