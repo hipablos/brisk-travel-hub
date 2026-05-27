@@ -18,6 +18,7 @@ import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReservaIdRouteImport } from './routes/reserva_.$id'
 import { Route as ReservaEditarIdRouteImport } from './routes/reserva-editar_.$id'
+import { Route as FinanceiroVendasRouteImport } from './routes/financeiro_.vendas'
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
@@ -67,6 +68,11 @@ const ReservaEditarIdRoute = ReservaEditarIdRouteImport.update({
   path: '/reserva-editar/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FinanceiroVendasRoute = FinanceiroVendasRouteImport.update({
+  id: '/financeiro_/vendas',
+  path: '/financeiro/vendas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CotacoesNovaRoute = CotacoesNovaRouteImport.update({
   id: '/cotacoes_/nova',
   path: '/cotacoes/nova',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
+  '/financeiro/vendas': typeof FinanceiroVendasRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
 }
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
+  '/financeiro/vendas': typeof FinanceiroVendasRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
 }
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/clientes_/novo': typeof ClientesNovoRoute
   '/cotacoes_/$id': typeof CotacoesIdRoute
   '/cotacoes_/nova': typeof CotacoesNovaRoute
+  '/financeiro_/vendas': typeof FinanceiroVendasRoute
   '/reserva-editar_/$id': typeof ReservaEditarIdRoute
   '/reserva_/$id': typeof ReservaIdRoute
 }
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/clientes/novo'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
+    | '/financeiro/vendas'
     | '/reserva-editar/$id'
     | '/reserva/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/clientes/novo'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
+    | '/financeiro/vendas'
     | '/reserva-editar/$id'
     | '/reserva/$id'
   id:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/clientes_/novo'
     | '/cotacoes_/$id'
     | '/cotacoes_/nova'
+    | '/financeiro_/vendas'
     | '/reserva-editar_/$id'
     | '/reserva_/$id'
   fileRoutesById: FileRoutesById
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   ClientesNovoRoute: typeof ClientesNovoRoute
   CotacoesIdRoute: typeof CotacoesIdRoute
   CotacoesNovaRoute: typeof CotacoesNovaRoute
+  FinanceiroVendasRoute: typeof FinanceiroVendasRoute
   ReservaEditarIdRoute: typeof ReservaEditarIdRoute
   ReservaIdRoute: typeof ReservaIdRoute
 }
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReservaEditarIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/financeiro_/vendas': {
+      id: '/financeiro_/vendas'
+      path: '/financeiro/vendas'
+      fullPath: '/financeiro/vendas'
+      preLoaderRoute: typeof FinanceiroVendasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cotacoes_/nova': {
       id: '/cotacoes_/nova'
       path: '/cotacoes/nova'
@@ -286,6 +306,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesNovoRoute: ClientesNovoRoute,
   CotacoesIdRoute: CotacoesIdRoute,
   CotacoesNovaRoute: CotacoesNovaRoute,
+  FinanceiroVendasRoute: FinanceiroVendasRoute,
   ReservaEditarIdRoute: ReservaEditarIdRoute,
   ReservaIdRoute: ReservaIdRoute,
 }
