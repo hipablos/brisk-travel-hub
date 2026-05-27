@@ -151,7 +151,7 @@ function NovoCliente() {
                   <div className="space-y-1.5">
                     <Label>Data de Nascimento</Label>
                     <div className="relative">
-                      <Input type="date" className="pl-9" value={form.dataNascimento} onChange={(e) => set("dataNascimento", e.target.value)} />
+                      <DateInput className="pl-9" minISO="1900-01-01" value={form.dataNascimento} onChange={(iso) => set("dataNascimento", iso)} />
                       <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
