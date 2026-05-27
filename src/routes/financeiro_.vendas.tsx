@@ -49,12 +49,7 @@ function earliestVencimento(arr?: { vencimento?: string }[]) {
 }
 
 function fmtData(d?: string) {
-  if (!d) return "—";
-  try {
-    return new Date(d + "T00:00:00").toLocaleDateString("pt-BR");
-  } catch {
-    return d;
-  }
+  return isoToBR(d);
 }
 
 function VendasPage() {
