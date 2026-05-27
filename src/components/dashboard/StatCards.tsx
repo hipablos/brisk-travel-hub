@@ -1,18 +1,23 @@
 import { TrendingUp, Users, Plane, DollarSign } from "lucide-react";
 import { useMemo } from "react";
 import { useCotacoes, formatBRL } from "@/lib/cotacoes-store";
+import { isInCurrentBrazilMonth, todayDateOnly } from "@/lib/dates";
 
 function sumLinhas(arr?: { valor?: number }[]) {
   return (arr ?? []).reduce((s, v) => s + (Number(v.valor) || 0), 0);
 }
 
-function isInCurrentMonth(iso?: string) {
-  if (!iso) return false;
-  const s = iso.length >= 10 ? iso.slice(0, 10) : iso;
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
-  if (!m) return false;
-  const now = new Date();
-  return Number(m[1]) === now.getFullYear() && Number(m[2]) === now.getMonth() + 1;
+function isInCurrentMonth(value?: string) {
+  if (!value) return false;
+  const createdAt = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (createdAt) return isInCurrentBrazilMonth(`${createdAt[3]}-${createdAt[2]}-${createdAt[1]}`);
+  return isInCurrentBrazilMonth(value);
+}
+
+function currentMonthLabel() {
+  const [, month, year] = todayDateOnly().split("-");
+  const name = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"][Number(month) - 1];
+  return `${name} ${year}`;
 }
 
 export function StatCards() {
@@ -58,7 +63,7 @@ export function StatCards() {
               <s.icon className="size-4 text-secondary" />
             </div>
             <span className="text-[11px] font-semibold text-muted-foreground">
-              {new Date().toLocaleDateString("pt-BR", { month: "long", timeZone: "America/Sao_Paulo" })}
+              {currentMonthLabel()}
             </span>
           </div>
           <div className="text-xs text-muted-foreground">{s.label}</div>
