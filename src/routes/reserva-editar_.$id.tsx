@@ -314,7 +314,7 @@ function VooForm({
               </div>
               <div>
                 <Label className="text-xs">Data</Label>
-                <Input type="date" value={t.data ?? dataDefault ?? ""} onChange={(e) => updateTrecho(i, { data: e.target.value })} />
+                <DateInput value={t.data ?? dataDefault ?? ""} onChange={(iso) => updateTrecho(i, { data: iso })} />
               </div>
               <div>
                 <Label className="text-xs">Hora de saída</Label>
