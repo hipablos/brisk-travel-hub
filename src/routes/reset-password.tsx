@@ -20,7 +20,7 @@ function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) return toast.error("Senha mínima de 6 caracteres");
+    if (password.length < 4) return toast.error("Senha mínima de 4 caracteres");
     if (password !== confirm) return toast.error("Senhas não coincidem");
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
