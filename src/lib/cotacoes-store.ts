@@ -87,6 +87,7 @@ export type Cotacao = {
   vendaVendas?: VendaLinha[];
   vendaObservacoes?: string;
   dataVenda?: string;
+  localizador?: string;
   vooIda?: any;
   vooVolta?: any;
   formasPagamentoIds?: string[];
