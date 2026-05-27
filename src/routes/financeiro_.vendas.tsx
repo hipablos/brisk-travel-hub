@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
-import { isoToBR } from "@/lib/dates";
+import { compareDateOnly, dateOnlyToBR } from "@/lib/dates";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,11 +45,11 @@ function sumLinhas(arr?: { valor?: number }[]) {
 function earliestVencimento(arr?: { vencimento?: string }[]) {
   const dates = (arr ?? []).map((v) => v.vencimento).filter(Boolean) as string[];
   if (!dates.length) return "";
-  return dates.sort()[0];
+  return dates.sort(compareDateOnly)[0];
 }
 
 function fmtData(d?: string) {
-  return isoToBR(d);
+  return dateOnlyToBR(d);
 }
 
 function VendasPage() {
@@ -86,8 +86,8 @@ function VendasPage() {
   const filtered = useMemo(() => {
     return rows.filter((r) => {
       if (clienteId !== "__all" && r.cotacao.cliente?.id !== clienteId) return false;
-      if (de && (!r.dataVenda || r.dataVenda < de)) return false;
-      if (ate && (!r.dataVenda || r.dataVenda > ate)) return false;
+      if (de && (!r.dataVenda || compareDateOnly(r.dataVenda, de) < 0)) return false;
+      if (ate && (!r.dataVenda || compareDateOnly(r.dataVenda, ate) > 0)) return false;
       return true;
     });
   }, [rows, de, ate, clienteId]);

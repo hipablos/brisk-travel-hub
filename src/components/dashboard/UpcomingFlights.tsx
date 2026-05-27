@@ -2,10 +2,10 @@ import { useMemo } from "react";
 import { Plane } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useCotacoes } from "@/lib/cotacoes-store";
-import { isoToBR, toLocalDate, todayISO } from "@/lib/dates";
+import { compareDateOnly, dateOnlyToBR, todayDateOnly } from "@/lib/dates";
 
-function fmtData(iso?: string) {
-  const br = isoToBR(iso);
+function fmtData(value?: string) {
+  const br = dateOnlyToBR(value);
   return br === "—" ? "—" : br;
 }
 
@@ -13,10 +13,10 @@ export function UpcomingFlights() {
   const cotacoes = useCotacoes();
 
   const proximos = useMemo(() => {
-    const hojeISO = todayISO();
+    const hoje = todayDateOnly();
     return cotacoes
-      .filter((c) => c.ida && toLocalDate(c.ida) && c.ida! >= hojeISO)
-      .sort((a, b) => (a.ida! < b.ida! ? -1 : 1))
+      .filter((c) => c.ida && compareDateOnly(c.ida, hoje) >= 0)
+      .sort((a, b) => compareDateOnly(a.ida, b.ida))
       .slice(0, 6);
   }, [cotacoes]);
 

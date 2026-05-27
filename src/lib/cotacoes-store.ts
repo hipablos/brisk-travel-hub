@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizeDateOnly } from "@/lib/dates";
 
 export type CotacaoStatus = "aguardando" | "aguardando_cliente" | "aprovado" | "reprovado";
 
@@ -130,7 +131,7 @@ async function currentUserId(): Promise<string | null> {
 function rowToCotacao(row: any): Cotacao {
   const d = (row.data ?? {}) as Partial<Cotacao>;
   return {
-    ...d,
+    ...normalizeCotacaoDates(d),
     id: row.id,
     code: row.code,
     status: row.status,
@@ -140,7 +141,31 @@ function rowToCotacao(row: any): Cotacao {
 
 function rowToCliente(row: any): Cliente {
   const d = (row.data ?? {}) as Partial<Cliente>;
-  return { ...d, id: row.id, nome: row.nome } as Cliente;
+  return { ...normalizeClienteDates(d), id: row.id, nome: row.nome } as Cliente;
+}
+
+const DATE_KEYS = new Set([
+  "ida", "volta", "validade", "dataVenda", "vencimento", "pagamento", "data",
+  "dataNascimento", "passaporteExpedicao", "passaporteVencimento", "vistoEmissao",
+]);
+
+function normalizeBusinessDates<T>(value: T): T {
+  if (Array.isArray(value)) return value.map((item) => normalizeBusinessDates(item)) as T;
+  if (!value || typeof value !== "object") return value;
+  const out: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof val === "string" && DATE_KEYS.has(key)) out[key] = normalizeDateOnly(val) || "";
+    else out[key] = normalizeBusinessDates(val);
+  }
+  return out as T;
+}
+
+function normalizeCotacaoDates(d: Partial<Cotacao>): Partial<Cotacao> {
+  return normalizeBusinessDates(d);
+}
+
+function normalizeClienteDates(d: Partial<Cliente>): Partial<Cliente> {
+  return normalizeBusinessDates(d);
 }
 
 // ---------- Cotacoes ----------
@@ -165,7 +190,8 @@ export async function getCotacao(id: string): Promise<Cotacao | undefined> {
 export async function saveCotacao(c: Cotacao): Promise<Cotacao | null> {
   const uid = await currentUserId();
   if (!uid) return null;
-  const { id, code, status, createdAt, ...rest } = c;
+  const normalized = normalizeCotacaoDates(c) as Cotacao;
+  const { id, code, status, createdAt, ...rest } = normalized;
   const payload = {
     user_id: uid,
     code,
@@ -229,7 +255,8 @@ export async function getCliente(id: string): Promise<Cliente | undefined> {
 export async function saveCliente(c: Cliente): Promise<Cliente | null> {
   const uid = await currentUserId();
   if (!uid) return null;
-  const { id, nome, ...rest } = c;
+  const normalized = normalizeClienteDates(c) as Cliente;
+  const { id, nome, ...rest } = normalized;
   const payload = { user_id: uid, nome, data: rest as any };
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   if (isUuid) {
