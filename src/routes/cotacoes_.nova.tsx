@@ -1010,7 +1010,7 @@ function NovaCotacao() {
                 <div className="space-y-1.5 mb-4">
                   <Label>Validade</Label>
                   <div className="relative">
-                    <Input type="date" className="pl-9" value={validade} onChange={(e) => setValidade(e.target.value)} />
+                    <DateInput className="pl-9" value={validade} onChange={(iso) => setValidade(iso)} />
                     <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                   </div>
                 </div>
