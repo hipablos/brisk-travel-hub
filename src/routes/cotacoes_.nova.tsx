@@ -28,6 +28,7 @@ import {
 } from "@/lib/cotacoes-store";
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
+import { VendaLinhaDialog } from "@/components/cotacoes/VendaLinhaDialog";
 import { Users, Eye } from "lucide-react";
 
 import { toast } from "sonner";
