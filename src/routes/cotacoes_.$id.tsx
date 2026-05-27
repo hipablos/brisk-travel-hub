@@ -298,8 +298,31 @@ function VisualizarCotacao() {
             border: none !important;
             box-shadow: none !important;
             background: #ffffff !important;
-            font-size: 10.5px !important;
+            font-size: 8.5px !important;
+            line-height: 1.25 !important;
           }
+          /* Proportional typography scale for print */
+          #cotacao-doc h2 { font-size: 12px !important; }
+          #cotacao-doc h3 { font-size: 10px !important; }
+          #cotacao-doc .text-base { font-size: 11px !important; }
+          #cotacao-doc .text-sm { font-size: 9px !important; }
+          #cotacao-doc .text-xs { font-size: 8px !important; }
+          #cotacao-doc .text-\\[11px\\] { font-size: 8px !important; }
+          #cotacao-doc .text-\\[10px\\] { font-size: 7.5px !important; }
+          #cotacao-doc .text-\\[9px\\] { font-size: 7px !important; }
+          /* Tighter spacing */
+          #cotacao-doc .py-4 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+          #cotacao-doc .py-3 { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; }
+          #cotacao-doc .pt-4 { padding-top: 0.5rem !important; }
+          #cotacao-doc .pt-3 { padding-top: 0.375rem !important; }
+          #cotacao-doc .pb-3 { padding-bottom: 0.375rem !important; }
+          #cotacao-doc .space-y-4 > * + * { margin-top: 0.5rem !important; }
+          #cotacao-doc .mb-3 { margin-bottom: 0.375rem !important; }
+          #cotacao-doc .mb-2 { margin-bottom: 0.25rem !important; }
+          #cotacao-doc .gap-4 { gap: 0.5rem !important; }
+          #cotacao-doc .gap-3 { gap: 0.375rem !important; }
+          /* Slightly smaller icons */
+          #cotacao-doc svg { transform: scale(0.9); transform-origin: center; }
           @page { margin: 0.5cm; size: A4; }
         }
       `}</style>
