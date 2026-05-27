@@ -26,14 +26,22 @@ export type DateValidation =
   | { ok: true; iso: string; year: number; month: number; day: number }
   | { ok: false; error: string };
 
-/** Valida um trio (ano, mês, dia) sem usar `new Date`. */
-export function validateYMD(year: number, month: number, day: number): DateValidation {
+/** Valida um trio (ano, mês, dia). Por padrão NÃO restringe ano (a faixa é aplicada pelo input). */
+export function validateYMD(
+  year: number,
+  month: number,
+  day: number,
+  opts?: { minYear?: number; maxYear?: number },
+): DateValidation {
   if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
     return { ok: false, error: "Data inválida" };
   }
-  if (year < MIN_YEAR || year > MAX_YEAR) {
-    return { ok: false, error: `Ano fora do intervalo (${MIN_YEAR}–${MAX_YEAR})` };
+  const minY = opts?.minYear;
+  const maxY = opts?.maxYear;
+  if ((minY !== undefined && year < minY) || (maxY !== undefined && year > maxY)) {
+    return { ok: false, error: `Ano fora do intervalo (${minY ?? "-"}–${maxY ?? "-"})` };
   }
+  if (year < 1 || year > 9999) return { ok: false, error: "Ano inválido" };
   if (month < 1 || month > 12) return { ok: false, error: "Mês inexistente" };
   const dim = daysInMonth(year, month);
   if (day < 1 || day > dim) return { ok: false, error: "Dia inválido para o mês" };
