@@ -250,9 +250,26 @@ export async function deleteCliente(id: string) {
 }
 
 // ---------- Hooks com Realtime ----------
+function useAuthUserId() {
+  const [uid, setUid] = useState<string | null | undefined>(undefined);
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) setUid(data.session?.user?.id ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (mounted) setUid(session?.user?.id ?? null);
+    });
+    return () => { mounted = false; sub.subscription.unsubscribe(); };
+  }, []);
+  return uid;
+}
+
 export function useCotacoes() {
+  const uid = useAuthUserId();
   const [list, setList] = useState<Cotacao[]>([]);
   useEffect(() => {
+    if (!uid) return; // espera a sessão restaurar antes de consultar (RLS exige auth.uid())
     let mounted = true;
     const reload = () => fetchCotacoes().then((d) => mounted && setList(d));
     reload();
@@ -261,13 +278,15 @@ export function useCotacoes() {
       .on("postgres_changes", { event: "*", schema: "public", table: "cotacoes" }, reload)
       .subscribe();
     return () => { mounted = false; supabase.removeChannel(channel); };
-  }, []);
+  }, [uid]);
   return list;
 }
 
 export function useClientes() {
+  const uid = useAuthUserId();
   const [list, setList] = useState<Cliente[]>([]);
   useEffect(() => {
+    if (!uid) return;
     let mounted = true;
     const reload = () => fetchClientes().then((d) => mounted && setList(d));
     reload();
@@ -276,7 +295,7 @@ export function useClientes() {
       .on("postgres_changes", { event: "*", schema: "public", table: "clientes" }, reload)
       .subscribe();
     return () => { mounted = false; supabase.removeChannel(channel); };
-  }, []);
+  }, [uid]);
   return list;
 }
 
