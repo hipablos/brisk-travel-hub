@@ -22,7 +22,7 @@ export const Route = createFileRoute("/login")({
 
 const loginSchema = z.object({
   email: z.string().trim().email("E-mail inválido").max(255),
-  password: z.string().min(6, "Mínimo de 6 caracteres").max(72),
+  password: z.string().min(4, "Mínimo de 4 caracteres").max(72),
 });
 
 const signupSchema = z
