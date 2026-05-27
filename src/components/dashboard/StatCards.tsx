@@ -8,9 +8,11 @@ function sumLinhas(arr?: { valor?: number }[]) {
 
 function isInCurrentMonth(iso?: string) {
   if (!iso) return false;
-  const d = new Date(iso.length === 10 ? iso + "T00:00:00" : iso);
+  const s = iso.length >= 10 ? iso.slice(0, 10) : iso;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return false;
   const now = new Date();
-  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  return Number(m[1]) === now.getFullYear() && Number(m[2]) === now.getMonth() + 1;
 }
 
 export function StatCards() {
