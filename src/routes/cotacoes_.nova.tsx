@@ -551,7 +551,7 @@ function NovaCotacao() {
                               <TableCell><Input value={v.fornecedor ?? ""} onChange={(e) => updValorCusto(v.id, { fornecedor: e.target.value })} /></TableCell>
                               <TableCell><Input value={v.pagamento ?? ""} onChange={(e) => updValorCusto(v.id, { pagamento: e.target.value })} /></TableCell>
                               <TableCell><Input value={v.parcelas ?? ""} onChange={(e) => updValorCusto(v.id, { parcelas: e.target.value })} /></TableCell>
-                              <TableCell><Input type="date" value={v.vencimento ?? ""} onChange={(e) => updValorCusto(v.id, { vencimento: e.target.value })} /></TableCell>
+                              <TableCell><DateInput value={v.vencimento ?? ""} onChange={(iso) => updValorCusto(v.id, { vencimento: iso })} /></TableCell>
                               <TableCell><Input value={v.categoria ?? ""} onChange={(e) => updValorCusto(v.id, { categoria: e.target.value })} /></TableCell>
                               <TableCell><Input value={v.descricao ?? ""} onChange={(e) => updValorCusto(v.id, { descricao: e.target.value })} /></TableCell>
                               <TableCell><Input type="number" step="0.01" className="text-right" value={v.valor || ""} onChange={(e) => updValorCusto(v.id, { valor: parseFloat(e.target.value) || 0 })} /></TableCell>
