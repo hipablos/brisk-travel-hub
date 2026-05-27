@@ -8,8 +8,9 @@ import {
   MAX_YEAR,
   parseISO,
   parseBR,
-  isoToBR,
-  brToISO,
+  dateOnlyToBR,
+  dateOnlyToNativeISO,
+  nativeISOToDateOnly,
   maskBR,
 } from "@/lib/dates";
 
@@ -17,10 +18,10 @@ type Props = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "value" | "onChange" | "type" | "min" | "max"
 > & {
-  /** Valor em ISO "YYYY-MM-DD" (formato canônico de armazenamento). */
+  /** Valor em DD-MM-AAAA (string pura, sem timezone). */
   value?: string;
-  /** Recebe ISO válido, ou string vazia quando o campo é limpo. */
-  onChange?: (iso: string) => void;
+  /** Recebe DD-MM-AAAA válido, ou string vazia quando o campo é limpo. */
+  onChange?: (value: string) => void;
   minISO?: string;
   maxISO?: string;
   /** Mostra mensagem de erro embaixo do campo. */
@@ -32,18 +33,18 @@ type Props = Omit<
  *  - calendário nativo (type="date")
  *  - máscara DD/MM/AAAA ao digitar fora do calendário (mobile/teclado)
  *  - validação real (mês 1-12, dia válido p/ mês, ano MIN..MAX)
- *  - nunca emite ISO inválido para o pai
+ *  - nunca emite data inválida para o pai
  */
 export const DateInput = React.forwardRef<HTMLInputElement, Props>(function DateInput(
   { value, onChange, className, minISO = MIN_ISO, maxISO = MAX_ISO, showError = true, onBlur, ...rest },
   ref,
 ) {
-  const [text, setText] = React.useState<string>(isoToBR(value) === "—" ? "" : isoToBR(value));
+  const [text, setText] = React.useState<string>(dateOnlyToBR(value) === "—" ? "" : dateOnlyToBR(value));
   const [error, setError] = React.useState<string | null>(null);
 
   // Mantém sincronizado quando o valor externo muda.
   React.useEffect(() => {
-    const next = value ? (isoToBR(value) === "—" ? "" : isoToBR(value)) : "";
+    const next = value ? (dateOnlyToBR(value) === "—" ? "" : dateOnlyToBR(value)) : "";
     setText(next);
     setError(null);
   }, [value]);
@@ -66,9 +67,10 @@ export const DateInput = React.forwardRef<HTMLInputElement, Props>(function Date
       setError(`Ano fora do intervalo permitido (${MIN_YEAR}–${MAX_YEAR})`);
       return;
     }
+    const dateOnly = nativeISOToDateOnly(r.iso);
     setError(null);
-    setText(isoToBR(r.iso));
-    onChange?.(r.iso);
+    setText(dateOnlyToBR(dateOnly));
+    onChange?.(dateOnly);
   }
 
   // Detecta se o navegador renderiza calendário (type="date"). Fallback: texto com máscara.
@@ -85,7 +87,7 @@ export const DateInput = React.forwardRef<HTMLInputElement, Props>(function Date
         <Input
           ref={ref}
           type="date"
-          value={value ?? ""}
+          value={dateOnlyToNativeISO(value) || ""}
           min={minISO}
           max={maxISO}
           onChange={handleNative}
@@ -120,7 +122,7 @@ export const DateInput = React.forwardRef<HTMLInputElement, Props>(function Date
               return;
             }
             setError(null);
-            onChange?.(r.iso);
+            onChange?.(r.value);
           } else {
             setError(null);
           }

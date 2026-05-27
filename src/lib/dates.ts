@@ -126,6 +126,13 @@ export function compareDateOnly(a?: string | null, b?: string | null): number {
   return da.localeCompare(db);
 }
 
+/** Compatibilidade para ordenações antigas; não usar para persistir/exibir. */
+export function toLocalDate(value?: string | null): Date | null {
+  const r = parseDateOnly(normalizeDateOnly(value));
+  if (!r.ok) return null;
+  return new Date(r.year, r.month - 1, r.day, 12, 0, 0, 0);
+}
+
 /** Hoje em DD-MM-AAAA no fuso do Brasil. */
 export function todayDateOnly(): string {
   const parts = new Intl.DateTimeFormat("pt-BR", {
