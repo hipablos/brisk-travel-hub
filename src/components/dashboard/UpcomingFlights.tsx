@@ -2,19 +2,20 @@ import { useMemo } from "react";
 import { Plane } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useCotacoes } from "@/lib/cotacoes-store";
+import { isoToBR, toLocalDate, todayISO } from "@/lib/dates";
 
 function fmtData(iso?: string) {
-  if (!iso) return "—";
-  try { return new Date(iso + "T00:00:00").toLocaleDateString("pt-BR"); } catch { return iso; }
+  const br = isoToBR(iso);
+  return br === "—" ? "—" : br;
 }
 
 export function UpcomingFlights() {
   const cotacoes = useCotacoes();
 
   const proximos = useMemo(() => {
-    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const hojeISO = todayISO();
     return cotacoes
-      .filter((c) => c.ida && new Date(c.ida + "T00:00:00") >= hoje)
+      .filter((c) => c.ida && toLocalDate(c.ida) && c.ida! >= hojeISO)
       .sort((a, b) => (a.ida! < b.ida! ? -1 : 1))
       .slice(0, 6);
   }, [cotacoes]);
