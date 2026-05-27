@@ -45,7 +45,7 @@ function sumLinhas(arr?: { valor?: number }[]) {
 function earliestVencimento(arr?: { vencimento?: string }[]) {
   const dates = (arr ?? []).map((v) => v.vencimento).filter(Boolean) as string[];
   if (!dates.length) return "";
-  return dates.sort()[0];
+  return dates.sort(compareDateOnly)[0];
 }
 
 function fmtData(d?: string) {
