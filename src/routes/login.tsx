@@ -29,7 +29,7 @@ const signupSchema = z
   .object({
     fullName: z.string().trim().min(2, "Informe seu nome completo").max(100),
     email: z.string().trim().email("E-mail inválido").max(255),
-    password: z.string().min(6, "Mínimo de 6 caracteres").max(72),
+    password: z.string().min(4, "Mínimo de 4 caracteres").max(72),
     confirm: z.string(),
   })
   .refine((d) => d.password === d.confirm, {
