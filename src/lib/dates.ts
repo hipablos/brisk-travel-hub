@@ -126,13 +126,6 @@ export function compareDateOnly(a?: string | null, b?: string | null): number {
   return da.localeCompare(db);
 }
 
-/** Compatibilidade para ordenações antigas; não usar para persistir/exibir. */
-export function toLocalDate(value?: string | null): Date | null {
-  const r = parseDateOnly(normalizeDateOnly(value));
-  if (!r.ok) return null;
-  return new Date(r.year, r.month - 1, r.day, 12, 0, 0, 0);
-}
-
 /** Hoje em DD-MM-AAAA no fuso do Brasil. */
 export function todayDateOnly(): string {
   const parts = new Intl.DateTimeFormat("pt-BR", {
@@ -150,10 +143,23 @@ export function todayDateOnly(): string {
 export function addDaysDateOnly(value: string, days: number): string {
   const r = parseDateOnly(normalizeDateOnly(value));
   if (!r.ok) return "";
-  const d = new Date(r.year, r.month - 1, r.day + days, 12, 0, 0, 0);
-  return validateYMD(d.getFullYear(), d.getMonth() + 1, d.getDate()).ok
-    ? `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`
-    : "";
+  let year = r.year;
+  let month = r.month;
+  let day = r.day + days;
+
+  while (day > daysInMonth(year, month)) {
+    day -= daysInMonth(year, month);
+    month += 1;
+    if (month > 12) { month = 1; year += 1; }
+  }
+  while (day < 1) {
+    month -= 1;
+    if (month < 1) { month = 12; year -= 1; }
+    day += daysInMonth(year, month);
+  }
+
+  const next = validateYMD(year, month, day);
+  return next.ok ? next.value : "";
 }
 
 export function isInCurrentBrazilMonth(value?: string | null): boolean {
