@@ -103,6 +103,7 @@ function NovaCotacao() {
   const [vendaVendas, setVendaVendas] = useState<VendaLinha[]>([]);
   const [vendaObservacoes, setVendaObservacoes] = useState("");
   const [dataVenda, setDataVenda] = useState("");
+  const [localizador, setLocalizador] = useState("");
   const [valorComparacao, setValorComparacao] = useState<string>("");
   const [instrucoesPagamento, setInstrucoesPagamento] = useState("");
   const [linkPagamento, setLinkPagamento] = useState("");
@@ -145,6 +146,7 @@ function NovaCotacao() {
       setVendaVendas(c.vendaVendas ?? []);
       setVendaObservacoes(c.vendaObservacoes ?? "");
       setDataVenda(c.dataVenda ?? "");
+      setLocalizador(c.localizador ?? "");
       setValorComparacao(c.valorComparacao ? String(c.valorComparacao) : "");
       setInstrucoesPagamento(c.instrucoesPagamento ?? "");
       setLinkPagamento(c.linkPagamento ?? "");
@@ -243,6 +245,7 @@ function NovaCotacao() {
       vendaVendas,
       vendaObservacoes,
       dataVenda,
+      localizador: localizador || undefined,
       valorComparacao: parseFloat(valorComparacao.replace(",", ".")) || undefined,
       instrucoesPagamento: instrucoesPagamento || undefined,
       linkPagamento: linkPagamento || undefined,
@@ -744,6 +747,29 @@ function NovaCotacao() {
                             vendaCustos.reduce((s, v) => s + (v.valor || 0), 0)
                           )}
                         </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* LOCALIZADOR DO VOO */}
+                  <section className="bg-card border border-border/50 rounded-xl p-6">
+                    <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                      <div className="flex-1">
+                        <Label htmlFor="localizador" className="text-sm font-semibold text-foreground">
+                          Localizador do Voo
+                        </Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Código de reserva (PNR) do voo. Opcional.
+                        </p>
+                      </div>
+                      <div className="md:w-72">
+                        <Input
+                          id="localizador"
+                          placeholder="Ex.: ABC123"
+                          value={localizador}
+                          onChange={(e) => setLocalizador(e.target.value.toUpperCase())}
+                          className="font-mono tracking-wider uppercase bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700 focus-visible:ring-yellow-500"
+                        />
                       </div>
                     </div>
                   </section>

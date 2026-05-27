@@ -38,7 +38,7 @@ const groups: Group[] = [
   {
     title: "Financeiro",
     items: [
-      { icon: ShoppingCart, label: "Vendas" },
+      { icon: ShoppingCart, label: "Vendas", href: "/financeiro/vendas" },
       { icon: Wallet, label: "Fluxo de Caixa" },
       { icon: ArrowDownCircle, label: "Receitas" },
       { icon: ArrowUpCircle, label: "Despesas" },
