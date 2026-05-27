@@ -231,7 +231,7 @@ function NovoCliente() {
                   <div className="space-y-1.5">
                     <Label>Data de Expedição do Passaporte</Label>
                     <div className="relative">
-                      <Input type="date" className="pl-9" value={form.passaporteExpedicao} onChange={(e) => set("passaporteExpedicao", e.target.value)} />
+                      <DateInput className="pl-9" minISO="1950-01-01" value={form.passaporteExpedicao} onChange={(iso) => set("passaporteExpedicao", iso)} />
                       <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
