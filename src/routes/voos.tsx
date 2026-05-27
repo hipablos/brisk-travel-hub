@@ -72,34 +72,48 @@ function VoosPage() {
     const items: VooItem[] = [];
     for (const c of cotacoes) {
       if (c.status !== "aprovado") continue;
-      const origem = splitLocal(c.origem);
-      const destino = splitLocal(c.destino);
+      const vIda: any = (c as any).vooIda ?? null;
+      const vVolta: any = (c as any).vooVolta ?? null;
+
+      const origemIda = splitLocal(vIda?.origem ?? c.origem);
+      const destinoIda = splitLocal(vIda?.destino ?? c.destino);
+      const origemVolta = splitLocal(vVolta?.origem ?? c.destino);
+      const destinoVolta = splitLocal(vVolta?.destino ?? c.origem);
+
       const passageiros = (c.adultos ?? 0) + (c.criancas ?? 0);
-      const ida = parseDateBR(c.ida);
+      const localizador = (c.localizador ?? vIda?.localizador ?? vVolta?.localizador ?? "").trim() || "—";
+
+      const ida = parseDateBR(vIda?.data ?? c.ida);
       if (ida) {
         items.push({
           id: `${c.id}-ida`, cotacaoId: c.id, dateObj: ida,
           data: ida.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
-          hora: "—", localizador: `BRK-${c.code.toUpperCase()}`,
+          hora: vIda?.horaSaida || "—",
+          localizador,
           cliente: c.cliente?.nome ?? "—", passageiros,
-          origem: origem.nome, origemSigla: origem.sigla,
-          destino: destino.nome, destinoSigla: destino.sigla,
-          trecho: "ida", cia: "—", codigoVoo: "—",
+          origem: origemIda.nome, origemSigla: origemIda.sigla,
+          destino: destinoIda.nome, destinoSigla: destinoIda.sigla,
+          trecho: "ida",
+          cia: vIda?.companhia || "—",
+          codigoVoo: vIda?.numeroVoo || "—",
         });
       }
-      const volta = parseDateBR(c.volta);
+      const volta = parseDateBR(vVolta?.data ?? c.volta);
       if (volta) {
         items.push({
           id: `${c.id}-volta`, cotacaoId: c.id, dateObj: volta,
           data: volta.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
-          hora: "—", localizador: `BRK-${c.code.toUpperCase()}`,
+          hora: vVolta?.horaSaida || "—",
+          localizador,
           cliente: c.cliente?.nome ?? "—", passageiros,
-          origem: destino.nome, origemSigla: destino.sigla,
-          destino: origem.nome, destinoSigla: origem.sigla,
-          trecho: "volta", cia: "—", codigoVoo: "—",
+          origem: origemVolta.nome, origemSigla: origemVolta.sigla,
+          destino: destinoVolta.nome, destinoSigla: destinoVolta.sigla,
+          trecho: "volta",
+          cia: vVolta?.companhia || "—",
+          codigoVoo: vVolta?.numeroVoo || "—",
         });
       }
-    }
+
     return items.sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
   }, [cotacoes]);
 
