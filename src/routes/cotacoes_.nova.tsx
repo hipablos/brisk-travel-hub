@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -550,7 +551,7 @@ function NovaCotacao() {
                               <TableCell><Input value={v.fornecedor ?? ""} onChange={(e) => updValorCusto(v.id, { fornecedor: e.target.value })} /></TableCell>
                               <TableCell><Input value={v.pagamento ?? ""} onChange={(e) => updValorCusto(v.id, { pagamento: e.target.value })} /></TableCell>
                               <TableCell><Input value={v.parcelas ?? ""} onChange={(e) => updValorCusto(v.id, { parcelas: e.target.value })} /></TableCell>
-                              <TableCell><Input type="date" value={v.vencimento ?? ""} onChange={(e) => updValorCusto(v.id, { vencimento: e.target.value })} /></TableCell>
+                              <TableCell><DateInput value={v.vencimento ?? ""} onChange={(iso) => updValorCusto(v.id, { vencimento: iso })} /></TableCell>
                               <TableCell><Input value={v.categoria ?? ""} onChange={(e) => updValorCusto(v.id, { categoria: e.target.value })} /></TableCell>
                               <TableCell><Input value={v.descricao ?? ""} onChange={(e) => updValorCusto(v.id, { descricao: e.target.value })} /></TableCell>
                               <TableCell><Input type="number" step="0.01" className="text-right" value={v.valor || ""} onChange={(e) => updValorCusto(v.id, { valor: parseFloat(e.target.value) || 0 })} /></TableCell>
@@ -729,7 +730,7 @@ function NovaCotacao() {
                       <div className="space-y-1.5">
                         <Label>Data da Venda</Label>
                         <div className="relative">
-                          <Input type="date" className="pl-9" value={dataVenda} onChange={(e) => setDataVenda(e.target.value)} />
+                          <DateInput className="pl-9" value={dataVenda} onChange={(iso) => setDataVenda(iso)} />
                           <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                         </div>
                       </div>
@@ -1009,7 +1010,7 @@ function NovaCotacao() {
                 <div className="space-y-1.5 mb-4">
                   <Label>Validade</Label>
                   <div className="relative">
-                    <Input type="date" className="pl-9" value={validade} onChange={(e) => setValidade(e.target.value)} />
+                    <DateInput className="pl-9" value={validade} onChange={(iso) => setValidade(iso)} />
                     <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                   </div>
                 </div>

@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
+import { isoToBR } from "@/lib/dates";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,12 +49,7 @@ function earliestVencimento(arr?: { vencimento?: string }[]) {
 }
 
 function fmtData(d?: string) {
-  if (!d) return "—";
-  try {
-    return new Date(d + "T00:00:00").toLocaleDateString("pt-BR");
-  } catch {
-    return d;
-  }
+  return isoToBR(d);
 }
 
 function VendasPage() {
@@ -156,11 +153,11 @@ function VendasPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">Período (de)</Label>
-                <Input type="date" value={de} onChange={(e) => setDe(e.target.value)} />
+                <DateInput value={de} onChange={(iso) => setDe(iso)} />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">Período (até)</Label>
-                <Input type="date" value={ate} onChange={(e) => setAte(e.target.value)} />
+                <DateInput value={ate} onChange={(iso) => setAte(iso)} />
               </div>
               <div className="space-y-1.5 md:col-span-2">
                 <Label className="text-xs">Cliente</Label>

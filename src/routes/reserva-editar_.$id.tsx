@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Save, Plane, Plus, Trash2 } from "lucide-react";
@@ -313,7 +314,7 @@ function VooForm({
               </div>
               <div>
                 <Label className="text-xs">Data</Label>
-                <Input type="date" value={t.data ?? dataDefault ?? ""} onChange={(e) => updateTrecho(i, { data: e.target.value })} />
+                <DateInput value={t.data ?? dataDefault ?? ""} onChange={(iso) => updateTrecho(i, { data: iso })} />
               </div>
               <div>
                 <Label className="text-xs">Hora de saída</Label>

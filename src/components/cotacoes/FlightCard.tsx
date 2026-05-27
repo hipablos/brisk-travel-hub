@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -225,7 +226,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove }: Props
                   </div>
                   <div className="space-y-1.5">
                     <Label>Data do voo</Label>
-                    <Input type="date" value={voo.data ?? ""} onChange={(e) => onChange({ data: e.target.value })} />
+                    <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">

@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -150,7 +151,7 @@ function NovoCliente() {
                   <div className="space-y-1.5">
                     <Label>Data de Nascimento</Label>
                     <div className="relative">
-                      <Input type="date" className="pl-9" value={form.dataNascimento} onChange={(e) => set("dataNascimento", e.target.value)} />
+                      <DateInput className="pl-9" minISO="1900-01-01" value={form.dataNascimento} onChange={(iso) => set("dataNascimento", iso)} />
                       <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
@@ -230,14 +231,14 @@ function NovoCliente() {
                   <div className="space-y-1.5">
                     <Label>Data de Expedição do Passaporte</Label>
                     <div className="relative">
-                      <Input type="date" className="pl-9" value={form.passaporteExpedicao} onChange={(e) => set("passaporteExpedicao", e.target.value)} />
+                      <DateInput className="pl-9" minISO="1950-01-01" value={form.passaporteExpedicao} onChange={(iso) => set("passaporteExpedicao", iso)} />
                       <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
                   <div className="space-y-1.5">
                     <Label>Vencimento do Passaporte</Label>
                     <div className="relative">
-                      <Input type="date" className="pl-9" value={form.passaporteVencimento} onChange={(e) => set("passaporteVencimento", e.target.value)} />
+                      <DateInput className="pl-9" value={form.passaporteVencimento} onChange={(iso) => set("passaporteVencimento", iso)} />
                       <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
@@ -247,7 +248,7 @@ function NovoCliente() {
                   <div className="space-y-1.5">
                     <Label>Data de Emissão do Visto</Label>
                     <div className="relative">
-                      <Input type="date" className="pl-9" value={form.vistoEmissao} onChange={(e) => set("vistoEmissao", e.target.value)} />
+                      <DateInput className="pl-9" value={form.vistoEmissao} onChange={(iso) => set("vistoEmissao", iso)} />
                       <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
