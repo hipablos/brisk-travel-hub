@@ -153,11 +153,11 @@ function VendasPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">Período (de)</Label>
-                <Input type="date" value={de} onChange={(e) => setDe(e.target.value)} />
+                <DateInput value={de} onChange={(iso) => setDe(iso)} />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">Período (até)</Label>
-                <Input type="date" value={ate} onChange={(e) => setAte(e.target.value)} />
+                <DateInput value={ate} onChange={(iso) => setAte(iso)} />
               </div>
               <div className="space-y-1.5 md:col-span-2">
                 <Label className="text-xs">Cliente</Label>
