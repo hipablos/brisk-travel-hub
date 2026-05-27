@@ -153,11 +153,10 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
           <div className="space-y-1.5">
             <Label>Vencimento</Label>
             <div className="relative">
-              <Input
-                type="date"
+              <DateInput
                 className="pl-9"
                 value={linha.vencimento ?? ""}
-                onChange={(e) => upd({ vencimento: e.target.value })}
+                onChange={(iso) => upd({ vencimento: iso })}
               />
               <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
             </div>
@@ -166,11 +165,10 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
           <div className="space-y-1.5">
             <Label>Data de Pagamento</Label>
             <div className="relative">
-              <Input
-                type="date"
+              <DateInput
                 className="pl-9"
                 value={linha.pagamento ?? ""}
-                onChange={(e) => upd({ pagamento: e.target.value })}
+                onChange={(iso) => upd({ pagamento: iso })}
               />
               <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
             </div>
