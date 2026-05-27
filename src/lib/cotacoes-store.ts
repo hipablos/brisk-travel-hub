@@ -418,8 +418,10 @@ export async function toggleFormaPagamentoAtivo(id: string, ativo: boolean) {
 }
 
 export function useFormasPagamento() {
+  const uid = useAuthUserId();
   const [list, setList] = useState<FormaPagamento[]>([]);
   useEffect(() => {
+    if (!uid) return;
     let mounted = true;
     const reload = () => fetchFormasPagamento().then((d) => mounted && setList(d));
     reload();
@@ -428,7 +430,7 @@ export function useFormasPagamento() {
       .on("postgres_changes", { event: "*", schema: "public", table: "formas_pagamento" }, reload)
       .subscribe();
     return () => { mounted = false; supabase.removeChannel(channel); };
-  }, []);
+  }, [uid]);
   return list;
 }
 
