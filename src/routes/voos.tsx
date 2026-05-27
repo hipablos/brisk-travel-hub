@@ -15,6 +15,7 @@ import {
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useCotacoes } from "@/lib/cotacoes-store";
+import { addDaysDateOnly, compareDateOnly, normalizeDateOnly, parseDateOnly, todayDateOnly } from "@/lib/dates";
 
 export const Route = createFileRoute("/voos")({
   component: VoosPage,
@@ -33,7 +34,7 @@ type VooItem = {
   cotacaoId: string;
   data: string;
   hora: string;
-  dateObj: Date;
+  dateKey: string;
   localizador: string;
   cliente: string;
   passageiros: number;
@@ -46,15 +47,12 @@ type VooItem = {
   codigoVoo: string;
 };
 
-function parseDateBR(s?: string): Date | null {
-  if (!s) return null;
-  let d: Date | null = null;
-  if (/^\d{4}-\d{2}-\d{2}/.test(s)) d = new Date(s);
-  else if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) {
-    const [dd, mm, yyyy] = s.split("/");
-    d = new Date(`${yyyy}-${mm}-${dd}`);
-  }
-  return d && !isNaN(d.getTime()) ? d : null;
+function formatFlightDate(value?: string): string {
+  const normalized = normalizeDateOnly(value);
+  const parsed = parseDateOnly(normalized);
+  if (!parsed.ok) return "—";
+  const months = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+  return `${String(parsed.day).padStart(2, "0")} ${months[parsed.month - 1]} ${parsed.year}`;
 }
 
 function splitLocal(loc?: string): { nome: string; sigla: string } {
@@ -83,11 +81,11 @@ function VoosPage() {
       const passageiros = (c.adultos ?? 0) + (c.criancas ?? 0);
       const localizador = (c.localizador ?? vIda?.localizador ?? vVolta?.localizador ?? "").trim() || "—";
 
-      const ida = parseDateBR(vIda?.data ?? c.ida);
+      const ida = normalizeDateOnly(vIda?.data ?? c.ida);
       if (ida) {
         items.push({
-          id: `${c.id}-ida`, cotacaoId: c.id, dateObj: ida,
-          data: ida.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
+          id: `${c.id}-ida`, cotacaoId: c.id, dateKey: ida,
+          data: formatFlightDate(ida),
           hora: vIda?.horaSaida || "—",
           localizador,
           cliente: c.cliente?.nome ?? "—", passageiros,
@@ -98,11 +96,11 @@ function VoosPage() {
           codigoVoo: vIda?.numeroVoo || "—",
         });
       }
-      const volta = parseDateBR(vVolta?.data ?? c.volta);
+      const volta = normalizeDateOnly(vVolta?.data ?? c.volta);
       if (volta) {
         items.push({
-          id: `${c.id}-volta`, cotacaoId: c.id, dateObj: volta,
-          data: volta.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
+          id: `${c.id}-volta`, cotacaoId: c.id, dateKey: volta,
+          data: formatFlightDate(volta),
           hora: vVolta?.horaSaida || "—",
           localizador,
           cliente: c.cliente?.nome ?? "—", passageiros,
@@ -116,20 +114,20 @@ function VoosPage() {
     }
 
 
-    return items.sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
+    return items.sort((a, b) => compareDateOnly(a.dateKey, b.dateKey));
   }, [cotacoes]);
 
-  const now = new Date();
-  const in30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const hoje = todayDateOnly();
+  const em30 = addDaysDateOnly(hoje, 30);
   const counts = {
-    realizados: voos.filter((v) => v.dateObj < now).length,
-    proximos:   voos.filter((v) => v.dateObj >= now && v.dateObj <= in30).length,
-    distantes:  voos.filter((v) => v.dateObj > in30).length,
+    realizados: voos.filter((v) => compareDateOnly(v.dateKey, hoje) < 0).length,
+    proximos:   voos.filter((v) => compareDateOnly(v.dateKey, hoje) >= 0 && compareDateOnly(v.dateKey, em30) <= 0).length,
+    distantes:  voos.filter((v) => compareDateOnly(v.dateKey, em30) > 0).length,
   };
   const filtered = voos.filter((v) => {
-    if (tab === "realizados") return v.dateObj < now;
-    if (tab === "proximos")   return v.dateObj >= now && v.dateObj <= in30;
-    return v.dateObj > in30;
+    if (tab === "realizados") return compareDateOnly(v.dateKey, hoje) < 0;
+    if (tab === "proximos")   return compareDateOnly(v.dateKey, hoje) >= 0 && compareDateOnly(v.dateKey, em30) <= 0;
+    return compareDateOnly(v.dateKey, em30) > 0;
   });
 
   const tabs: { key: TabKey; label: string; count: number; cls: string }[] = [
