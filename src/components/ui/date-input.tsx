@@ -1,5 +1,8 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import {
   MIN_ISO,
@@ -10,9 +13,9 @@ import {
   parseBR,
   dateOnlyToBR,
   dateOnlyToNativeISO,
-  nativeISOToDateOnly,
   maskBR,
 } from "@/lib/dates";
+import { CalendarIcon } from "lucide-react";
 
 type Props = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -41,6 +44,10 @@ export const DateInput = React.forwardRef<HTMLInputElement, Props>(function Date
 ) {
   const [text, setText] = React.useState<string>(dateOnlyToBR(value) === "—" ? "" : dateOnlyToBR(value));
   const [error, setError] = React.useState<string | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const minDate = React.useMemo(() => isoToLocalDate(minISO), [minISO]);
+  const maxDate = React.useMemo(() => isoToLocalDate(maxISO), [maxISO]);
+  const selectedDate = React.useMemo(() => isoToLocalDate(dateOnlyToNativeISO(value)), [value]);
 
   // Mantém sincronizado quando o valor externo muda.
   React.useEffect(() => {
@@ -49,92 +56,103 @@ export const DateInput = React.forwardRef<HTMLInputElement, Props>(function Date
     setError(null);
   }, [value]);
 
-  // Suporta calendário nativo: o navegador entrega "YYYY-MM-DD"
-  function handleNative(e: React.ChangeEvent<HTMLInputElement>) {
-    const v = e.target.value;
-    if (!v) {
-      setText("");
-      setError(null);
-      onChange?.("");
-      return;
-    }
-    const r = parseISO(v);
-    if (!r.ok) {
-      setError(r.error);
-      return;
-    }
-    if (r.iso < minISO || r.iso > maxISO) {
-      setError(`Ano fora do intervalo permitido (${MIN_YEAR}–${MAX_YEAR})`);
-      return;
-    }
-    const dateOnly = nativeISOToDateOnly(r.iso);
-    setError(null);
-    setText(dateOnlyToBR(dateOnly));
-    onChange?.(dateOnly);
-  }
-
-  // Detecta se o navegador renderiza calendário (type="date"). Fallback: texto com máscara.
-  const [supportsDate, setSupportsDate] = React.useState(true);
-  React.useEffect(() => {
-    const i = document.createElement("input");
-    i.setAttribute("type", "date");
-    setSupportsDate(i.type === "date");
-  }, []);
-
-  if (supportsDate) {
-    return (
-      <div className="w-full">
-        <Input
-          ref={ref}
-          type="date"
-          value={dateOnlyToNativeISO(value) || ""}
-          min={minISO}
-          max={maxISO}
-          onChange={handleNative}
-          onBlur={onBlur}
-          className={cn(className)}
-          {...rest}
-        />
-        {showError && error && <p className="mt-1 text-xs text-destructive">{error}</p>}
-      </div>
-    );
-  }
-
-  // Fallback: máscara DD/MM/AAAA
   return (
     <div className="w-full">
-      <Input
-        ref={ref}
-        inputMode="numeric"
-        placeholder="DD/MM/AAAA"
-        value={text}
-        onChange={(e) => {
-          const masked = maskBR(e.target.value);
-          setText(masked);
-          if (masked.length === 10) {
-            const r = parseBR(masked);
-            if (!r.ok) {
-              setError(r.error);
+      <div className="relative">
+        <Input
+          ref={ref}
+          inputMode="numeric"
+          placeholder="DD/MM/AAAA"
+          value={text}
+          onChange={(e) => {
+            const masked = maskBR(e.target.value);
+            setText(masked);
+            if (!masked) {
+              setError(null);
+              onChange?.("");
               return;
             }
-            if (r.iso < minISO || r.iso > maxISO) {
-              setError(`Ano fora do intervalo permitido (${MIN_YEAR}–${MAX_YEAR})`);
-              return;
-            }
-            setError(null);
-            onChange?.(r.value);
-          } else {
-            setError(null);
-          }
-        }}
-        onBlur={(e) => {
-          if (text && text.length < 10) setError("Data inválida");
-          onBlur?.(e);
-        }}
-        className={cn(className)}
-        {...rest}
-      />
+            if (masked.length === 10) commitText(masked, { showRangeError: true });
+            else setError(null);
+          }}
+          onBlur={(e) => {
+            if (text && text.length < 10) setError("Data inválida");
+            if (text.length === 10) commitText(text, { showRangeError: true });
+            onBlur?.(e);
+          }}
+          className={cn("pr-10", className)}
+          {...rest}
+        />
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 size-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label="Abrir calendário"
+            >
+              <CalendarIcon className="size-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              defaultMonth={selectedDate ?? minDate ?? undefined}
+              fromDate={minDate ?? undefined}
+              toDate={maxDate ?? undefined}
+              onSelect={(date) => {
+                if (!date) return;
+                const next = localDateToDateOnly(date);
+                setText(dateOnlyToBR(next));
+                setError(null);
+                onChange?.(next);
+                setOpen(false);
+              }}
+              initialFocus
+              className="p-3 pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
       {showError && error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </div>
   );
+
+  function commitText(masked: string, opts?: { showRangeError?: boolean }) {
+    const r = parseBR(masked);
+    if (!r.ok) {
+      setError(r.error);
+      return false;
+    }
+    if (r.iso < minISO || r.iso > maxISO) {
+      setError(opts?.showRangeError ? rangeError(minISO, maxISO) : null);
+      return false;
+    }
+    setError(null);
+    onChange?.(r.value);
+    return true;
+  }
 });
+
+function isoToLocalDate(iso?: string | null): Date | undefined {
+  const r = parseISO(iso);
+  if (!r.ok) return undefined;
+  return new Date(r.year, r.month - 1, r.day);
+}
+
+function localDateToDateOnly(date: Date): string {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear()).padStart(4, "0");
+  return `${day}-${month}-${year}`;
+}
+
+function rangeError(minISO: string, maxISO: string): string {
+  const min = parseISO(minISO);
+  const max = parseISO(maxISO);
+  const minYear = min.ok ? min.year : MIN_YEAR;
+  const maxYear = max.ok ? max.year : MAX_YEAR;
+  return `Ano fora do intervalo permitido (${minYear}–${maxYear})`;
+}
