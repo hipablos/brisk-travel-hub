@@ -13,7 +13,11 @@ import {
 import {
   Plane, PlaneTakeoff, PlaneLanding, ChevronDown, Hash, Edit3,
   Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Armchair, UtensilsCrossed, BellRing, Minus,
+  MoreHorizontal, Copy,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
