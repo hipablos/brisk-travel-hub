@@ -118,7 +118,7 @@ function Counter({
   );
 }
 
-export function FlightCard({ direction, voo: rawVoo, onChange, onRemove }: Props) {
+export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total }: Props) {
   const voo = {
     ...rawVoo,
     escalas: rawVoo.escalas ?? [],
@@ -127,7 +127,10 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove }: Props
   const [open, setOpen] = useState(false);
   const isIda = direction === "ida";
   const Icon = isIda ? PlaneTakeoff : PlaneLanding;
-  const title = isIda ? "Voo de Ida" : "Voo de Volta";
+  const baseTitle = isIda ? "Voo de Ida" : "Voo de Volta";
+  const title = typeof index === "number" && typeof total === "number" && total > 1
+    ? `${baseTitle} ${index + 1}`
+    : baseTitle;
 
 
   const addEscala = () => {
