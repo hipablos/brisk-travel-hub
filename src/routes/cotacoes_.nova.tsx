@@ -210,7 +210,9 @@ function NovaCotacao() {
       toast.error("Selecione ou cadastre um cliente");
       return null;
     }
-    const destinoFinal = (destino || vooIda.destino || "").trim();
+    const vooIda = vooIdas[0];
+    const vooVolta = vooVoltas[0] ?? null;
+    const destinoFinal = (destino || vooIda?.destino || "").trim();
     if (!destinoFinal) {
       toast.error("Informe o destino do voo de ida");
       return null;
@@ -224,13 +226,15 @@ function NovaCotacao() {
       cliente: { ...cliente, email: email || cliente.email, telefone: telefone || cliente.telefone },
       tag: tag || undefined,
       labels: existing?.labels ?? [],
-      origem: origem || vooIda.origem,
-      destino: destino || vooIda.destino,
-      ida: ida || vooIda.data,
+      origem: origem || vooIda?.origem,
+      destino: destino || vooIda?.destino,
+      ida: ida || vooIda?.data,
       volta: volta || vooVolta?.data,
       adultos, criancas,
       vooIda,
       vooVolta: vooVolta ?? undefined,
+      vooIdas,
+      vooVoltas,
       servicos: services.map((s) => ({
         id: s.id, type: s.type, description: s.description,
         value: parseFloat(s.value.replace(",", ".")) || 0,
