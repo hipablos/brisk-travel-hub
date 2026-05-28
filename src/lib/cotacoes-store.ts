@@ -91,6 +91,8 @@ export type Cotacao = {
   localizador?: string;
   vooIda?: any;
   vooVolta?: any;
+  vooIdas?: any[];
+  vooVoltas?: any[];
   formasPagamentoIds?: string[];
   valorComparacao?: number;
   instrucoesPagamento?: string;
