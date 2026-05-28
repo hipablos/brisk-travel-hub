@@ -86,6 +86,9 @@ interface Props {
   voo: Voo;
   onChange: (patch: Partial<Voo>) => void;
   onRemove?: () => void;
+  onDuplicate?: () => void;
+  index?: number;
+  total?: number;
 }
 
 function Counter({
