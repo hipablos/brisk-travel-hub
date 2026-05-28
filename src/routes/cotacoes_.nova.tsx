@@ -92,8 +92,8 @@ function NovaCotacao() {
     { id: "1", type: "voo", description: "", value: "" },
   ]);
 
-  const [vooIda, setVooIda] = useState<Voo>(() => novoVoo());
-  const [vooVolta, setVooVolta] = useState<Voo | null>(null);
+  const [vooIdas, setVooIdas] = useState<Voo[]>(() => [novoVoo()]);
+  const [vooVoltas, setVooVoltas] = useState<Voo[]>([]);
 
   // Valores tab
   const [valoresCusto, setValoresCusto] = useState<ValorCusto[]>([]);
