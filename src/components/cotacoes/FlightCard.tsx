@@ -193,13 +193,30 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
             <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => { setOpen(true); onChange({ tipo: voo.tipo === "localizador" ? "direto" : voo.tipo }); }}>
               <Edit3 className="size-3.5" /> Incluir manualmente
             </Button>
-            {onRemove && (
-              <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive" onClick={onRemove}>
-                <Trash2 className="size-4" />
-              </Button>
+            {(onDuplicate || onRemove) && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" aria-label="Mais opções">
+                    <MoreHorizontal className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-44">
+                  {onDuplicate && (
+                    <DropdownMenuItem onClick={onDuplicate}>
+                      <Copy className="size-4 mr-2" /> Duplicar campo
+                    </DropdownMenuItem>
+                  )}
+                  {onRemove && (
+                    <DropdownMenuItem onClick={onRemove} className="text-destructive focus:text-destructive">
+                      <Trash2 className="size-4 mr-2" /> Excluir campo
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>
+
 
         <CollapsibleContent>
           <div className="px-5 pb-5 pt-1 space-y-5 border-t border-border/50">
