@@ -382,28 +382,70 @@ function NovaCotacao() {
                 </div>
               </section>
 
-              <FlightCard
-                direction="ida"
-                voo={vooIda}
-                onChange={(patch) => setVooIda((v) => ({ ...v, ...patch }))}
-              />
-
-              {vooVolta ? (
+              {vooIdas.map((v, idx) => (
                 <FlightCard
-                  direction="volta"
-                  voo={vooVolta}
-                  onChange={(patch) => setVooVolta((v) => (v ? { ...v, ...patch } : v))}
-                  onRemove={() => setVooVolta(null)}
+                  key={v.id}
+                  direction="ida"
+                  voo={v}
+                  index={idx}
+                  total={vooIdas.length}
+                  onChange={(patch) =>
+                    setVooIdas((list) => list.map((x, i) => (i === idx ? { ...x, ...patch } : x)))
+                  }
+                  onDuplicate={() =>
+                    setVooIdas((list) => {
+                      const copy = { ...list[idx], id: crypto.randomUUID() };
+                      const next = [...list];
+                      next.splice(idx + 1, 0, copy);
+                      return next;
+                    })
+                  }
+                  onRemove={
+                    vooIdas.length > 1
+                      ? () => setVooIdas((list) => list.filter((_, i) => i !== idx))
+                      : undefined
+                  }
                 />
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setVooVolta(novoVoo())}
-                  className="w-full rounded-xl border border-dashed border-border hover:border-secondary hover:bg-secondary/5 text-sm text-muted-foreground hover:text-foreground py-4 flex items-center justify-center gap-2 transition-colors"
-                >
-                  <Plus className="size-4" /> Adicionar voo de volta
-                </button>
-              )}
+              ))}
+
+              <button
+                type="button"
+                onClick={() => setVooIdas((list) => [...list, novoVoo()])}
+                className="w-full rounded-xl border border-dashed border-border hover:border-primary hover:bg-primary/5 text-sm text-muted-foreground hover:text-foreground py-3 flex items-center justify-center gap-2 transition-colors"
+              >
+                <Plus className="size-4" /> Adicionar outro voo de ida
+              </button>
+
+              {vooVoltas.map((v, idx) => (
+                <FlightCard
+                  key={v.id}
+                  direction="volta"
+                  voo={v}
+                  index={idx}
+                  total={vooVoltas.length}
+                  onChange={(patch) =>
+                    setVooVoltas((list) => list.map((x, i) => (i === idx ? { ...x, ...patch } : x)))
+                  }
+                  onDuplicate={() =>
+                    setVooVoltas((list) => {
+                      const copy = { ...list[idx], id: crypto.randomUUID() };
+                      const next = [...list];
+                      next.splice(idx + 1, 0, copy);
+                      return next;
+                    })
+                  }
+                  onRemove={() => setVooVoltas((list) => list.filter((_, i) => i !== idx))}
+                />
+              ))}
+
+              <button
+                type="button"
+                onClick={() => setVooVoltas((list) => [...list, novoVoo()])}
+                className="w-full rounded-xl border border-dashed border-border hover:border-secondary hover:bg-secondary/5 text-sm text-muted-foreground hover:text-foreground py-4 flex items-center justify-center gap-2 transition-colors"
+              >
+                <Plus className="size-4" /> {vooVoltas.length === 0 ? "Adicionar voo de volta" : "Adicionar outro voo de volta"}
+              </button>
+
 
               <section className="bg-card border border-border/50 rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-4">
