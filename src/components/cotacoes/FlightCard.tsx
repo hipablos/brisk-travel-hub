@@ -13,7 +13,11 @@ import {
 import {
   Plane, PlaneTakeoff, PlaneLanding, ChevronDown, Hash, Edit3,
   Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Armchair, UtensilsCrossed, BellRing, Minus,
+  MoreHorizontal, Copy,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
@@ -82,6 +86,9 @@ interface Props {
   voo: Voo;
   onChange: (patch: Partial<Voo>) => void;
   onRemove?: () => void;
+  onDuplicate?: () => void;
+  index?: number;
+  total?: number;
 }
 
 function Counter({
@@ -111,7 +118,7 @@ function Counter({
   );
 }
 
-export function FlightCard({ direction, voo: rawVoo, onChange, onRemove }: Props) {
+export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total }: Props) {
   const voo = {
     ...rawVoo,
     escalas: rawVoo.escalas ?? [],
@@ -120,7 +127,10 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove }: Props
   const [open, setOpen] = useState(false);
   const isIda = direction === "ida";
   const Icon = isIda ? PlaneTakeoff : PlaneLanding;
-  const title = isIda ? "Voo de Ida" : "Voo de Volta";
+  const baseTitle = isIda ? "Voo de Ida" : "Voo de Volta";
+  const title = typeof index === "number" && typeof total === "number" && total > 1
+    ? `${baseTitle} ${index + 1}`
+    : baseTitle;
 
 
   const addEscala = () => {
@@ -183,13 +193,30 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove }: Props
             <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => { setOpen(true); onChange({ tipo: voo.tipo === "localizador" ? "direto" : voo.tipo }); }}>
               <Edit3 className="size-3.5" /> Incluir manualmente
             </Button>
-            {onRemove && (
-              <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive" onClick={onRemove}>
-                <Trash2 className="size-4" />
-              </Button>
+            {(onDuplicate || onRemove) && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" aria-label="Mais opções">
+                    <MoreHorizontal className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-44">
+                  {onDuplicate && (
+                    <DropdownMenuItem onClick={onDuplicate}>
+                      <Copy className="size-4 mr-2" /> Duplicar campo
+                    </DropdownMenuItem>
+                  )}
+                  {onRemove && (
+                    <DropdownMenuItem onClick={onRemove} className="text-destructive focus:text-destructive">
+                      <Trash2 className="size-4 mr-2" /> Excluir campo
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>
+
 
         <CollapsibleContent>
           <div className="px-5 pb-5 pt-1 space-y-5 border-t border-border/50">
