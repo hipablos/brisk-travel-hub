@@ -81,11 +81,12 @@ function NovaCotacao() {
   const [volta, setVolta] = useState("");
   const [adultos, setAdultos] = useState(2);
   const [criancas, setCriancas] = useState(0);
-  const [termos, setTermos] = useState(DEFAULT_TERMOS);
-  const [outrasInformacoes, setOutrasInformacoes] = useState(DEFAULT_OUTRAS_INFORMACOES);
+  const [termos, setTermos] = useState("");
+  const [outrasInformacoes, setOutrasInformacoes] = useState("");
   const [termosModeloId, setTermosModeloId] = useState<string>("");
   const [outrasModeloId, setOutrasModeloId] = useState<string>("");
   const termosModelos = useTermosModelos();
+
 
   const [observacoes, setObservacoes] = useState("");
   const [status, setStatus] = useState<CotacaoStatus>("aguardando");
@@ -131,8 +132,9 @@ function NovaCotacao() {
       setAdultos(c.adultos);
       setCriancas(c.criancas);
       setObservacoes(c.observacoes ?? "");
-      setTermos(c.termos ?? DEFAULT_TERMOS);
-      setOutrasInformacoes(c.outrasInformacoes ?? DEFAULT_OUTRAS_INFORMACOES);
+      setTermos(c.termos ?? "");
+      setOutrasInformacoes(c.outrasInformacoes ?? "");
+
       setStatus(c.status);
       setValidade(c.validade ?? "");
       setPagamento(c.pagamento ?? "");
