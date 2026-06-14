@@ -230,6 +230,19 @@ export async function deleteCotacao(id: string) {
   if (error) console.error("[cotacoes] delete error:", error);
 }
 
+export async function duplicateCotacao(id: string): Promise<Cotacao | null> {
+  const original = await getCotacao(id);
+  if (!original) return null;
+  const copy: Cotacao = {
+    ...original,
+    id: crypto.randomUUID(),
+    code: genCode(),
+    status: "aguardando",
+    createdAt: new Date().toISOString(),
+  };
+  return await saveCotacao(copy);
+}
+
 export async function updateCotacaoLabels(id: string, labels: string[]) {
   const c = await getCotacao(id);
   if (!c) return;

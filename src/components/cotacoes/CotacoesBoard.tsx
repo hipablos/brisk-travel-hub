@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
-import { Hash, Eye, Pencil, MoreVertical, MessageSquare, GripVertical, Trash2 } from "lucide-react";
+import { Hash, Eye, Pencil, MoreVertical, MessageSquare, GripVertical, Trash2, Copy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
+import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, duplicateCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
 import { LabelsPopover } from "./LabelsPopover";
 import { toast } from "sonner";
 
@@ -108,6 +108,18 @@ function KanbanCard({
               >
                 <Pencil className="size-3.5" />
               </Link>
+              <button
+                type="button"
+                onClick={async () => {
+                  const res = await duplicateCotacao(card.id);
+                  if (res) toast.success(`Cotação duplicada (${res.code})`);
+                  else toast.error("Não foi possível duplicar a cotação");
+                }}
+                className="p-1 hover:text-foreground"
+                title="Duplicar cotação"
+              >
+                <Copy className="size-3.5" />
+              </button>
               <button
                 type="button"
                 onClick={async () => {
