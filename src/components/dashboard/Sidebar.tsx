@@ -41,6 +41,7 @@ const groups: Group[] = [
     { icon: CreditCard, label: "Formas de Pagamento", href: "/formas-pagamento" },
     { icon: FileSignature, label: "Termos e Condições", href: "/termos-condicoes" },
     { icon: Plug, label: "Integrações", href: "/integracoes" },
+    { icon: MessageCircle, label: "Telegram", href: "/integracoes/telegram" },
   ] },
 
 ];
