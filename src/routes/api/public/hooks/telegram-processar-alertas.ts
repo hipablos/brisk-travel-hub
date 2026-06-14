@@ -43,7 +43,9 @@ export const Route = createFileRoute("/api/public/hooks/telegram-processar-alert
     handlers: {
       POST: async ({ request }) => {
         const expectedApiKeys = [
+          process.env.SUPABASE_ANON_KEY,
           process.env.SUPABASE_PUBLISHABLE_KEY,
+          import.meta.env.VITE_SUPABASE_ANON_KEY,
           import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         ].filter(Boolean);
         const apiKey = request.headers.get("apikey");
