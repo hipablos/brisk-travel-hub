@@ -465,3 +465,78 @@ function TelegramPage() {
     </div>
   );
 }
+
+function ProximosAlertas({ alertas }: { alertas: Alerta[] }) {
+  const [open, setOpen] = useState(false);
+  const fmt = (d: Date) => d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+  const top = alertas.slice(0, 3);
+
+  const renderCard = (a: Alerta) => (
+    <div key={a.key} className="rounded-lg border bg-background p-4 space-y-2">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <div className="text-sm font-semibold">{a.cliente}</div>
+          <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <Bell className="size-3" /> {a.tipo}
+            {a.numeroVoo && (
+              <>
+                <span className="text-muted-foreground/50">•</span>
+                <Plane className="size-3" /> {a.numeroVoo}
+              </>
+            )}
+          </div>
+        </div>
+        <Badge variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px]">
+          {a.status}
+        </Badge>
+      </div>
+      {(a.origem || a.destino) && (
+        <div className="text-xs text-muted-foreground">
+          {a.origem ?? "—"} → {a.destino ?? "—"}
+        </div>
+      )}
+      <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
+        <div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Evento</div>
+          <div className="font-medium">{fmt(a.eventoEm)}</div>
+        </div>
+        <div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Envio previsto</div>
+          <div className="font-medium">{fmt(a.enviarEm)}</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <section className="rounded-xl border bg-card p-5 md:p-6 space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Bell className="size-4 text-muted-foreground" />
+          <h2 className="text-base font-semibold">Próximos Alertas</h2>
+        </div>
+        {alertas.length > 3 && (
+          <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+            Ver todos ({alertas.length})
+          </Button>
+        )}
+      </div>
+      {top.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Nenhum alerta programado.</p>
+      ) : (
+        <div className="grid md:grid-cols-3 gap-3">{top.map(renderCard)}</div>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Todos os Próximos Alertas</DialogTitle>
+          </DialogHeader>
+          <div className="grid md:grid-cols-2 gap-3 mt-2">
+            {alertas.map(renderCard)}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+}
