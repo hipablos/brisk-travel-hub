@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Send, Save, Loader2, ChevronRight, MessageCircle } from "lucide-react";
+import { Send, Save, Loader2, ChevronRight, MessageCircle, CheckCircle2, XCircle, History } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -80,12 +81,32 @@ const NOTIFS: { key: keyof TelegramConfig; label: string; preview: string }[] = 
   },
 ];
 
+type EnvioRow = {
+  id: string;
+  tipo: string;
+  mensagem: string;
+  status: string;
+  erro: string | null;
+  created_at: string;
+};
+
 function TelegramPage() {
   const { user } = useAuth();
   const [cfg, setCfg] = useState<TelegramConfig>(DEFAULT);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [envios, setEnvios] = useState<EnvioRow[]>([]);
+
+  const loadEnvios = async (uid: string) => {
+    const { data } = await supabase
+      .from("telegram_envios")
+      .select("*")
+      .eq("user_id", uid)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setEnvios((data as EnvioRow[]) ?? []);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -96,6 +117,7 @@ function TelegramPage() {
         .eq("user_id", user.id)
         .maybeSingle();
       if (data) setCfg({ ...DEFAULT, ...data, token_bot: data.token_bot ?? "", chat_id: data.chat_id ?? "" });
+      await loadEnvios(user.id);
       setLoading(false);
     })();
   }, [user]);
@@ -119,29 +141,44 @@ function TelegramPage() {
   };
 
   const handleTest = async () => {
+    if (!user) return;
     if (!cfg.token_bot.trim() || !cfg.chat_id.trim()) {
       toast.error("Informe o Token do Bot e o Chat ID antes de testar.");
       return;
     }
     setTesting(true);
+    const now = new Date();
+    const dataHora = now.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "medium" });
+    const mensagem = `🚀 Teste de integração realizado com sucesso!\nBrisk CRM conectado ao Telegram.\nData e hora do teste: ${dataHora}`;
+
+    let status: "enviado" | "falhou" = "falhou";
+    let erro: string | null = null;
+
     try {
       const res = await fetch(
         `https://api.telegram.org/bot${cfg.token_bot.trim()}/sendMessage`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: cfg.chat_id.trim(),
-            text: "🚀 Teste de integração realizado com sucesso!\nBrisk CRM conectado ao Telegram.",
-          }),
+          body: JSON.stringify({ chat_id: cfg.chat_id.trim(), text: mensagem }),
         },
       );
       const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.description || "Falha");
+      if (!res.ok || !data.ok) throw new Error(data.description || `HTTP ${res.status}`);
+      status = "enviado";
       toast.success("Mensagem enviada com sucesso.");
-    } catch {
-      toast.error("Não foi possível enviar a mensagem. Verifique o Token e o Chat ID.");
+    } catch (e) {
+      erro = e instanceof Error ? e.message : "Falha desconhecida";
+      toast.error(`Falha no envio: ${erro}`);
     } finally {
+      await supabase.from("telegram_envios").insert({
+        user_id: user.id,
+        tipo: "Teste de integração",
+        mensagem,
+        status,
+        erro,
+      });
+      await loadEnvios(user.id);
       setTesting(false);
     }
   };
@@ -300,6 +337,56 @@ function TelegramPage() {
                     </div>
                   )}
                 </div>
+              </section>
+
+              {/* Histórico de Envios */}
+              <section className="rounded-xl border bg-card p-5 md:p-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <History className="size-4 text-muted-foreground" />
+                  <h2 className="text-base font-semibold">Histórico de Envios</h2>
+                </div>
+                {envios.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum envio registrado ainda. Use o botão "Enviar mensagem de teste" para gerar o primeiro registro.
+                  </p>
+                ) : (
+                  <div className="rounded-lg border overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Data e hora</TableHead>
+                          <TableHead>Tipo</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Detalhes</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {envios.map((e) => (
+                          <TableRow key={e.id}>
+                            <TableCell className="text-xs whitespace-nowrap">
+                              {new Date(e.created_at).toLocaleString("pt-BR")}
+                            </TableCell>
+                            <TableCell className="text-xs">{e.tipo}</TableCell>
+                            <TableCell>
+                              {e.status === "enviado" ? (
+                                <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 gap-1">
+                                  <CheckCircle2 className="size-3" /> Enviado
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 gap-1">
+                                  <XCircle className="size-3" /> Falhou
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground max-w-xs truncate">
+                              {e.erro ?? "—"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </section>
             </>
           )}
