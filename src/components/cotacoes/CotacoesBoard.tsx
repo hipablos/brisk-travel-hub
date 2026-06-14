@@ -216,7 +216,7 @@ export function CotacoesBoard() {
 
   return (
     <div
-      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 pb-4 h-[calc(100vh-280px)] items-start mt-6 w-full"
+      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 pb-4 flex-1 min-h-0 mt-6 w-full"
       onDragEnd={() => setDraggingId(null)}
     >
       {columns.map((col) => (
