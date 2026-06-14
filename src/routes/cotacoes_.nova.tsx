@@ -164,6 +164,23 @@ function NovaCotacao() {
     });
   }, [editId]);
 
+  // Aplica modelo padrão em novas cotações quando os modelos carregam
+  useEffect(() => {
+    if (editing) return;
+    const padraoT = termosModelos.find((m) => m.categoria === "termos" && m.padrao && m.ativo);
+    const padraoO = termosModelos.find((m) => m.categoria === "outras" && m.padrao && m.ativo);
+    if (padraoT && !termosModeloId) {
+      setTermosModeloId(padraoT.id);
+      setTermos(padraoT.conteudo);
+    }
+    if (padraoO && !outrasModeloId) {
+      setOutrasModeloId(padraoO.id);
+      setOutrasInformacoes(padraoO.conteudo);
+    }
+  }, [termosModelos, editing, termosModeloId, outrasModeloId]);
+
+
+
 
   // Valores helpers
   const addValorCusto = () => setValoresCusto((l) => [...l, { id: crypto.randomUUID(), valor: 0 }]);
