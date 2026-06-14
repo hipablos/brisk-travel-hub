@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VoosRouteImport } from './routes/voos'
 import { Route as TermosCondicoesRouteImport } from './routes/termos-condicoes'
+import { Route as IntegracoesRouteImport } from './routes/integracoes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegracoesRouteImport } from './routes/integracoes'
