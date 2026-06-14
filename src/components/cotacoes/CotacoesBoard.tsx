@@ -140,7 +140,7 @@ function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, on
     <div className="flex flex-col w-full min-w-0">
       <div className={cn("flex items-center justify-between gap-2 px-2.5 py-2 rounded-t-lg font-bold text-[11px] uppercase tracking-wider", colorClass)}>
         <span className="truncate">{title} ({count})</span>
-        <span>{totalAmount}</span>
+        <span className="shrink-0">{totalAmount}</span>
       </div>
       <div
         onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (!over) setOver(true); }}
