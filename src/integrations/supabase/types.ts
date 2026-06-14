@@ -266,6 +266,7 @@ export type Database = {
           erro: string | null
           id: string
           mensagem: string
+          referencia: string | null
           status: string
           tipo: string
           user_id: string
@@ -275,6 +276,7 @@ export type Database = {
           erro?: string | null
           id?: string
           mensagem: string
+          referencia?: string | null
           status: string
           tipo: string
           user_id: string
@@ -284,6 +286,7 @@ export type Database = {
           erro?: string | null
           id?: string
           mensagem?: string
+          referencia?: string | null
           status?: string
           tipo?: string
           user_id?: string
