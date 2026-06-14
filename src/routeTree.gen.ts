@@ -25,6 +25,7 @@ import { Route as FinanceiroVendasRouteImport } from './routes/financeiro_.venda
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
+import { Route as ApiPublicHooksTelegramCheckinRouteImport } from './routes/api/public/hooks/telegram-checkin'
 
 const VoosRoute = VoosRouteImport.update({
   id: '/voos',
@@ -106,6 +107,12 @@ const ClientesNovoRoute = ClientesNovoRouteImport.update({
   path: '/clientes/novo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksTelegramCheckinRoute =
+  ApiPublicHooksTelegramCheckinRouteImport.update({
+    id: '/api/public/hooks/telegram-checkin',
+    path: '/api/public/hooks/telegram-checkin',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
+  '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,6 +150,7 @@ export interface FileRoutesByTo {
   '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
+  '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,6 +170,7 @@ export interface FileRoutesById {
   '/integracoes_/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar_/$id': typeof ReservaEditarIdRoute
   '/reserva_/$id': typeof ReservaIdRoute
+  '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/integracoes/telegram'
     | '/reserva-editar/$id'
     | '/reserva/$id'
+    | '/api/public/hooks/telegram-checkin'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/integracoes/telegram'
     | '/reserva-editar/$id'
     | '/reserva/$id'
+    | '/api/public/hooks/telegram-checkin'
   id:
     | '__root__'
     | '/'
@@ -217,6 +229,7 @@ export interface FileRouteTypes {
     | '/integracoes_/telegram'
     | '/reserva-editar_/$id'
     | '/reserva_/$id'
+    | '/api/public/hooks/telegram-checkin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,6 +249,7 @@ export interface RootRouteChildren {
   IntegracoesTelegramRoute: typeof IntegracoesTelegramRoute
   ReservaEditarIdRoute: typeof ReservaEditarIdRoute
   ReservaIdRoute: typeof ReservaIdRoute
+  ApiPublicHooksTelegramCheckinRoute: typeof ApiPublicHooksTelegramCheckinRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -352,6 +366,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientesNovoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/telegram-checkin': {
+      id: '/api/public/hooks/telegram-checkin'
+      path: '/api/public/hooks/telegram-checkin'
+      fullPath: '/api/public/hooks/telegram-checkin'
+      preLoaderRoute: typeof ApiPublicHooksTelegramCheckinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -372,6 +393,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntegracoesTelegramRoute: IntegracoesTelegramRoute,
   ReservaEditarIdRoute: ReservaEditarIdRoute,
   ReservaIdRoute: ReservaIdRoute,
+  ApiPublicHooksTelegramCheckinRoute: ApiPublicHooksTelegramCheckinRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
