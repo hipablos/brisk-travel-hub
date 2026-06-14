@@ -141,29 +141,44 @@ function TelegramPage() {
   };
 
   const handleTest = async () => {
+    if (!user) return;
     if (!cfg.token_bot.trim() || !cfg.chat_id.trim()) {
       toast.error("Informe o Token do Bot e o Chat ID antes de testar.");
       return;
     }
     setTesting(true);
+    const now = new Date();
+    const dataHora = now.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "medium" });
+    const mensagem = `🚀 Teste de integração realizado com sucesso!\nBrisk CRM conectado ao Telegram.\nData e hora do teste: ${dataHora}`;
+
+    let status: "enviado" | "falhou" = "falhou";
+    let erro: string | null = null;
+
     try {
       const res = await fetch(
         `https://api.telegram.org/bot${cfg.token_bot.trim()}/sendMessage`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: cfg.chat_id.trim(),
-            text: "🚀 Teste de integração realizado com sucesso!\nBrisk CRM conectado ao Telegram.",
-          }),
+          body: JSON.stringify({ chat_id: cfg.chat_id.trim(), text: mensagem }),
         },
       );
       const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.description || "Falha");
+      if (!res.ok || !data.ok) throw new Error(data.description || `HTTP ${res.status}`);
+      status = "enviado";
       toast.success("Mensagem enviada com sucesso.");
-    } catch {
-      toast.error("Não foi possível enviar a mensagem. Verifique o Token e o Chat ID.");
+    } catch (e) {
+      erro = e instanceof Error ? e.message : "Falha desconhecida";
+      toast.error(`Falha no envio: ${erro}`);
     } finally {
+      await supabase.from("telegram_envios").insert({
+        user_id: user.id,
+        tipo: "Teste de integração",
+        mensagem,
+        status,
+        erro,
+      });
+      await loadEnvios(user.id);
       setTesting(false);
     }
   };
