@@ -25,8 +25,10 @@ import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
   useFormasPagamento, computeFormaTotal, deleteCotacao,
   DEFAULT_TERMOS, DEFAULT_OUTRAS_INFORMACOES,
+  useTermosModelos,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
+
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
 import { VendaLinhaDialog } from "@/components/cotacoes/VendaLinhaDialog";
@@ -79,8 +81,13 @@ function NovaCotacao() {
   const [volta, setVolta] = useState("");
   const [adultos, setAdultos] = useState(2);
   const [criancas, setCriancas] = useState(0);
-  const [termos, setTermos] = useState(DEFAULT_TERMOS);
-  const [outrasInformacoes, setOutrasInformacoes] = useState(DEFAULT_OUTRAS_INFORMACOES);
+  const [termos, setTermos] = useState("");
+  const [outrasInformacoes, setOutrasInformacoes] = useState("");
+  const [termosModeloId, setTermosModeloId] = useState<string>("");
+  const [outrasModeloId, setOutrasModeloId] = useState<string>("");
+  const termosModelos = useTermosModelos();
+
+
   const [observacoes, setObservacoes] = useState("");
   const [status, setStatus] = useState<CotacaoStatus>("aguardando");
   const [validade, setValidade] = useState("");
@@ -125,8 +132,9 @@ function NovaCotacao() {
       setAdultos(c.adultos);
       setCriancas(c.criancas);
       setObservacoes(c.observacoes ?? "");
-      setTermos(c.termos ?? DEFAULT_TERMOS);
-      setOutrasInformacoes(c.outrasInformacoes ?? DEFAULT_OUTRAS_INFORMACOES);
+      setTermos(c.termos ?? "");
+      setOutrasInformacoes(c.outrasInformacoes ?? "");
+
       setStatus(c.status);
       setValidade(c.validade ?? "");
       setPagamento(c.pagamento ?? "");
@@ -157,6 +165,23 @@ function NovaCotacao() {
       setVooVoltas(voltasArr);
     });
   }, [editId]);
+
+  // Aplica modelo padrão em novas cotações quando os modelos carregam
+  useEffect(() => {
+    if (editing) return;
+    const padraoT = termosModelos.find((m) => m.categoria === "termos" && m.padrao && m.ativo);
+    const padraoO = termosModelos.find((m) => m.categoria === "outras" && m.padrao && m.ativo);
+    if (padraoT && !termosModeloId) {
+      setTermosModeloId(padraoT.id);
+      setTermos(padraoT.conteudo);
+    }
+    if (padraoO && !outrasModeloId) {
+      setOutrasModeloId(padraoO.id);
+      setOutrasInformacoes(padraoO.conteudo);
+    }
+  }, [termosModelos, editing, termosModeloId, outrasModeloId]);
+
+
 
 
   // Valores helpers
@@ -544,15 +569,84 @@ function NovaCotacao() {
 
               <section className="bg-card border border-border/50 rounded-xl p-6 space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground mb-2">Termos e Condições</h2>
-                  <p className="text-xs text-muted-foreground mb-2">Aparece no PDF da cotação enviada ao cliente.</p>
-                  <Textarea value={termos} onChange={(e) => setTermos(e.target.value)} rows={5} />
+                  <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
+                    <h2 className="text-lg font-semibold text-foreground">Termos e Condições</h2>
+                    <Button asChild type="button" variant="outline" size="sm" className="gap-2">
+                      <Link to="/termos-condicoes"><FileSignature className="size-4" /> Gerenciar modelos</Link>
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">Selecione um modelo cadastrado. O conteúdo será salvo junto à cotação.</p>
+                  <Select
+                    value={termosModeloId || "__none"}
+                    onValueChange={(v) => {
+                      if (v === "__none") {
+                        setTermosModeloId("");
+                        setTermos("");
+                        return;
+                      }
+                      const m = termosModelos.find((x) => x.id === v);
+                      if (m) {
+                        setTermosModeloId(m.id);
+                        setTermos(m.conteudo);
+                      }
+                    }}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Selecione um modelo" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none">Sem termos</SelectItem>
+                      {termosModelos.filter((m) => m.categoria === "termos" && m.ativo).map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          {m.nome}{m.padrao ? " (padrão)" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {termos && (
+                    <div className="mt-2 text-[11px] text-muted-foreground whitespace-pre-wrap border border-dashed border-border/60 rounded p-2 max-h-32 overflow-auto">
+                      {termos}
+                    </div>
+                  )}
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground mb-2">Outras Informações</h2>
-                  <p className="text-xs text-muted-foreground mb-2">Aparece no PDF da cotação enviada ao cliente.</p>
-                  <Textarea value={outrasInformacoes} onChange={(e) => setOutrasInformacoes(e.target.value)} rows={5} />
+                  <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
+                    <h2 className="text-lg font-semibold text-foreground">Outras Informações</h2>
+                    <Button asChild type="button" variant="outline" size="sm" className="gap-2">
+                      <Link to="/termos-condicoes"><FileSignature className="size-4" /> Gerenciar modelos</Link>
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">Selecione um modelo cadastrado. O conteúdo será salvo junto à cotação.</p>
+                  <Select
+                    value={outrasModeloId || "__none"}
+                    onValueChange={(v) => {
+                      if (v === "__none") {
+                        setOutrasModeloId("");
+                        setOutrasInformacoes("");
+                        return;
+                      }
+                      const m = termosModelos.find((x) => x.id === v);
+                      if (m) {
+                        setOutrasModeloId(m.id);
+                        setOutrasInformacoes(m.conteudo);
+                      }
+                    }}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Selecione um modelo" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none">Sem outras informações</SelectItem>
+                      {termosModelos.filter((m) => m.categoria === "outras" && m.ativo).map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          {m.nome}{m.padrao ? " (padrão)" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {outrasInformacoes && (
+                    <div className="mt-2 text-[11px] text-muted-foreground whitespace-pre-wrap border border-dashed border-border/60 rounded p-2 max-h-32 overflow-auto">
+                      {outrasInformacoes}
+                    </div>
+                  )}
                 </div>
+
                 <div>
                   <h2 className="text-lg font-semibold text-foreground mb-2">Observações internas</h2>
                   <p className="text-xs text-muted-foreground mb-2">Não aparece no PDF — uso interno.</p>
