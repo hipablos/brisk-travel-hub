@@ -20,7 +20,7 @@ function Cotacoes() {
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         <Topbar />
-        <main className="p-6 w-full mx-auto flex-1 flex flex-col min-w-0 overflow-x-clip overflow-y-visible">
+        <main className="p-6 w-full mx-auto flex-1 flex flex-col min-w-0">
           <CotacoesFilters />
           <CotacoesBoard />
         </main>
