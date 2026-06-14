@@ -119,6 +119,7 @@ function TelegramPage() {
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [envios, setEnvios] = useState<EnvioRow[]>([]);
+  const [alertas, setAlertas] = useState<Alerta[]>([]);
 
   const loadEnvios = async (uid: string) => {
     const { data } = await supabase
@@ -128,6 +129,49 @@ function TelegramPage() {
       .order("created_at", { ascending: false })
       .limit(50);
     setEnvios((data as EnvioRow[]) ?? []);
+    return (data as EnvioRow[]) ?? [];
+  };
+
+  const loadAlertas = async (uid: string, enviosAtuais: EnvioRow[]) => {
+    const { data: cots } = await supabase
+      .from("cotacoes")
+      .select("id, code, data")
+      .eq("user_id", uid)
+      .eq("status", "aprovado");
+
+    const enviadasRefs = new Set(
+      enviosAtuais
+        .filter((e) => e.status === "enviado" && e.tipo === "checkin_48h" && e.referencia)
+        .map((e) => e.referencia as string),
+    );
+
+    const now = new Date();
+    const lista: Alerta[] = [];
+    for (const cot of cots ?? []) {
+      const d = (cot.data ?? {}) as Record<string, any>;
+      const idas = Array.isArray(d.vooIdas) ? d.vooIdas : d.vooIda ? [d.vooIda] : [];
+      const primeiro = idas[0];
+      if (!primeiro) continue;
+      const dep = parseDeparture(primeiro.data, primeiro.horaSaida);
+      if (!dep) continue;
+      const enviarEm = new Date(dep.getTime() - 48 * 60 * 60 * 1000);
+      if (dep.getTime() < now.getTime()) continue;
+      const ref = `${cot.id}:0`;
+      if (enviadasRefs.has(ref)) continue;
+      lista.push({
+        key: ref,
+        tipo: "Check-in",
+        cliente: d.cliente?.nome ?? "—",
+        numeroVoo: primeiro.numeroVoo,
+        origem: primeiro.origemInfo?.iata ?? primeiro.origem,
+        destino: primeiro.destinoInfo?.iata ?? primeiro.destino,
+        eventoEm: dep,
+        enviarEm,
+        status: "Pendente",
+      });
+    }
+    lista.sort((a, b) => a.enviarEm.getTime() - b.enviarEm.getTime());
+    setAlertas(lista);
   };
 
   useEffect(() => {
@@ -139,7 +183,8 @@ function TelegramPage() {
         .eq("user_id", user.id)
         .maybeSingle();
       if (data) setCfg({ ...DEFAULT, ...data, token_bot: data.token_bot ?? "", chat_id: data.chat_id ?? "" });
-      await loadEnvios(user.id);
+      const env = await loadEnvios(user.id);
+      await loadAlertas(user.id, env);
       setLoading(false);
     })();
   }, [user]);
