@@ -457,6 +457,9 @@ function TelegramPage() {
                 </div>
               </section>
 
+              {/* Rotina automática */}
+              <RotinaAutomatica rotina={rotina} conectado={Boolean(conectado)} />
+
               {/* Próximos Alertas */}
               <ProximosAlertas alertas={alertas} />
 
