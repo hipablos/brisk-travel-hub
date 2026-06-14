@@ -406,6 +406,9 @@ function TelegramPage() {
                 </div>
               </section>
 
+              {/* Próximos Alertas */}
+              <ProximosAlertas alertas={alertas} />
+
               {/* Histórico de Envios */}
               <section className="rounded-xl border bg-card p-5 md:p-6 space-y-4">
                 <div className="flex items-center gap-2">
