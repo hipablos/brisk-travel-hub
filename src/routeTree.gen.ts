@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VoosRouteImport } from './routes/voos'
+import { Route as TermosCondicoesRouteImport } from './routes/termos-condicoes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FormasPagamentoRouteImport } from './routes/formas-pagamento'
@@ -26,6 +27,11 @@ import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
 const VoosRoute = VoosRouteImport.update({
   id: '/voos',
   path: '/voos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosCondicoesRoute = TermosCondicoesRouteImport.update({
+  id: '/termos-condicoes',
+  path: '/termos-condicoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/formas-pagamento': typeof FormasPagamentoRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/termos-condicoes': typeof TermosCondicoesRoute
   '/voos': typeof VoosRoute
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/formas-pagamento': typeof FormasPagamentoRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/termos-condicoes': typeof TermosCondicoesRoute
   '/voos': typeof VoosRoute
   '/clientes/novo': typeof ClientesNovoRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/formas-pagamento': typeof FormasPagamentoRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/termos-condicoes': typeof TermosCondicoesRoute
   '/voos': typeof VoosRoute
   '/clientes_/novo': typeof ClientesNovoRoute
   '/cotacoes_/$id': typeof CotacoesIdRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/formas-pagamento'
     | '/login'
     | '/reset-password'
+    | '/termos-condicoes'
     | '/voos'
     | '/clientes/novo'
     | '/cotacoes/$id'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/formas-pagamento'
     | '/login'
     | '/reset-password'
+    | '/termos-condicoes'
     | '/voos'
     | '/clientes/novo'
     | '/cotacoes/$id'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/formas-pagamento'
     | '/login'
     | '/reset-password'
+    | '/termos-condicoes'
     | '/voos'
     | '/clientes_/novo'
     | '/cotacoes_/$id'
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   FormasPagamentoRoute: typeof FormasPagamentoRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TermosCondicoesRoute: typeof TermosCondicoesRoute
   VoosRoute: typeof VoosRoute
   ClientesNovoRoute: typeof ClientesNovoRoute
   CotacoesIdRoute: typeof CotacoesIdRoute
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/voos'
       fullPath: '/voos'
       preLoaderRoute: typeof VoosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos-condicoes': {
+      id: '/termos-condicoes'
+      path: '/termos-condicoes'
+      fullPath: '/termos-condicoes'
+      preLoaderRoute: typeof TermosCondicoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -302,6 +322,7 @@ const rootRouteChildren: RootRouteChildren = {
   FormasPagamentoRoute: FormasPagamentoRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TermosCondicoesRoute: TermosCondicoesRoute,
   VoosRoute: VoosRoute,
   ClientesNovoRoute: ClientesNovoRoute,
   CotacoesIdRoute: CotacoesIdRoute,
