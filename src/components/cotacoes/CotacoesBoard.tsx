@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
-import { Hash, Eye, Pencil, MoreVertical, MessageSquare, GripVertical, Trash2 } from "lucide-react";
+import { Hash, Eye, Pencil, MoreVertical, MessageSquare, GripVertical, Trash2, Copy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
+import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, duplicateCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
 import { LabelsPopover } from "./LabelsPopover";
 import { toast } from "sonner";
 
