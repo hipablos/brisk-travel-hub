@@ -120,6 +120,7 @@ function TelegramPage() {
   const [testing, setTesting] = useState(false);
   const [envios, setEnvios] = useState<EnvioRow[]>([]);
   const [alertas, setAlertas] = useState<Alerta[]>([]);
+  const [rotina, setRotina] = useState<RotinaStatus | null>(null);
 
   const loadEnvios = async (uid: string) => {
     const { data } = await supabase
@@ -132,46 +133,85 @@ function TelegramPage() {
     return (data as EnvioRow[]) ?? [];
   };
 
-  const loadAlertas = async (uid: string, enviosAtuais: EnvioRow[]) => {
+  const loadRotina = async (uid: string) => {
+    const { data } = await supabase
+      .from("telegram_rotina_status")
+      .select("ultima_verificacao, alertas_processados, status, erro")
+      .eq("user_id", uid)
+      .maybeSingle();
+    setRotina((data as RotinaStatus | null) ?? null);
+  };
+
+  const loadAlertas = async (uid: string) => {
     const { data: cots } = await supabase
       .from("cotacoes")
       .select("id, code, data")
       .eq("user_id", uid)
       .eq("status", "aprovado");
 
-    const enviadasRefs = new Set(
-      enviosAtuais
-        .filter((e) => e.status === "enviado" && e.tipo === "checkin_48h" && e.referencia)
-        .map((e) => e.referencia as string),
-    );
-
     const now = new Date();
-    const lista: Alerta[] = [];
     for (const cot of cots ?? []) {
-      const d = (cot.data ?? {}) as Record<string, any>;
-      const idas = Array.isArray(d.vooIdas) ? d.vooIdas : d.vooIda ? [d.vooIda] : [];
-      const primeiro = idas[0];
-      if (!primeiro) continue;
-      const dep = parseDeparture(primeiro.data, primeiro.horaSaida);
-      if (!dep) continue;
-      const enviarEm = new Date(dep.getTime() - 48 * 60 * 60 * 1000);
-      if (dep.getTime() < now.getTime()) continue;
-      const ref = `${cot.id}:0`;
-      if (enviadasRefs.has(ref)) continue;
-      lista.push({
-        key: ref,
-        tipo: "Check-in",
-        cliente: d.cliente?.nome ?? "—",
-        numeroVoo: primeiro.numeroVoo,
-        origem: primeiro.origemInfo?.iata ?? primeiro.origem,
-        destino: primeiro.destinoInfo?.iata ?? primeiro.destino,
-        eventoEm: dep,
-        enviarEm,
-        status: "Pendente",
-      });
+      const alert = buildCheckinAlertFromCotacao(cot);
+      if (!alert || alert.eventoEm.getTime() < now.getTime()) continue;
+      const { data: existing } = await supabase
+        .from("telegram_alertas")
+        .select("id, status")
+        .eq("user_id", uid)
+        .eq("tipo", alert.tipo)
+        .eq("referencia", alert.referencia)
+        .maybeSingle();
+      if (!existing) {
+        await supabase.from("telegram_alertas").insert({
+          user_id: uid,
+          tipo: alert.tipo,
+          referencia: alert.referencia,
+          cliente: alert.cliente,
+          numero_voo: alert.numeroVoo,
+          origem: alert.origem,
+          destino: alert.destino,
+          evento_em: alert.eventoEm.toISOString(),
+          enviar_em: alert.enviarEm.toISOString(),
+          mensagem: alert.mensagem,
+          metadata: alert.metadata as any,
+        });
+      } else if (existing.status === "Pendente") {
+        await supabase
+          .from("telegram_alertas")
+          .update({
+            cliente: alert.cliente,
+            numero_voo: alert.numeroVoo,
+            origem: alert.origem,
+            destino: alert.destino,
+            evento_em: alert.eventoEm.toISOString(),
+            enviar_em: alert.enviarEm.toISOString(),
+            mensagem: alert.mensagem,
+            metadata: alert.metadata as any,
+            erro: null,
+          })
+          .eq("id", existing.id);
+      }
     }
-    lista.sort((a, b) => a.enviarEm.getTime() - b.enviarEm.getTime());
-    setAlertas(lista);
+
+    const { data: pending } = await supabase
+      .from("telegram_alertas")
+      .select("id, tipo, cliente, numero_voo, origem, destino, evento_em, enviar_em, status")
+      .eq("user_id", uid)
+      .eq("status", "Pendente")
+      .order("enviar_em", { ascending: true });
+
+    setAlertas(
+      ((pending ?? []) as any[]).map((a) => ({
+        key: a.id,
+        tipo: a.tipo,
+        cliente: a.cliente,
+        numeroVoo: a.numero_voo ?? undefined,
+        origem: a.origem ?? undefined,
+        destino: a.destino ?? undefined,
+        eventoEm: new Date(a.evento_em),
+        enviarEm: new Date(a.enviar_em),
+        status: "Pendente",
+      })),
+    );
   };
 
   useEffect(() => {
