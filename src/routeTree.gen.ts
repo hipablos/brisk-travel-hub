@@ -13,6 +13,7 @@ import { Route as VoosRouteImport } from './routes/voos'
 import { Route as TermosCondicoesRouteImport } from './routes/termos-condicoes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as IntegracoesRouteImport } from './routes/integracoes'
 import { Route as FormasPagamentoRouteImport } from './routes/formas-pagamento'
 import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as ClientesRouteImport } from './routes/clientes'
@@ -42,6 +43,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegracoesRoute = IntegracoesRouteImport.update({
+  id: '/integracoes',
+  path: '/integracoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FormasPagamentoRoute = FormasPagamentoRouteImport.update({
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
   '/formas-pagamento': typeof FormasPagamentoRoute
+  '/integracoes': typeof IntegracoesRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/termos-condicoes': typeof TermosCondicoesRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
   '/formas-pagamento': typeof FormasPagamentoRoute
+  '/integracoes': typeof IntegracoesRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/termos-condicoes': typeof TermosCondicoesRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
   '/formas-pagamento': typeof FormasPagamentoRoute
+  '/integracoes': typeof IntegracoesRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/termos-condicoes': typeof TermosCondicoesRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/cotacoes'
     | '/formas-pagamento'
+    | '/integracoes'
     | '/login'
     | '/reset-password'
     | '/termos-condicoes'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/cotacoes'
     | '/formas-pagamento'
+    | '/integracoes'
     | '/login'
     | '/reset-password'
     | '/termos-condicoes'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/cotacoes'
     | '/formas-pagamento'
+    | '/integracoes'
     | '/login'
     | '/reset-password'
     | '/termos-condicoes'
@@ -200,6 +212,7 @@ export interface RootRouteChildren {
   ClientesRoute: typeof ClientesRoute
   CotacoesRoute: typeof CotacoesRoute
   FormasPagamentoRoute: typeof FormasPagamentoRoute
+  IntegracoesRoute: typeof IntegracoesRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermosCondicoesRoute: typeof TermosCondicoesRoute
@@ -240,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integracoes': {
+      id: '/integracoes'
+      path: '/integracoes'
+      fullPath: '/integracoes'
+      preLoaderRoute: typeof IntegracoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/formas-pagamento': {
@@ -320,6 +340,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesRoute: ClientesRoute,
   CotacoesRoute: CotacoesRoute,
   FormasPagamentoRoute: FormasPagamentoRoute,
+  IntegracoesRoute: IntegracoesRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermosCondicoesRoute: TermosCondicoesRoute,

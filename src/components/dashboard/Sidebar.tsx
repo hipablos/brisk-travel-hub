@@ -3,7 +3,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, Calendar, Plane, Hotel,
   MapPin, ShoppingCart, ChevronDown, LogOut,
-  Users, CreditCard, FileSignature,
+  Users, CreditCard, FileSignature, Plug,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
