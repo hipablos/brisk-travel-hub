@@ -14,9 +14,9 @@ export function CotacoesFilters() {
   return (
     <div className="space-y-4">
       {/* Top Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 min-w-0">
         <h1 className="text-2xl font-bold text-foreground">Cotações</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" className="gap-2">
             <LinkIcon className="size-4" />
             Links
@@ -31,8 +31,8 @@ export function CotacoesFilters() {
       </div>
 
       {/* Filters Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 items-end bg-card p-4 rounded-xl border border-border/50">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-4 items-end bg-card p-4 rounded-xl border border-border/50 min-w-0">
+        <div className="space-y-1.5 min-w-0">
           <label className="text-sm font-medium text-foreground">Cliente</label>
           <Select defaultValue="todos">
             <SelectTrigger>
@@ -46,12 +46,12 @@ export function CotacoesFilters() {
           </Select>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 min-w-0">
           <label className="text-sm font-medium text-foreground">Tag/Identificador</label>
           <Input placeholder="Tag ou Identificador" />
         </div>
 
-        <div className="space-y-1.5 lg:col-span-2">
+        <div className="space-y-1.5 md:col-span-2 min-w-0">
           <label className="text-sm font-medium text-foreground">Período da Cotação</label>
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
@@ -66,7 +66,7 @@ export function CotacoesFilters() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-end gap-2 min-w-0 md:col-span-2 lg:col-span-1 2xl:col-span-1">
           <div className="space-y-1.5 flex-1">
             <label className="text-sm font-medium text-foreground">Usuário</label>
             <Select defaultValue="todos">
@@ -78,10 +78,10 @@ export function CotacoesFilters() {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline" size="icon" className="mb-0 mt-6 shrink-0">
+          <Button variant="outline" size="icon" className="mb-0 shrink-0">
             <Filter className="size-4" />
           </Button>
-          <Button className="mb-0 mt-6 shrink-0 bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className="mb-0 shrink-0 bg-blue-600 hover:bg-blue-700 text-white">
             Pesquisar
           </Button>
         </div>
