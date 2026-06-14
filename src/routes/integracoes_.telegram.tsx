@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Send, Save, Loader2, ChevronRight, MessageCircle, CheckCircle2, XCircle, History, Bell, Plane } from "lucide-react";
+import { Send, Save, Loader2, ChevronRight, MessageCircle, CheckCircle2, XCircle, History, Bell, Plane, Activity } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { buildCheckinAlertFromCotacao } from "@/lib/telegram-alertas";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/integracoes_/telegram")({
@@ -104,14 +105,12 @@ type Alerta = {
   status: "Pendente";
 };
 
-function parseDeparture(data?: string, hora?: string): Date | null {
-  if (!data || !hora) return null;
-  const md = /^(\d{2})-(\d{2})-(\d{4})$/.exec(data.trim());
-  const mt = /^(\d{2}):(\d{2})$/.exec(hora.trim());
-  if (!md || !mt) return null;
-  // Brazil local (UTC-3) -> UTC
-  return new Date(Date.UTC(+md[3], +md[2] - 1, +md[1], +mt[1] + 3, +mt[2], 0));
-}
+type RotinaStatus = {
+  ultima_verificacao: string | null;
+  alertas_processados: number;
+  status: string;
+  erro: string | null;
+};
 
 function TelegramPage() {
   const { user } = useAuth();
@@ -121,6 +120,7 @@ function TelegramPage() {
   const [testing, setTesting] = useState(false);
   const [envios, setEnvios] = useState<EnvioRow[]>([]);
   const [alertas, setAlertas] = useState<Alerta[]>([]);
+  const [rotina, setRotina] = useState<RotinaStatus | null>(null);
 
   const loadEnvios = async (uid: string) => {
     const { data } = await supabase
@@ -133,50 +133,95 @@ function TelegramPage() {
     return (data as EnvioRow[]) ?? [];
   };
 
-  const loadAlertas = async (uid: string, enviosAtuais: EnvioRow[]) => {
+  const loadRotina = async (uid: string) => {
+    const { data } = await supabase
+      .from("telegram_rotina_status")
+      .select("ultima_verificacao, alertas_processados, status, erro")
+      .eq("user_id", uid)
+      .maybeSingle();
+    setRotina((data as RotinaStatus | null) ?? null);
+  };
+
+  const loadAlertas = async (uid: string) => {
     const { data: cots } = await supabase
       .from("cotacoes")
       .select("id, code, data")
       .eq("user_id", uid)
       .eq("status", "aprovado");
 
-    const enviadasRefs = new Set(
-      enviosAtuais
-        .filter((e) => e.status === "enviado" && e.tipo === "checkin_48h" && e.referencia)
-        .map((e) => e.referencia as string),
-    );
-
     const now = new Date();
-    const lista: Alerta[] = [];
     for (const cot of cots ?? []) {
-      const d = (cot.data ?? {}) as Record<string, any>;
-      const idas = Array.isArray(d.vooIdas) ? d.vooIdas : d.vooIda ? [d.vooIda] : [];
-      const primeiro = idas[0];
-      if (!primeiro) continue;
-      const dep = parseDeparture(primeiro.data, primeiro.horaSaida);
-      if (!dep) continue;
-      const enviarEm = new Date(dep.getTime() - 48 * 60 * 60 * 1000);
-      if (dep.getTime() < now.getTime()) continue;
-      const ref = `${cot.id}:0`;
-      if (enviadasRefs.has(ref)) continue;
-      lista.push({
-        key: ref,
-        tipo: "Check-in",
-        cliente: d.cliente?.nome ?? "—",
-        numeroVoo: primeiro.numeroVoo,
-        origem: primeiro.origemInfo?.iata ?? primeiro.origem,
-        destino: primeiro.destinoInfo?.iata ?? primeiro.destino,
-        eventoEm: dep,
-        enviarEm,
-        status: "Pendente",
-      });
+      const alert = buildCheckinAlertFromCotacao(cot);
+      if (!alert || alert.eventoEm.getTime() < now.getTime()) continue;
+      const { data: existing } = await supabase
+        .from("telegram_alertas")
+        .select("id, status")
+        .eq("user_id", uid)
+        .eq("tipo", alert.tipo)
+        .eq("referencia", alert.referencia)
+        .maybeSingle();
+      if (!existing) {
+        await supabase.from("telegram_alertas").insert({
+          user_id: uid,
+          tipo: alert.tipo,
+          referencia: alert.referencia,
+          cliente: alert.cliente,
+          numero_voo: alert.numeroVoo,
+          origem: alert.origem,
+          destino: alert.destino,
+          evento_em: alert.eventoEm.toISOString(),
+          enviar_em: alert.enviarEm.toISOString(),
+          mensagem: alert.mensagem,
+          metadata: alert.metadata as any,
+        });
+      } else if (existing.status === "Pendente") {
+        await supabase
+          .from("telegram_alertas")
+          .update({
+            cliente: alert.cliente,
+            numero_voo: alert.numeroVoo,
+            origem: alert.origem,
+            destino: alert.destino,
+            evento_em: alert.eventoEm.toISOString(),
+            enviar_em: alert.enviarEm.toISOString(),
+            mensagem: alert.mensagem,
+            metadata: alert.metadata as any,
+            erro: null,
+          })
+          .eq("id", existing.id);
+      }
     }
-    lista.sort((a, b) => a.enviarEm.getTime() - b.enviarEm.getTime());
-    setAlertas(lista);
+
+    const { data: pending } = await supabase
+      .from("telegram_alertas")
+      .select("id, tipo, cliente, numero_voo, origem, destino, evento_em, enviar_em, status")
+      .eq("user_id", uid)
+      .eq("status", "Pendente")
+      .order("enviar_em", { ascending: true });
+
+    setAlertas(
+      ((pending ?? []) as any[]).map((a) => ({
+        key: a.id,
+        tipo: a.tipo,
+        cliente: a.cliente,
+        numeroVoo: a.numero_voo ?? undefined,
+        origem: a.origem ?? undefined,
+        destino: a.destino ?? undefined,
+        eventoEm: new Date(a.evento_em),
+        enviarEm: new Date(a.enviar_em),
+        status: "Pendente",
+      })),
+    );
   };
 
   useEffect(() => {
     if (!user) return;
+    let active = true;
+    const refresh = async () => {
+      await loadEnvios(user.id);
+      await loadAlertas(user.id);
+      await loadRotina(user.id);
+    };
     (async () => {
       const { data } = await supabase
         .from("telegram_config")
@@ -184,10 +229,14 @@ function TelegramPage() {
         .eq("user_id", user.id)
         .maybeSingle();
       if (data) setCfg({ ...DEFAULT, ...data, token_bot: data.token_bot ?? "", chat_id: data.chat_id ?? "" });
-      const env = await loadEnvios(user.id);
-      await loadAlertas(user.id, env);
-      setLoading(false);
+      await refresh();
+      if (active) setLoading(false);
     })();
+    const interval = window.setInterval(refresh, 60_000);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
   }, [user]);
 
   const setField = <K extends keyof TelegramConfig>(k: K, v: TelegramConfig[K]) =>
@@ -247,6 +296,7 @@ function TelegramPage() {
         erro,
       });
       await loadEnvios(user.id);
+      await loadRotina(user.id);
       setTesting(false);
     }
   };
@@ -407,6 +457,9 @@ function TelegramPage() {
                 </div>
               </section>
 
+              {/* Rotina automática */}
+              <RotinaAutomatica rotina={rotina} conectado={Boolean(conectado)} />
+
               {/* Próximos Alertas */}
               <ProximosAlertas alertas={alertas} />
 
@@ -464,6 +517,48 @@ function TelegramPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+function RotinaAutomatica({ rotina, conectado }: { rotina: RotinaStatus | null; conectado: boolean }) {
+  const ativa = conectado && rotina?.status === "Ativa";
+  return (
+    <section className="rounded-xl border bg-card p-5 md:p-6 space-y-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Activity className="size-4 text-muted-foreground" />
+          <h2 className="text-base font-semibold">Rotina automática</h2>
+        </div>
+        <Badge
+          variant="outline"
+          className={
+            ativa
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 gap-1"
+              : "border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 gap-1"
+          }
+        >
+          <span className={`size-2 rounded-full ${ativa ? "bg-emerald-500" : "bg-rose-500"}`} />
+          {ativa ? "Ativa" : "Inativa"}
+        </Badge>
+      </div>
+      <div className="grid md:grid-cols-3 gap-3">
+        <div className="rounded-lg border bg-background p-4">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Última verificação</div>
+          <div className="text-sm font-medium mt-1">
+            {rotina?.ultima_verificacao ? new Date(rotina.ultima_verificacao).toLocaleString("pt-BR") : "—"}
+          </div>
+        </div>
+        <div className="rounded-lg border bg-background p-4">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Alertas processados</div>
+          <div className="text-sm font-medium mt-1">{rotina?.alertas_processados ?? 0}</div>
+        </div>
+        <div className="rounded-lg border bg-background p-4">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Status da rotina</div>
+          <div className="text-sm font-medium mt-1">{ativa ? "Ativa" : "Inativa"}</div>
+        </div>
+      </div>
+      {rotina?.erro && <p className="text-xs text-rose-600 dark:text-rose-400">{rotina.erro}</p>}
+    </section>
   );
 }
 

@@ -212,6 +212,66 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_alertas: {
+        Row: {
+          cliente: string
+          created_at: string
+          destino: string | null
+          enviar_em: string
+          erro: string | null
+          evento_em: string
+          id: string
+          mensagem: string
+          metadata: Json
+          numero_voo: string | null
+          origem: string | null
+          processed_at: string | null
+          referencia: string
+          status: string
+          tipo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cliente: string
+          created_at?: string
+          destino?: string | null
+          enviar_em: string
+          erro?: string | null
+          evento_em: string
+          id?: string
+          mensagem: string
+          metadata?: Json
+          numero_voo?: string | null
+          origem?: string | null
+          processed_at?: string | null
+          referencia: string
+          status?: string
+          tipo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cliente?: string
+          created_at?: string
+          destino?: string | null
+          enviar_em?: string
+          erro?: string | null
+          evento_em?: string
+          id?: string
+          mensagem?: string
+          metadata?: Json
+          numero_voo?: string | null
+          origem?: string | null
+          processed_at?: string | null
+          referencia?: string
+          status?: string
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       telegram_config: {
         Row: {
           ativo: boolean
@@ -289,6 +349,39 @@ export type Database = {
           referencia?: string | null
           status?: string
           tipo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      telegram_rotina_status: {
+        Row: {
+          alertas_processados: number
+          created_at: string
+          erro: string | null
+          id: string
+          status: string
+          ultima_verificacao: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alertas_processados?: number
+          created_at?: string
+          erro?: string | null
+          id?: string
+          status?: string
+          ultima_verificacao?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alertas_processados?: number
+          created_at?: string
+          erro?: string | null
+          id?: string
+          status?: string
+          ultima_verificacao?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
