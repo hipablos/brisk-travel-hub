@@ -25,8 +25,10 @@ import {
   saveCotacao, useClientes, getCotacao, genCode, formatBRL,
   useFormasPagamento, computeFormaTotal, deleteCotacao,
   DEFAULT_TERMOS, DEFAULT_OUTRAS_INFORMACOES,
+  useTermosModelos,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
+
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
 import { VendaLinhaDialog } from "@/components/cotacoes/VendaLinhaDialog";
@@ -81,6 +83,10 @@ function NovaCotacao() {
   const [criancas, setCriancas] = useState(0);
   const [termos, setTermos] = useState(DEFAULT_TERMOS);
   const [outrasInformacoes, setOutrasInformacoes] = useState(DEFAULT_OUTRAS_INFORMACOES);
+  const [termosModeloId, setTermosModeloId] = useState<string>("");
+  const [outrasModeloId, setOutrasModeloId] = useState<string>("");
+  const termosModelos = useTermosModelos();
+
   const [observacoes, setObservacoes] = useState("");
   const [status, setStatus] = useState<CotacaoStatus>("aguardando");
   const [validade, setValidade] = useState("");
