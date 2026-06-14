@@ -20,6 +20,7 @@ import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReservaIdRouteImport } from './routes/reserva_.$id'
 import { Route as ReservaEditarIdRouteImport } from './routes/reserva-editar_.$id'
+import { Route as IntegracoesTelegramRouteImport } from './routes/integracoes_.telegram'
 import { Route as FinanceiroVendasRouteImport } from './routes/financeiro_.vendas'
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
@@ -80,6 +81,11 @@ const ReservaEditarIdRoute = ReservaEditarIdRouteImport.update({
   path: '/reserva-editar/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegracoesTelegramRoute = IntegracoesTelegramRouteImport.update({
+  id: '/integracoes_/telegram',
+  path: '/integracoes/telegram',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FinanceiroVendasRoute = FinanceiroVendasRouteImport.update({
   id: '/financeiro_/vendas',
   path: '/financeiro/vendas',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
   '/financeiro/vendas': typeof FinanceiroVendasRoute
+  '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
 }
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
   '/financeiro/vendas': typeof FinanceiroVendasRoute
+  '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
 }
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/cotacoes_/$id': typeof CotacoesIdRoute
   '/cotacoes_/nova': typeof CotacoesNovaRoute
   '/financeiro_/vendas': typeof FinanceiroVendasRoute
+  '/integracoes_/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar_/$id': typeof ReservaEditarIdRoute
   '/reserva_/$id': typeof ReservaIdRoute
 }
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/cotacoes/$id'
     | '/cotacoes/nova'
     | '/financeiro/vendas'
+    | '/integracoes/telegram'
     | '/reserva-editar/$id'
     | '/reserva/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/cotacoes/$id'
     | '/cotacoes/nova'
     | '/financeiro/vendas'
+    | '/integracoes/telegram'
     | '/reserva-editar/$id'
     | '/reserva/$id'
   id:
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/cotacoes_/$id'
     | '/cotacoes_/nova'
     | '/financeiro_/vendas'
+    | '/integracoes_/telegram'
     | '/reserva-editar_/$id'
     | '/reserva_/$id'
   fileRoutesById: FileRoutesById
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   CotacoesIdRoute: typeof CotacoesIdRoute
   CotacoesNovaRoute: typeof CotacoesNovaRoute
   FinanceiroVendasRoute: typeof FinanceiroVendasRoute
+  IntegracoesTelegramRoute: typeof IntegracoesTelegramRoute
   ReservaEditarIdRoute: typeof ReservaEditarIdRoute
   ReservaIdRoute: typeof ReservaIdRoute
 }
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReservaEditarIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/integracoes_/telegram': {
+      id: '/integracoes_/telegram'
+      path: '/integracoes/telegram'
+      fullPath: '/integracoes/telegram'
+      preLoaderRoute: typeof IntegracoesTelegramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/financeiro_/vendas': {
       id: '/financeiro_/vendas'
       path: '/financeiro/vendas'
@@ -349,6 +369,7 @@ const rootRouteChildren: RootRouteChildren = {
   CotacoesIdRoute: CotacoesIdRoute,
   CotacoesNovaRoute: CotacoesNovaRoute,
   FinanceiroVendasRoute: FinanceiroVendasRoute,
+  IntegracoesTelegramRoute: IntegracoesTelegramRoute,
   ReservaEditarIdRoute: ReservaEditarIdRoute,
   ReservaIdRoute: ReservaIdRoute,
 }

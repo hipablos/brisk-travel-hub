@@ -95,7 +95,7 @@ function TelegramPage() {
         .select("*")
         .eq("user_id", user.id)
         .maybeSingle();
-      if (data) setCfg({ ...DEFAULT, ...data });
+      if (data) setCfg({ ...DEFAULT, ...data, token_bot: data.token_bot ?? "", chat_id: data.chat_id ?? "" });
       setLoading(false);
     })();
   }, [user]);
