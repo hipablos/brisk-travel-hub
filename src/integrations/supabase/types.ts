@@ -113,6 +113,57 @@ export type Database = {
         }
         Relationships: []
       }
+      integracoes: {
+        Row: {
+          ambiente: string
+          api_key: string | null
+          api_url: string | null
+          ativo: boolean
+          categoria: string
+          config: Json
+          created_at: string
+          id: string
+          last_sync_at: string | null
+          nome: string
+          provedor: string | null
+          secret_key: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ambiente?: string
+          api_key?: string | null
+          api_url?: string | null
+          ativo?: boolean
+          categoria: string
+          config?: Json
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          nome: string
+          provedor?: string | null
+          secret_key?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ambiente?: string
+          api_key?: string | null
+          api_url?: string | null
+          ativo?: boolean
+          categoria?: string
+          config?: Json
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          nome?: string
+          provedor?: string | null
+          secret_key?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       labels_custom: {
         Row: {
           color: string
