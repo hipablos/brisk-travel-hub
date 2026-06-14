@@ -472,3 +472,111 @@ export function computeFormaTotal(baseTotal: number, f: FormaPagamento) {
   const valorParcela = final / parcelas;
   return { final, desconto: desc, acrescimo: acr, parcelas, valorParcela };
 }
+
+// ---------- Termos / Outras Informações (modelos) ----------
+export type TermoCategoria = "termos" | "outras";
+
+export type TermoModelo = {
+  id: string;
+  categoria: TermoCategoria;
+  nome: string;
+  conteudo: string;
+  padrao: boolean;
+  ativo: boolean;
+  createdAt: string;
+};
+
+function rowToTermo(row: any): TermoModelo {
+  return {
+    id: row.id,
+    categoria: row.categoria,
+    nome: row.nome,
+    conteudo: row.conteudo ?? "",
+    padrao: !!row.padrao,
+    ativo: !!row.ativo,
+    createdAt: row.created_at,
+  };
+}
+
+export async function fetchTermosModelos(): Promise<TermoModelo[]> {
+  const { data, error } = await supabase
+    .from("termos_modelos")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) { console.error("[termos] fetch error:", error); return []; }
+  return (data ?? []).map(rowToTermo);
+}
+
+export async function saveTermoModelo(t: Omit<TermoModelo, "createdAt"> & { createdAt?: string }): Promise<TermoModelo | null> {
+  const uid = await currentUserId();
+  if (!uid) return null;
+  // Garantir um único padrão por categoria
+  if (t.padrao) {
+    await supabase
+      .from("termos_modelos")
+      .update({ padrao: false })
+      .eq("user_id", uid)
+      .eq("categoria", t.categoria)
+      .neq("id", t.id);
+  }
+  const payload = {
+    user_id: uid,
+    categoria: t.categoria,
+    nome: t.nome,
+    conteudo: t.conteudo,
+    padrao: t.padrao,
+    ativo: t.ativo,
+  };
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(t.id);
+  if (isUuid) {
+    const { data: existing } = await supabase.from("termos_modelos").select("id").eq("id", t.id).maybeSingle();
+    if (existing) {
+      const { data, error } = await supabase.from("termos_modelos").update(payload).eq("id", t.id).select().single();
+      if (error) { console.error("[termos] update error:", error); return null; }
+      return rowToTermo(data);
+    }
+  }
+  const { data, error } = await supabase.from("termos_modelos").insert(payload).select().single();
+  if (error) { console.error("[termos] insert error:", error); return null; }
+  return rowToTermo(data);
+}
+
+export async function deleteTermoModelo(id: string) {
+  const { error } = await supabase.from("termos_modelos").delete().eq("id", id);
+  if (error) console.error("[termos] delete error:", error);
+}
+
+export async function toggleTermoModeloAtivo(id: string, ativo: boolean) {
+  const { error } = await supabase.from("termos_modelos").update({ ativo }).eq("id", id);
+  if (error) console.error("[termos] toggle error:", error);
+}
+
+export async function setTermoModeloPadrao(id: string, categoria: TermoCategoria) {
+  const uid = await currentUserId();
+  if (!uid) return;
+  await supabase
+    .from("termos_modelos")
+    .update({ padrao: false })
+    .eq("user_id", uid)
+    .eq("categoria", categoria);
+  const { error } = await supabase.from("termos_modelos").update({ padrao: true }).eq("id", id);
+  if (error) console.error("[termos] set padrao error:", error);
+}
+
+export function useTermosModelos() {
+  const uid = useAuthUserId();
+  const [list, setList] = useState<TermoModelo[]>([]);
+  useEffect(() => {
+    if (!uid) return;
+    let mounted = true;
+    const reload = () => fetchTermosModelos().then((d) => mounted && setList(d));
+    reload();
+    const channel = supabase
+      .channel(`termos-changes-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "termos_modelos" }, reload)
+      .subscribe();
+    return () => { mounted = false; supabase.removeChannel(channel); };
+  }, [uid]);
+  return list;
+}
+
