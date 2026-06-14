@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Send, Save, Loader2, ChevronRight, MessageCircle, CheckCircle2, XCircle, History } from "lucide-react";
+import { Send, Save, Loader2, ChevronRight, MessageCircle, CheckCircle2, XCircle, History, Bell, Plane } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
