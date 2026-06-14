@@ -111,6 +111,18 @@ function KanbanCard({
               <button
                 type="button"
                 onClick={async () => {
+                  const res = await duplicateCotacao(card.id);
+                  if (res) toast.success(`Cotação duplicada (${res.code})`);
+                  else toast.error("Não foi possível duplicar a cotação");
+                }}
+                className="p-1 hover:text-foreground"
+                title="Duplicar cotação"
+              >
+                <Copy className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
                   if (!confirm(`Excluir a cotação ${card.code}? Esta ação não pode ser desfeita.`)) return;
                   await deleteCotacao(card.id);
                   toast.success("Cotação excluída");
