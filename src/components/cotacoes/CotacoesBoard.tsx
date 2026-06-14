@@ -137,7 +137,7 @@ function KanbanCard({
 function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, onDropCard, onDragCard, draggingId }: ColumnProps) {
   const [over, setOver] = useState(false);
   return (
-    <div className="flex flex-col w-full min-w-0">
+    <div className="flex flex-col w-full min-w-0 max-w-full">
       <div className={cn("flex items-center justify-between gap-2 px-2.5 py-2 rounded-t-lg font-bold text-[11px] uppercase tracking-wider", colorClass)}>
         <span className="truncate">{title} ({count})</span>
         <span className="shrink-0">{totalAmount}</span>
@@ -152,7 +152,7 @@ function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, on
           if (id) onDropCard(id, status);
         }}
         className={cn(
-          "flex-1 bg-card/30 border border-border/50 border-t-0 p-2 flex flex-col gap-2 overflow-y-auto transition-colors",
+          "bg-card/30 border border-border/50 border-t-0 p-2 flex flex-col gap-2 transition-colors min-h-24",
           over && "bg-primary/5 border-primary/40 ring-2 ring-primary/30 ring-inset",
           draggingId && !over && "border-dashed"
         )}
@@ -216,7 +216,7 @@ export function CotacoesBoard() {
 
   return (
     <div
-      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 pb-4 flex-1 min-h-0 mt-6 w-full"
+      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 pb-6 mt-6 w-full min-w-0 items-start"
       onDragEnd={() => setDraggingId(null)}
     >
       {columns.map((col) => (

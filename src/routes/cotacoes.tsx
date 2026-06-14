@@ -18,9 +18,9 @@ function Cotacoes() {
   return (
     <div className="min-h-screen bg-background flex">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0 h-screen">
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         <Topbar />
-        <main className="p-6 w-full mx-auto flex-1 flex flex-col min-h-0 overflow-hidden">
+        <main className="p-6 w-full mx-auto flex-1 flex flex-col min-w-0 overflow-x-hidden">
           <CotacoesFilters />
           <CotacoesBoard />
         </main>
