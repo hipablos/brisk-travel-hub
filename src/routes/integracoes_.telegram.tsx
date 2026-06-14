@@ -81,12 +81,32 @@ const NOTIFS: { key: keyof TelegramConfig; label: string; preview: string }[] = 
   },
 ];
 
+type EnvioRow = {
+  id: string;
+  tipo: string;
+  mensagem: string;
+  status: string;
+  erro: string | null;
+  created_at: string;
+};
+
 function TelegramPage() {
   const { user } = useAuth();
   const [cfg, setCfg] = useState<TelegramConfig>(DEFAULT);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [envios, setEnvios] = useState<EnvioRow[]>([]);
+
+  const loadEnvios = async (uid: string) => {
+    const { data } = await supabase
+      .from("telegram_envios")
+      .select("*")
+      .eq("user_id", uid)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setEnvios((data as EnvioRow[]) ?? []);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -97,6 +117,7 @@ function TelegramPage() {
         .eq("user_id", user.id)
         .maybeSingle();
       if (data) setCfg({ ...DEFAULT, ...data, token_bot: data.token_bot ?? "", chat_id: data.chat_id ?? "" });
+      await loadEnvios(user.id);
       setLoading(false);
     })();
   }, [user]);
