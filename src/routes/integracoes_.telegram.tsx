@@ -216,6 +216,12 @@ function TelegramPage() {
 
   useEffect(() => {
     if (!user) return;
+    let active = true;
+    const refresh = async () => {
+      await loadEnvios(user.id);
+      await loadAlertas(user.id);
+      await loadRotina(user.id);
+    };
     (async () => {
       const { data } = await supabase
         .from("telegram_config")
@@ -223,11 +229,14 @@ function TelegramPage() {
         .eq("user_id", user.id)
         .maybeSingle();
       if (data) setCfg({ ...DEFAULT, ...data, token_bot: data.token_bot ?? "", chat_id: data.chat_id ?? "" });
-      await loadEnvios(user.id);
-      await loadAlertas(user.id);
-      await loadRotina(user.id);
-      setLoading(false);
+      await refresh();
+      if (active) setLoading(false);
     })();
+    const interval = window.setInterval(refresh, 60_000);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
   }, [user]);
 
   const setField = <K extends keyof TelegramConfig>(k: K, v: TelegramConfig[K]) =>
@@ -287,6 +296,7 @@ function TelegramPage() {
         erro,
       });
       await loadEnvios(user.id);
+      await loadRotina(user.id);
       setTesting(false);
     }
   };
