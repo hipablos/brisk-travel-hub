@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VoosRouteImport } from './routes/voos'
 import { Route as TermosCondicoesRouteImport } from './routes/termos-condicoes'
-import { Route as IntegracoesRouteImport } from './routes/integracoes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegracoesRouteImport } from './routes/integracoes'
@@ -34,6 +33,11 @@ const VoosRoute = VoosRouteImport.update({
 const TermosCondicoesRoute = TermosCondicoesRouteImport.update({
   id: '/termos-condicoes',
   path: '/termos-condicoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegracoesRoute = IntegracoesRouteImport.update({
+  id: '/integracoes',
+  path: '/integracoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
