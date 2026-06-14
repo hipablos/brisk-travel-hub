@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Send, Save, Loader2, ChevronRight, MessageCircle, CheckCircle2, XCircle, History, Bell, Plane } from "lucide-react";
+import { Send, Save, Loader2, ChevronRight, MessageCircle, CheckCircle2, XCircle, History, Bell, Plane, Activity } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { buildCheckinAlertFromCotacao } from "@/lib/telegram-alertas";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/integracoes_/telegram")({
@@ -104,14 +105,12 @@ type Alerta = {
   status: "Pendente";
 };
 
-function parseDeparture(data?: string, hora?: string): Date | null {
-  if (!data || !hora) return null;
-  const md = /^(\d{2})-(\d{2})-(\d{4})$/.exec(data.trim());
-  const mt = /^(\d{2}):(\d{2})$/.exec(hora.trim());
-  if (!md || !mt) return null;
-  // Brazil local (UTC-3) -> UTC
-  return new Date(Date.UTC(+md[3], +md[2] - 1, +md[1], +mt[1] + 3, +mt[2], 0));
-}
+type RotinaStatus = {
+  ultima_verificacao: string | null;
+  alertas_processados: number;
+  status: string;
+  erro: string | null;
+};
 
 function TelegramPage() {
   const { user } = useAuth();
