@@ -31,7 +31,7 @@ export function CotacoesFilters() {
       </div>
 
       {/* Filters Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-4 items-end bg-card p-4 rounded-xl border border-border/50 min-w-0">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-4 items-end bg-card p-4 rounded-xl border border-border/50 min-w-0">
         <div className="space-y-1.5 min-w-0">
           <label className="text-sm font-medium text-foreground">Cliente</label>
           <Select defaultValue="todos">
@@ -66,7 +66,7 @@ export function CotacoesFilters() {
           </div>
         </div>
 
-        <div className="flex items-end gap-2 min-w-0 md:col-span-2 lg:col-span-1 2xl:col-span-1">
+        <div className="flex items-end gap-2 min-w-0 md:col-span-2 xl:col-span-1 2xl:col-span-1">
           <div className="space-y-1.5 flex-1">
             <label className="text-sm font-medium text-foreground">Usuário</label>
             <Select defaultValue="todos">
