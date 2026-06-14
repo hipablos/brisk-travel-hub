@@ -42,9 +42,12 @@ export const Route = createFileRoute("/api/public/hooks/telegram-processar-alert
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const expectedApiKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+        const expectedApiKeys = [
+          process.env.SUPABASE_PUBLISHABLE_KEY,
+          import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        ].filter(Boolean);
         const apiKey = request.headers.get("apikey");
-        if (expectedApiKey && apiKey !== expectedApiKey) {
+        if (expectedApiKeys.length > 0 && (!apiKey || !expectedApiKeys.includes(apiKey))) {
           return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
         }
 
