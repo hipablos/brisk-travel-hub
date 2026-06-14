@@ -338,6 +338,56 @@ function TelegramPage() {
                   )}
                 </div>
               </section>
+
+              {/* Histórico de Envios */}
+              <section className="rounded-xl border bg-card p-5 md:p-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <History className="size-4 text-muted-foreground" />
+                  <h2 className="text-base font-semibold">Histórico de Envios</h2>
+                </div>
+                {envios.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum envio registrado ainda. Use o botão "Enviar mensagem de teste" para gerar o primeiro registro.
+                  </p>
+                ) : (
+                  <div className="rounded-lg border overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Data e hora</TableHead>
+                          <TableHead>Tipo</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Detalhes</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {envios.map((e) => (
+                          <TableRow key={e.id}>
+                            <TableCell className="text-xs whitespace-nowrap">
+                              {new Date(e.created_at).toLocaleString("pt-BR")}
+                            </TableCell>
+                            <TableCell className="text-xs">{e.tipo}</TableCell>
+                            <TableCell>
+                              {e.status === "enviado" ? (
+                                <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 gap-1">
+                                  <CheckCircle2 className="size-3" /> Enviado
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 gap-1">
+                                  <XCircle className="size-3" /> Falhou
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground max-w-xs truncate">
+                              {e.erro ?? "—"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </section>
             </>
           )}
         </main>
