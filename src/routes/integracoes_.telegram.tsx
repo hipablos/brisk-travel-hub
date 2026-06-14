@@ -520,6 +520,48 @@ function TelegramPage() {
   );
 }
 
+function RotinaAutomatica({ rotina, conectado }: { rotina: RotinaStatus | null; conectado: boolean }) {
+  const ativa = conectado && rotina?.status === "Ativa";
+  return (
+    <section className="rounded-xl border bg-card p-5 md:p-6 space-y-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Activity className="size-4 text-muted-foreground" />
+          <h2 className="text-base font-semibold">Rotina automática</h2>
+        </div>
+        <Badge
+          variant="outline"
+          className={
+            ativa
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 gap-1"
+              : "border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 gap-1"
+          }
+        >
+          <span className={`size-2 rounded-full ${ativa ? "bg-emerald-500" : "bg-rose-500"}`} />
+          {ativa ? "Ativa" : "Inativa"}
+        </Badge>
+      </div>
+      <div className="grid md:grid-cols-3 gap-3">
+        <div className="rounded-lg border bg-background p-4">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Última verificação</div>
+          <div className="text-sm font-medium mt-1">
+            {rotina?.ultima_verificacao ? new Date(rotina.ultima_verificacao).toLocaleString("pt-BR") : "—"}
+          </div>
+        </div>
+        <div className="rounded-lg border bg-background p-4">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Alertas processados</div>
+          <div className="text-sm font-medium mt-1">{rotina?.alertas_processados ?? 0}</div>
+        </div>
+        <div className="rounded-lg border bg-background p-4">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Status da rotina</div>
+          <div className="text-sm font-medium mt-1">{ativa ? "Ativa" : "Inativa"}</div>
+        </div>
+      </div>
+      {rotina?.erro && <p className="text-xs text-rose-600 dark:text-rose-400">{rotina.erro}</p>}
+    </section>
+  );
+}
+
 function ProximosAlertas({ alertas }: { alertas: Alerta[] }) {
   const [open, setOpen] = useState(false);
   const fmt = (d: Date) => d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
