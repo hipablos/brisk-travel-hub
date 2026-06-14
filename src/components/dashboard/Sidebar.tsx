@@ -3,7 +3,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, Calendar, Plane, Hotel,
   MapPin, ShoppingCart, ChevronDown, LogOut,
-  Users, CreditCard, FileSignature, Plug,
+  Users, CreditCard, FileSignature, Plug, MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -41,6 +41,7 @@ const groups: Group[] = [
     { icon: CreditCard, label: "Formas de Pagamento", href: "/formas-pagamento" },
     { icon: FileSignature, label: "Termos e Condições", href: "/termos-condicoes" },
     { icon: Plug, label: "Integrações", href: "/integracoes" },
+    { icon: MessageCircle, label: "Telegram", href: "/integracoes/telegram" },
   ] },
 
 ];

@@ -212,6 +212,54 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_config: {
+        Row: {
+          ativo: boolean
+          chat_id: string | null
+          created_at: string
+          id: string
+          notificar_checkin: boolean
+          notificar_embarque: boolean
+          notificar_followup: boolean
+          notificar_pagamentos: boolean
+          notificar_tarefas: boolean
+          notificar_vendas: boolean
+          token_bot: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          notificar_checkin?: boolean
+          notificar_embarque?: boolean
+          notificar_followup?: boolean
+          notificar_pagamentos?: boolean
+          notificar_tarefas?: boolean
+          notificar_vendas?: boolean
+          token_bot?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          notificar_checkin?: boolean
+          notificar_embarque?: boolean
+          notificar_followup?: boolean
+          notificar_pagamentos?: boolean
+          notificar_tarefas?: boolean
+          notificar_vendas?: boolean
+          token_bot?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       termos_modelos: {
         Row: {
           ativo: boolean
