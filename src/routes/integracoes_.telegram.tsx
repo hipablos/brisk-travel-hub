@@ -88,7 +88,29 @@ type EnvioRow = {
   status: string;
   erro: string | null;
   created_at: string;
+  referencia?: string | null;
 };
+
+type Alerta = {
+  key: string;
+  tipo: string;
+  cliente: string;
+  numeroVoo?: string;
+  origem?: string;
+  destino?: string;
+  eventoEm: Date;
+  enviarEm: Date;
+  status: "Pendente";
+};
+
+function parseDeparture(data?: string, hora?: string): Date | null {
+  if (!data || !hora) return null;
+  const md = /^(\d{2})-(\d{2})-(\d{4})$/.exec(data.trim());
+  const mt = /^(\d{2}):(\d{2})$/.exec(hora.trim());
+  if (!md || !mt) return null;
+  // Brazil local (UTC-3) -> UTC
+  return new Date(Date.UTC(+md[3], +md[2] - 1, +md[1], +mt[1] + 3, +mt[2], 0));
+}
 
 function TelegramPage() {
   const { user } = useAuth();
