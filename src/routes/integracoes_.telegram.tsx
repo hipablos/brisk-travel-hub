@@ -223,8 +223,9 @@ function TelegramPage() {
         .eq("user_id", user.id)
         .maybeSingle();
       if (data) setCfg({ ...DEFAULT, ...data, token_bot: data.token_bot ?? "", chat_id: data.chat_id ?? "" });
-      const env = await loadEnvios(user.id);
-      await loadAlertas(user.id, env);
+      await loadEnvios(user.id);
+      await loadAlertas(user.id);
+      await loadRotina(user.id);
       setLoading(false);
     })();
   }, [user]);
