@@ -137,9 +137,9 @@ function KanbanCard({
 function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, onDropCard, onDragCard, draggingId }: ColumnProps) {
   const [over, setOver] = useState(false);
   return (
-    <div className="flex flex-col min-w-[300px] max-w-[350px] w-full shrink-0">
-      <div className={cn("flex items-center justify-between px-3 py-2 rounded-t-lg font-bold text-xs uppercase tracking-wider", colorClass)}>
-        <span>{title} ({count})</span>
+    <div className="flex flex-col w-full min-w-0">
+      <div className={cn("flex items-center justify-between gap-2 px-2.5 py-2 rounded-t-lg font-bold text-[11px] uppercase tracking-wider", colorClass)}>
+        <span className="truncate">{title} ({count})</span>
         <span>{totalAmount}</span>
       </div>
       <div
