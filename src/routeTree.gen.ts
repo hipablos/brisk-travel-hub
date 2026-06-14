@@ -35,11 +35,6 @@ const TermosCondicoesRoute = TermosCondicoesRouteImport.update({
   path: '/termos-condicoes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IntegracoesRoute = IntegracoesRouteImport.update({
-  id: '/integracoes',
-  path: '/integracoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
