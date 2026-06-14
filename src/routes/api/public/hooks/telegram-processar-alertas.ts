@@ -106,7 +106,7 @@ export const Route = createFileRoute("/api/public/hooks/telegram-processar-alert
                 evento_em: alert.eventoEm.toISOString(),
                 enviar_em: alert.enviarEm.toISOString(),
                 mensagem: alert.mensagem,
-                metadata: alert.metadata,
+                metadata: alert.metadata as any,
               });
             } else if (existing.status === "Pendente") {
               await supabaseAdmin
@@ -119,7 +119,7 @@ export const Route = createFileRoute("/api/public/hooks/telegram-processar-alert
                   evento_em: alert.eventoEm.toISOString(),
                   enviar_em: alert.enviarEm.toISOString(),
                   mensagem: alert.mensagem,
-                  metadata: alert.metadata,
+                  metadata: alert.metadata as any,
                   erro: null,
                 })
                 .eq("id", existing.id);

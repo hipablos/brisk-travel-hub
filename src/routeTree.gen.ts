@@ -25,6 +25,7 @@ import { Route as FinanceiroVendasRouteImport } from './routes/financeiro_.venda
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
+import { Route as ApiPublicHooksTelegramProcessarAlertasRouteImport } from './routes/api/public/hooks/telegram-processar-alertas'
 import { Route as ApiPublicHooksTelegramCheckinRouteImport } from './routes/api/public/hooks/telegram-checkin'
 
 const VoosRoute = VoosRouteImport.update({
@@ -107,6 +108,12 @@ const ClientesNovoRoute = ClientesNovoRouteImport.update({
   path: '/clientes/novo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksTelegramProcessarAlertasRoute =
+  ApiPublicHooksTelegramProcessarAlertasRouteImport.update({
+    id: '/api/public/hooks/telegram-processar-alertas',
+    path: '/api/public/hooks/telegram-processar-alertas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksTelegramCheckinRoute =
   ApiPublicHooksTelegramCheckinRouteImport.update({
     id: '/api/public/hooks/telegram-checkin',
@@ -132,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
   '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
+  '/api/public/hooks/telegram-processar-alertas': typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -151,6 +159,7 @@ export interface FileRoutesByTo {
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
   '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
+  '/api/public/hooks/telegram-processar-alertas': typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -171,6 +180,7 @@ export interface FileRoutesById {
   '/reserva-editar_/$id': typeof ReservaEditarIdRoute
   '/reserva_/$id': typeof ReservaIdRoute
   '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
+  '/api/public/hooks/telegram-processar-alertas': typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/reserva-editar/$id'
     | '/reserva/$id'
     | '/api/public/hooks/telegram-checkin'
+    | '/api/public/hooks/telegram-processar-alertas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/reserva-editar/$id'
     | '/reserva/$id'
     | '/api/public/hooks/telegram-checkin'
+    | '/api/public/hooks/telegram-processar-alertas'
   id:
     | '__root__'
     | '/'
@@ -230,6 +242,7 @@ export interface FileRouteTypes {
     | '/reserva-editar_/$id'
     | '/reserva_/$id'
     | '/api/public/hooks/telegram-checkin'
+    | '/api/public/hooks/telegram-processar-alertas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -250,6 +263,7 @@ export interface RootRouteChildren {
   ReservaEditarIdRoute: typeof ReservaEditarIdRoute
   ReservaIdRoute: typeof ReservaIdRoute
   ApiPublicHooksTelegramCheckinRoute: typeof ApiPublicHooksTelegramCheckinRoute
+  ApiPublicHooksTelegramProcessarAlertasRoute: typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -366,6 +380,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientesNovoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/telegram-processar-alertas': {
+      id: '/api/public/hooks/telegram-processar-alertas'
+      path: '/api/public/hooks/telegram-processar-alertas'
+      fullPath: '/api/public/hooks/telegram-processar-alertas'
+      preLoaderRoute: typeof ApiPublicHooksTelegramProcessarAlertasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/telegram-checkin': {
       id: '/api/public/hooks/telegram-checkin'
       path: '/api/public/hooks/telegram-checkin'
@@ -394,6 +415,8 @@ const rootRouteChildren: RootRouteChildren = {
   ReservaEditarIdRoute: ReservaEditarIdRoute,
   ReservaIdRoute: ReservaIdRoute,
   ApiPublicHooksTelegramCheckinRoute: ApiPublicHooksTelegramCheckinRoute,
+  ApiPublicHooksTelegramProcessarAlertasRoute:
+    ApiPublicHooksTelegramProcessarAlertasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
