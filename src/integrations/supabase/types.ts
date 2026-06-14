@@ -260,6 +260,36 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_envios: {
+        Row: {
+          created_at: string
+          erro: string | null
+          id: string
+          mensagem: string
+          status: string
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          erro?: string | null
+          id?: string
+          mensagem: string
+          status: string
+          tipo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          erro?: string | null
+          id?: string
+          mensagem?: string
+          status?: string
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       termos_modelos: {
         Row: {
           ativo: boolean
