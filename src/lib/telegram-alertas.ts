@@ -4,9 +4,14 @@ export type TelegramCotacaoRow = {
   data: unknown;
 };
 
+export type TrechoTipo = "ida" | "volta";
+
 export type TelegramAlertPayload = {
   tipo: "Check-in";
   referencia: string;
+  trechoTipo: TrechoTipo;
+  trechoIndex: number;
+  trechoLabel: string;
   cliente: string;
   numeroVoo: string | null;
   origem: string | null;
@@ -49,47 +54,133 @@ function airportLabel(voo: Voo, key: "origem" | "destino"): string | null {
   return info?.label ?? info?.nome ?? info?.iata ?? voo[key] ?? null;
 }
 
-export function buildCheckinAlertFromCotacao(cotacao: TelegramCotacaoRow): TelegramAlertPayload | null {
+function collectVoos(data: Record<string, any>, tipo: TrechoTipo): Voo[] {
+  if (tipo === "ida") {
+    if (Array.isArray(data.vooIdas)) return data.vooIdas as Voo[];
+    if (data.vooIda) return [data.vooIda as Voo];
+    return [];
+  }
+  if (Array.isArray(data.vooVoltas)) return data.vooVoltas as Voo[];
+  if (data.vooVolta) return [data.vooVolta as Voo];
+  return [];
+}
+
+function labelFor(tipo: TrechoTipo, index: number, total: number): string {
+  const base = tipo === "ida" ? "Ida" : "Volta";
+  return total > 1 ? `${base} – Trecho ${index + 1}` : base;
+}
+
+export type DiagnosticoTrecho = {
+  referencia: string;
+  trechoTipo: TrechoTipo;
+  trechoIndex: number;
+  trechoLabel: string;
+  embarqueEm: Date | null;
+  enviarEm: Date | null;
+  origem: string | null;
+  destino: string | null;
+  numeroVoo: string | null;
+  motivo: string | null;
+  alert: TelegramAlertPayload | null;
+};
+
+export function diagnoseCotacaoTrechos(cotacao: TelegramCotacaoRow): DiagnosticoTrecho[] {
   const data = (cotacao.data ?? {}) as Record<string, any>;
-  const idas = Array.isArray(data.vooIdas) ? data.vooIdas : data.vooIda ? [data.vooIda] : [];
-  const primeiro = idas[0] as Voo | undefined;
-  if (!primeiro) return null;
-
-  const eventoEm = parseTelegramDeparture(primeiro.data, primeiro.horaSaida);
-  if (!eventoEm) return null;
-
-  const enviarEm = new Date(eventoEm.getTime() - 48 * 60 * 60 * 1000);
   const cliente = data.cliente?.nome ?? "—";
-  const companhia = primeiro.companhia ?? "—";
-  const numeroVoo = primeiro.numeroVoo ?? null;
-  const origem = airportLabel(primeiro, "origem");
-  const destino = airportLabel(primeiro, "destino");
-  const embarque = formatDateTimeBR(eventoEm);
+  const out: DiagnosticoTrecho[] = [];
 
-  const mensagem =
-    `✈️ CHECK-IN DISPONÍVEL\n\n` +
-    `Cliente: ${cliente}\n` +
-    `Companhia aérea: ${companhia}\n` +
-    `Número do voo: ${numeroVoo ?? "—"}\n` +
-    `Origem: ${origem ?? "—"}\n` +
-    `Destino: ${destino ?? "—"}\n` +
-    `Embarque: ${embarque}\n\n` +
-    `Ação recomendada:\nEntre em contato com o cliente para orientá-lo sobre o check-in.`;
+  for (const tipo of ["ida", "volta"] as TrechoTipo[]) {
+    const voos = collectVoos(data, tipo);
+    voos.forEach((voo, idx) => {
+      const label = labelFor(tipo, idx, voos.length);
+      const referencia = `${cotacao.id}:${tipo}:${idx}`;
+      const origem = airportLabel(voo, "origem");
+      const destino = airportLabel(voo, "destino");
+      const numeroVoo = voo.numeroVoo ?? null;
+      const eventoEm = parseTelegramDeparture(voo.data, voo.horaSaida);
 
-  return {
-    tipo: "Check-in",
-    referencia: `${cotacao.id}:0`,
-    cliente,
-    numeroVoo,
-    origem,
-    destino,
-    eventoEm,
-    enviarEm,
-    mensagem,
-    metadata: {
-      cotacao_id: cotacao.id,
-      cotacao_code: cotacao.code ?? null,
-      companhia,
-    },
-  };
+      if (!eventoEm) {
+        out.push({
+          referencia,
+          trechoTipo: tipo,
+          trechoIndex: idx,
+          trechoLabel: label,
+          embarqueEm: null,
+          enviarEm: null,
+          origem,
+          destino,
+          numeroVoo,
+          motivo: "Data ou horário de embarque não cadastrado neste trecho.",
+          alert: null,
+        });
+        return;
+      }
+
+      const enviarEm = new Date(eventoEm.getTime() - 48 * 60 * 60 * 1000);
+      const companhia = voo.companhia ?? "—";
+      const embarque = formatDateTimeBR(eventoEm);
+
+      const mensagem =
+        `✈️ CHECK-IN DISPONÍVEL (${label})\n\n` +
+        `Cliente: ${cliente}\n` +
+        `Companhia aérea: ${companhia}\n` +
+        `Número do voo: ${numeroVoo ?? "—"}\n` +
+        `Origem: ${origem ?? "—"}\n` +
+        `Destino: ${destino ?? "—"}\n` +
+        `Embarque: ${embarque}\n\n` +
+        `Ação recomendada:\nEntre em contato com o cliente para orientá-lo sobre o check-in.` +
+        (cotacao.code ? `\n\nCotação: ${cotacao.code}` : "");
+
+      const alert: TelegramAlertPayload = {
+        tipo: "Check-in",
+        referencia,
+        trechoTipo: tipo,
+        trechoIndex: idx,
+        trechoLabel: label,
+        cliente,
+        numeroVoo,
+        origem,
+        destino,
+        eventoEm,
+        enviarEm,
+        mensagem,
+        metadata: {
+          cotacao_id: cotacao.id,
+          cotacao_code: cotacao.code ?? null,
+          companhia,
+          trecho_tipo: tipo,
+          trecho_index: idx,
+          trecho_label: label,
+        },
+      };
+
+      out.push({
+        referencia,
+        trechoTipo: tipo,
+        trechoIndex: idx,
+        trechoLabel: label,
+        embarqueEm: eventoEm,
+        enviarEm,
+        origem,
+        destino,
+        numeroVoo,
+        motivo: eventoEm.getTime() < Date.now() ? "Embarque já ocorreu." : null,
+        alert,
+      });
+    });
+  }
+
+  return out;
+}
+
+/** Returns one alert per flight segment (ida and volta, including multi-segment). */
+export function buildCheckinAlertsFromCotacao(cotacao: TelegramCotacaoRow): TelegramAlertPayload[] {
+  return diagnoseCotacaoTrechos(cotacao)
+    .filter((d) => d.alert && d.embarqueEm && d.embarqueEm.getTime() >= Date.now())
+    .map((d) => d.alert!) as TelegramAlertPayload[];
+}
+
+/** @deprecated use buildCheckinAlertsFromCotacao */
+export function buildCheckinAlertFromCotacao(cotacao: TelegramCotacaoRow): TelegramAlertPayload | null {
+  return buildCheckinAlertsFromCotacao(cotacao)[0] ?? null;
 }
