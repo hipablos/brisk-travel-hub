@@ -96,6 +96,7 @@ type EnvioRow = {
 type Alerta = {
   key: string;
   tipo: string;
+  trecho?: string;
   cliente: string;
   numeroVoo?: string;
   origem?: string;
