@@ -32,6 +32,7 @@ import {
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
 import { VendaLinhaDialog } from "@/components/cotacoes/VendaLinhaDialog";
+import { TelegramAlertDiagnostic } from "@/components/cotacoes/TelegramAlertDiagnostic";
 import { Users, Eye } from "lucide-react";
 
 import { toast } from "sonner";
@@ -330,8 +331,18 @@ function NovaCotacao() {
                 <h1 className="text-2xl font-bold text-foreground">{editing ? "Editar Cotação" : "Nova Cotação"}</h1>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button asChild variant="outline"><Link to="/cotacoes">Cancelar</Link></Button>
+              {editing && editId && (
+                <TelegramAlertDiagnostic
+                  cotacaoId={editId}
+                  code={undefined}
+                  status={status}
+                  cliente={clientes.find((c) => c.id === clienteId) ?? null}
+                  vooIdas={vooIdas}
+                  vooVoltas={vooVoltas}
+                />
+              )}
               {editing && editId && (
                 <Button
                   type="button"

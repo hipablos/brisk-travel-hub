@@ -68,76 +68,85 @@ export const Route = createFileRoute("/api/public/hooks/telegram-checkin")({
             for (const cot of cots ?? []) {
               const d = (cot.data ?? {}) as Record<string, unknown>;
               const idas = (Array.isArray(d.vooIdas) ? d.vooIdas : d.vooIda ? [d.vooIda] : []) as Voo[];
-              const primeiro = idas[0];
-              const depMs = parseDepartureMs(primeiro);
-              if (!depMs || depMs < lo || depMs > hi) continue;
+              const voltas = (Array.isArray(d.vooVoltas) ? d.vooVoltas : d.vooVolta ? [d.vooVolta] : []) as Voo[];
+              const trechos: { voo: Voo; tipo: "ida" | "volta"; idx: number; total: number }[] = [
+                ...idas.map((v, i) => ({ voo: v, tipo: "ida" as const, idx: i, total: idas.length })),
+                ...voltas.map((v, i) => ({ voo: v, tipo: "volta" as const, idx: i, total: voltas.length })),
+              ];
 
-              const referencia = `${cot.id}:0`;
+              for (const t of trechos) {
+                const depMs = parseDepartureMs(t.voo);
+                if (!depMs || depMs < lo || depMs > hi) continue;
 
-              // Skip if already sent
-              const { data: existing } = await supabaseAdmin
-                .from("telegram_envios")
-                .select("id")
-                .eq("user_id", cfg.user_id)
-                .eq("tipo", "checkin_48h")
-                .eq("referencia", referencia)
-                .eq("status", "enviado")
-                .limit(1);
-              if (existing && existing.length > 0) {
-                pulados++;
-                continue;
-              }
+                const baseLabel = t.tipo === "ida" ? "Ida" : "Volta";
+                const trechoLabel = t.total > 1 ? `${baseLabel} – Trecho ${t.idx + 1}` : baseLabel;
+                const referencia = `${cot.id}:${t.tipo}:${t.idx}`;
 
-              const cliente = (d as any).cliente?.nome ?? "—";
-              const companhia = primeiro.companhia ?? "—";
-              const numeroVoo = primeiro.numeroVoo ?? "—";
-              const origem = primeiro.origem ?? "—";
-              const destino = primeiro.destino ?? "—";
-              const embarque = fmtDateTimeBR(primeiro);
-
-              const mensagem =
-                `✈️ CHECK-IN DISPONÍVEL\n\n` +
-                `Cliente: ${cliente}\n` +
-                `Companhia aérea: ${companhia}\n` +
-                `Número do voo: ${numeroVoo}\n` +
-                `Origem: ${origem}\n` +
-                `Destino: ${destino}\n` +
-                `Embarque: ${embarque}\n\n` +
-                `Ação recomendada:\nEntre em contato com o cliente para orientá-lo sobre o check-in.\n\n` +
-                `Cotação: ${cot.code}`;
-
-              let status: "enviado" | "falhou" = "enviado";
-              let erro: string | null = null;
-              try {
-                const resp = await fetch(
-                  `https://api.telegram.org/bot${cfg.token_bot}/sendMessage`,
-                  {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ chat_id: cfg.chat_id, text: mensagem }),
-                  },
-                );
-                if (!resp.ok) {
-                  status = "falhou";
-                  erro = `HTTP ${resp.status}: ${(await resp.text()).slice(0, 500)}`;
-                  falhas++;
-                } else {
-                  enviados++;
+                // Skip if already sent
+                const { data: existing } = await supabaseAdmin
+                  .from("telegram_envios")
+                  .select("id")
+                  .eq("user_id", cfg.user_id)
+                  .eq("tipo", "checkin_48h")
+                  .eq("referencia", referencia)
+                  .eq("status", "enviado")
+                  .limit(1);
+                if (existing && existing.length > 0) {
+                  pulados++;
+                  continue;
                 }
-              } catch (e: any) {
-                status = "falhou";
-                erro = String(e?.message ?? e).slice(0, 500);
-                falhas++;
-              }
 
-              await supabaseAdmin.from("telegram_envios").insert({
-                user_id: cfg.user_id,
-                tipo: "checkin_48h",
-                mensagem,
-                status,
-                erro,
-                referencia,
-              });
+                const cliente = (d as any).cliente?.nome ?? "—";
+                const companhia = t.voo.companhia ?? "—";
+                const numeroVoo = t.voo.numeroVoo ?? "—";
+                const origem = t.voo.origem ?? "—";
+                const destino = t.voo.destino ?? "—";
+                const embarque = fmtDateTimeBR(t.voo);
+
+                const mensagem =
+                  `✈️ CHECK-IN DISPONÍVEL (${trechoLabel})\n\n` +
+                  `Cliente: ${cliente}\n` +
+                  `Companhia aérea: ${companhia}\n` +
+                  `Número do voo: ${numeroVoo}\n` +
+                  `Origem: ${origem}\n` +
+                  `Destino: ${destino}\n` +
+                  `Embarque: ${embarque}\n\n` +
+                  `Ação recomendada:\nEntre em contato com o cliente para orientá-lo sobre o check-in.\n\n` +
+                  `Cotação: ${cot.code}`;
+
+                let status: "enviado" | "falhou" = "enviado";
+                let erro: string | null = null;
+                try {
+                  const resp = await fetch(
+                    `https://api.telegram.org/bot${cfg.token_bot}/sendMessage`,
+                    {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ chat_id: cfg.chat_id, text: mensagem }),
+                    },
+                  );
+                  if (!resp.ok) {
+                    status = "falhou";
+                    erro = `HTTP ${resp.status}: ${(await resp.text()).slice(0, 500)}`;
+                    falhas++;
+                  } else {
+                    enviados++;
+                  }
+                } catch (e: any) {
+                  status = "falhou";
+                  erro = String(e?.message ?? e).slice(0, 500);
+                  falhas++;
+                }
+
+                await supabaseAdmin.from("telegram_envios").insert({
+                  user_id: cfg.user_id,
+                  tipo: "checkin_48h",
+                  mensagem,
+                  status,
+                  erro,
+                  referencia,
+                });
+              }
             }
           }
 
