@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VoosRouteImport } from './routes/voos'
 import { Route as TermosCondicoesRouteImport } from './routes/termos-condicoes'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegracoesRouteImport } from './routes/integracoes'
 import { Route as FormasPagamentoRouteImport } from './routes/formas-pagamento'
@@ -24,6 +25,8 @@ import { Route as IntegracoesTelegramRouteImport } from './routes/integracoes_.t
 import { Route as FinanceiroVendasRouteImport } from './routes/financeiro_.vendas'
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
+import { Route as ConfiguracoesMarcaRouteImport } from './routes/configuracoes.marca'
+import { Route as ConfiguracoesLayoutLoginRouteImport } from './routes/configuracoes.layout-login'
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
 import { Route as ApiPublicHooksTelegramProcessarAlertasRouteImport } from './routes/api/public/hooks/telegram-processar-alertas'
 import { Route as ApiPublicHooksTelegramCheckinRouteImport } from './routes/api/public/hooks/telegram-checkin'
@@ -41,6 +44,11 @@ const TermosCondicoesRoute = TermosCondicoesRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -103,6 +111,17 @@ const CotacoesIdRoute = CotacoesIdRouteImport.update({
   path: '/cotacoes/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfiguracoesMarcaRoute = ConfiguracoesMarcaRouteImport.update({
+  id: '/configuracoes/marca',
+  path: '/configuracoes/marca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracoesLayoutLoginRoute =
+  ConfiguracoesLayoutLoginRouteImport.update({
+    id: '/configuracoes/layout-login',
+    path: '/configuracoes/layout-login',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ClientesNovoRoute = ClientesNovoRouteImport.update({
   id: '/clientes_/novo',
   path: '/clientes/novo',
@@ -128,10 +147,13 @@ export interface FileRoutesByFullPath {
   '/formas-pagamento': typeof FormasPagamentoRoute
   '/integracoes': typeof IntegracoesRoute
   '/login': typeof LoginRoute
+  '/perfil': typeof PerfilRoute
   '/reset-password': typeof ResetPasswordRoute
   '/termos-condicoes': typeof TermosCondicoesRoute
   '/voos': typeof VoosRoute
   '/clientes/novo': typeof ClientesNovoRoute
+  '/configuracoes/layout-login': typeof ConfiguracoesLayoutLoginRoute
+  '/configuracoes/marca': typeof ConfiguracoesMarcaRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
   '/financeiro/vendas': typeof FinanceiroVendasRoute
@@ -148,10 +170,13 @@ export interface FileRoutesByTo {
   '/formas-pagamento': typeof FormasPagamentoRoute
   '/integracoes': typeof IntegracoesRoute
   '/login': typeof LoginRoute
+  '/perfil': typeof PerfilRoute
   '/reset-password': typeof ResetPasswordRoute
   '/termos-condicoes': typeof TermosCondicoesRoute
   '/voos': typeof VoosRoute
   '/clientes/novo': typeof ClientesNovoRoute
+  '/configuracoes/layout-login': typeof ConfiguracoesLayoutLoginRoute
+  '/configuracoes/marca': typeof ConfiguracoesMarcaRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
   '/financeiro/vendas': typeof FinanceiroVendasRoute
@@ -169,10 +194,13 @@ export interface FileRoutesById {
   '/formas-pagamento': typeof FormasPagamentoRoute
   '/integracoes': typeof IntegracoesRoute
   '/login': typeof LoginRoute
+  '/perfil': typeof PerfilRoute
   '/reset-password': typeof ResetPasswordRoute
   '/termos-condicoes': typeof TermosCondicoesRoute
   '/voos': typeof VoosRoute
   '/clientes_/novo': typeof ClientesNovoRoute
+  '/configuracoes/layout-login': typeof ConfiguracoesLayoutLoginRoute
+  '/configuracoes/marca': typeof ConfiguracoesMarcaRoute
   '/cotacoes_/$id': typeof CotacoesIdRoute
   '/cotacoes_/nova': typeof CotacoesNovaRoute
   '/financeiro_/vendas': typeof FinanceiroVendasRoute
@@ -191,10 +219,13 @@ export interface FileRouteTypes {
     | '/formas-pagamento'
     | '/integracoes'
     | '/login'
+    | '/perfil'
     | '/reset-password'
     | '/termos-condicoes'
     | '/voos'
     | '/clientes/novo'
+    | '/configuracoes/layout-login'
+    | '/configuracoes/marca'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
     | '/financeiro/vendas'
@@ -211,10 +242,13 @@ export interface FileRouteTypes {
     | '/formas-pagamento'
     | '/integracoes'
     | '/login'
+    | '/perfil'
     | '/reset-password'
     | '/termos-condicoes'
     | '/voos'
     | '/clientes/novo'
+    | '/configuracoes/layout-login'
+    | '/configuracoes/marca'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
     | '/financeiro/vendas'
@@ -231,10 +265,13 @@ export interface FileRouteTypes {
     | '/formas-pagamento'
     | '/integracoes'
     | '/login'
+    | '/perfil'
     | '/reset-password'
     | '/termos-condicoes'
     | '/voos'
     | '/clientes_/novo'
+    | '/configuracoes/layout-login'
+    | '/configuracoes/marca'
     | '/cotacoes_/$id'
     | '/cotacoes_/nova'
     | '/financeiro_/vendas'
@@ -252,10 +289,13 @@ export interface RootRouteChildren {
   FormasPagamentoRoute: typeof FormasPagamentoRoute
   IntegracoesRoute: typeof IntegracoesRoute
   LoginRoute: typeof LoginRoute
+  PerfilRoute: typeof PerfilRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermosCondicoesRoute: typeof TermosCondicoesRoute
   VoosRoute: typeof VoosRoute
   ClientesNovoRoute: typeof ClientesNovoRoute
+  ConfiguracoesLayoutLoginRoute: typeof ConfiguracoesLayoutLoginRoute
+  ConfiguracoesMarcaRoute: typeof ConfiguracoesMarcaRoute
   CotacoesIdRoute: typeof CotacoesIdRoute
   CotacoesNovaRoute: typeof CotacoesNovaRoute
   FinanceiroVendasRoute: typeof FinanceiroVendasRoute
@@ -287,6 +327,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -373,6 +420,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CotacoesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/configuracoes/marca': {
+      id: '/configuracoes/marca'
+      path: '/configuracoes/marca'
+      fullPath: '/configuracoes/marca'
+      preLoaderRoute: typeof ConfiguracoesMarcaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes/layout-login': {
+      id: '/configuracoes/layout-login'
+      path: '/configuracoes/layout-login'
+      fullPath: '/configuracoes/layout-login'
+      preLoaderRoute: typeof ConfiguracoesLayoutLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clientes_/novo': {
       id: '/clientes_/novo'
       path: '/clientes/novo'
@@ -404,10 +465,13 @@ const rootRouteChildren: RootRouteChildren = {
   FormasPagamentoRoute: FormasPagamentoRoute,
   IntegracoesRoute: IntegracoesRoute,
   LoginRoute: LoginRoute,
+  PerfilRoute: PerfilRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermosCondicoesRoute: TermosCondicoesRoute,
   VoosRoute: VoosRoute,
   ClientesNovoRoute: ClientesNovoRoute,
+  ConfiguracoesLayoutLoginRoute: ConfiguracoesLayoutLoginRoute,
+  ConfiguracoesMarcaRoute: ConfiguracoesMarcaRoute,
   CotacoesIdRoute: CotacoesIdRoute,
   CotacoesNovaRoute: CotacoesNovaRoute,
   FinanceiroVendasRoute: FinanceiroVendasRoute,
