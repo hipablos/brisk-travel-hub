@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { buildCheckinAlertFromCotacao } from "@/lib/telegram-alertas";
+import { buildCheckinAlertsFromCotacao } from "@/lib/telegram-alertas";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/integracoes_/telegram")({
@@ -151,33 +151,21 @@ function TelegramPage() {
 
     const now = new Date();
     for (const cot of cots ?? []) {
-      const alert = buildCheckinAlertFromCotacao(cot);
-      if (!alert || alert.eventoEm.getTime() < now.getTime()) continue;
-      const { data: existing } = await supabase
-        .from("telegram_alertas")
-        .select("id, status")
-        .eq("user_id", uid)
-        .eq("tipo", alert.tipo)
-        .eq("referencia", alert.referencia)
-        .maybeSingle();
-      if (!existing) {
-        await supabase.from("telegram_alertas").insert({
-          user_id: uid,
-          tipo: alert.tipo,
-          referencia: alert.referencia,
-          cliente: alert.cliente,
-          numero_voo: alert.numeroVoo,
-          origem: alert.origem,
-          destino: alert.destino,
-          evento_em: alert.eventoEm.toISOString(),
-          enviar_em: alert.enviarEm.toISOString(),
-          mensagem: alert.mensagem,
-          metadata: alert.metadata as any,
-        });
-      } else if (existing.status === "Pendente") {
-        await supabase
+      const alerts = buildCheckinAlertsFromCotacao(cot);
+      for (const alert of alerts) {
+        if (alert.eventoEm.getTime() < now.getTime()) continue;
+        const { data: existing } = await supabase
           .from("telegram_alertas")
-          .update({
+          .select("id, status")
+          .eq("user_id", uid)
+          .eq("tipo", alert.tipo)
+          .eq("referencia", alert.referencia)
+          .maybeSingle();
+        if (!existing) {
+          await supabase.from("telegram_alertas").insert({
+            user_id: uid,
+            tipo: alert.tipo,
+            referencia: alert.referencia,
             cliente: alert.cliente,
             numero_voo: alert.numeroVoo,
             origem: alert.origem,
@@ -186,9 +174,23 @@ function TelegramPage() {
             enviar_em: alert.enviarEm.toISOString(),
             mensagem: alert.mensagem,
             metadata: alert.metadata as any,
-            erro: null,
-          })
-          .eq("id", existing.id);
+          });
+        } else if (existing.status === "Pendente") {
+          await supabase
+            .from("telegram_alertas")
+            .update({
+              cliente: alert.cliente,
+              numero_voo: alert.numeroVoo,
+              origem: alert.origem,
+              destino: alert.destino,
+              evento_em: alert.eventoEm.toISOString(),
+              enviar_em: alert.enviarEm.toISOString(),
+              mensagem: alert.mensagem,
+              metadata: alert.metadata as any,
+              erro: null,
+            })
+            .eq("id", existing.id);
+        }
       }
     }
 
