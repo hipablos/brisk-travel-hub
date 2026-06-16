@@ -59,6 +59,9 @@ const baseGroups: Group[] = [
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation();
   const { signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
+
+  const groups = baseGroups.filter((g) => !g.adminOnly || isAdmin);
 
   // Find which group contains the active route to start with that one open.
   const activeGroupTitle = groups.find((g) =>
