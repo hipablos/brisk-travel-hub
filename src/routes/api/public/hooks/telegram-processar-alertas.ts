@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildCheckinAlertsFromCotacao } from "@/lib/telegram-alertas";
+import { buildCheckinAlertsFromCotacao, TELEGRAM_ALERT_REFERENCIA_ATUAL_DB_PATTERN } from "@/lib/telegram-alertas";
 
 type TelegramConfig = {
   user_id: string;
@@ -136,6 +136,7 @@ export const Route = createFileRoute("/api/public/hooks/telegram-processar-alert
           .from("telegram_alertas")
           .select("id, user_id, tipo, referencia, mensagem")
           .eq("status", "Pendente")
+          .filter("referencia", "match", TELEGRAM_ALERT_REFERENCIA_ATUAL_DB_PATTERN)
           .lte("enviar_em", checkedAt)
           .order("enviar_em", { ascending: true })
           .limit(100);

@@ -6,6 +6,13 @@ export type TelegramCotacaoRow = {
 
 export type TrechoTipo = "ida" | "volta";
 
+export const TELEGRAM_ALERT_REFERENCIA_ATUAL_DB_PATTERN = ":(ida|volta):[0-9]+$";
+export const TELEGRAM_ALERT_REFERENCIA_ATUAL_REGEX = /:(ida|volta):\d+$/;
+
+export function isTelegramAlertReferenciaAtual(referencia?: string | null): boolean {
+  return TELEGRAM_ALERT_REFERENCIA_ATUAL_REGEX.test(referencia ?? "");
+}
+
 export type TelegramAlertPayload = {
   tipo: "Check-in";
   referencia: string;

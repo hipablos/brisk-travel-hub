@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { buildCheckinAlertsFromCotacao } from "@/lib/telegram-alertas";
+import { buildCheckinAlertsFromCotacao, isTelegramAlertReferenciaAtual } from "@/lib/telegram-alertas";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/integracoes_/telegram")({
@@ -197,13 +197,13 @@ function TelegramPage() {
 
     const { data: pending } = await supabase
       .from("telegram_alertas")
-      .select("id, tipo, cliente, numero_voo, origem, destino, evento_em, enviar_em, status, metadata")
+      .select("id, tipo, referencia, cliente, numero_voo, origem, destino, evento_em, enviar_em, status, metadata")
       .eq("user_id", uid)
       .eq("status", "Pendente")
       .order("enviar_em", { ascending: true });
 
     setAlertas(
-      ((pending ?? []) as any[]).map((a) => ({
+      ((pending ?? []) as any[]).filter((a) => isTelegramAlertReferenciaAtual(a.referencia)).map((a) => ({
         key: a.id,
         tipo: a.tipo,
         trecho: a.metadata?.trecho_label ?? undefined,
