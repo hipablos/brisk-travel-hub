@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useBrand } from "@/hooks/use-brand";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -39,6 +40,7 @@ const signupSchema = z
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { login: layout, brand } = useBrand();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
@@ -130,35 +132,52 @@ function LoginPage() {
     setForgotEmail("");
   };
 
+  const bgStyle = { background: layout?.fundo_valor || "var(--gradient-brand)" };
+  const cardStyle = { background: layout?.cor_card || "var(--card)" };
+  const btnStyle = layout
+    ? { background: layout.cor_botao, color: layout.cor_botao_texto }
+    : {};
+  const linkColor = layout?.cor_links || "var(--secondary)";
+  const textColor = layout?.cor_textos || "var(--primary-foreground)";
+  const logoAlign = (layout?.logo_alinhamento || "left") as "left" | "center" | "right";
+
   return (
     <div className="min-h-screen flex items-stretch bg-background">
       {/* Brand panel */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 p-12 relative overflow-hidden"
-        style={{ background: "var(--gradient-brand)" }}>
-        <div className="relative z-10 flex items-center gap-3">
-          <BriskLogo variant="white" className="h-14 w-auto" />
+      <div className="hidden lg:flex flex-col justify-between w-1/2 p-12 relative overflow-hidden" style={bgStyle}>
+        <div className="relative z-10" style={{ textAlign: logoAlign }}>
+          {layout?.logo_url ? (
+            <img src={layout.logo_url} alt="" style={{ width: layout.logo_largura, height: layout.logo_altura, objectFit: "contain", display: "inline-block" }} />
+          ) : brand?.logo_url ? (
+            <img src={brand.logo_url} alt="" className="h-14 w-auto inline-block" />
+          ) : (
+            <BriskLogo variant="white" className="h-14 w-auto inline-block" />
+          )}
         </div>
-        <div className="relative z-10 space-y-4">
-          <h1 className="text-4xl font-bold text-primary-foreground leading-tight">
-            Gestão completa para sua agência de viagens.
+        <div className="relative z-10 space-y-4" style={{ color: textColor }}>
+          <h1 className="text-4xl font-bold leading-tight">
+            {layout?.titulo || "Gestão completa para sua agência de viagens."}
           </h1>
-          <p className="text-primary-foreground/80 max-w-md">
-            Cotações, clientes, voos e financeiro em um só lugar. Tudo com a identidade da Brisk.
+          <p className="opacity-80 max-w-md">
+            {layout?.subtitulo || "Cotações, clientes, voos e financeiro em um só lugar."}
           </p>
         </div>
-        <div className="relative z-10 text-xs text-primary-foreground/60">
-          © {new Date().getFullYear()} Brisk Viagens
+        <div className="relative z-10 text-xs opacity-60" style={{ color: textColor }}>
+          © {new Date().getFullYear()} {brand?.empresa_nome || "Brisk Viagens"}
         </div>
-        {/* decorative blobs */}
-        <div className="absolute -top-32 -right-32 size-96 rounded-full bg-secondary/20 blur-3xl" />
+        <div className="absolute -top-32 -right-32 size-96 rounded-full bg-white/5 blur-3xl" />
         <div className="absolute -bottom-40 -left-20 size-96 rounded-full bg-white/5 blur-3xl" />
       </div>
 
       {/* Form panel */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-10" style={cardStyle}>
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <BriskLogo variant="color" className="h-10 w-auto" />
+            {brand?.logo_url ? (
+              <img src={brand.logo_url} alt="" className="h-10 w-auto" />
+            ) : (
+              <BriskLogo variant="color" className="h-10 w-auto" />
+            )}
           </div>
 
           {forgotOpen ? (
@@ -178,7 +197,7 @@ function LoginPage() {
                     className="pl-9" placeholder="seu@email.com" required />
                 </div>
               </div>
-              <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" disabled={loading}>
+              <Button type="submit" className="w-full hover:opacity-90" style={btnStyle} disabled={loading}>
                 {loading && <Loader2 className="size-4 animate-spin" />}
                 Enviar link
               </Button>
@@ -220,7 +239,7 @@ function LoginPage() {
                     <div className="flex items-center justify-between">
                       <Label htmlFor="l-password">Senha</Label>
                       <button type="button" onClick={() => setForgotOpen(true)}
-                        className="text-xs text-secondary hover:underline">
+                        className="text-xs hover:underline" style={{ color: linkColor }}>
                         Esqueci minha senha
                       </button>
                     </div>
@@ -232,13 +251,13 @@ function LoginPage() {
                     </div>
                     {lErrors.password && <p className="text-xs text-destructive">{lErrors.password}</p>}
                   </div>
-                  <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" disabled={loading}>
+                  <Button type="submit" className="w-full hover:opacity-90" style={btnStyle} disabled={loading}>
                     {loading && <Loader2 className="size-4 animate-spin" />}
                     Entrar
                   </Button>
                   <p className="text-sm text-center text-muted-foreground">
                     Não tem conta?{" "}
-                    <button type="button" onClick={() => setTab("signup")} className="text-secondary hover:underline font-medium">
+                    <button type="button" onClick={() => setTab("signup")} className="hover:underline font-medium" style={{ color: linkColor }}>
                       Criar conta
                     </button>
                   </p>
@@ -286,13 +305,13 @@ function LoginPage() {
                     </div>
                     {sErrors.confirm && <p className="text-xs text-destructive">{sErrors.confirm}</p>}
                   </div>
-                  <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" disabled={loading}>
+                  <Button type="submit" className="w-full hover:opacity-90" style={btnStyle} disabled={loading}>
                     {loading && <Loader2 className="size-4 animate-spin" />}
                     Criar conta
                   </Button>
                   <p className="text-sm text-center text-muted-foreground">
                     Já tem conta?{" "}
-                    <button type="button" onClick={() => setTab("login")} className="text-secondary hover:underline font-medium">
+                    <button type="button" onClick={() => setTab("login")} className="hover:underline font-medium" style={{ color: linkColor }}>
                       Entrar
                     </button>
                   </p>

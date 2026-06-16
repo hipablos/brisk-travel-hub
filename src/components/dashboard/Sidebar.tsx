@@ -9,6 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-role";
+import { useBrand } from "@/hooks/use-brand";
 import { BriskLogo } from "@/components/BriskLogo";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
@@ -60,6 +61,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation();
   const { signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { brand } = useBrand();
 
   const groups = baseGroups.filter((g) => !g.adminOnly || isAdmin);
 
@@ -80,7 +82,11 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <div className="px-6 py-6 border-b border-sidebar-border flex items-center justify-between">
-        <BriskLogo variant="white" className="h-10 w-auto" />
+        {brand?.logo_url ? (
+          <img src={brand.logo_url} alt={brand.nome_sistema} className="h-10 w-auto object-contain" />
+        ) : (
+          <BriskLogo variant="white" className="h-10 w-auto" />
+        )}
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">

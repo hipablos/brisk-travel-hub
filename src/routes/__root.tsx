@@ -14,6 +14,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider, RequireAuth } from "@/hooks/use-auth";
 import { useRouterState } from "@tanstack/react-router";
 import { ThemeProvider } from "@/hooks/use-theme";
+import { BrandProvider } from "@/hooks/use-brand";
 
 const PUBLIC_ROUTES = ["/login", "/reset-password"];
 
@@ -130,10 +131,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <AuthProvider>
-          {isPublic ? <Outlet /> : <RequireAuth><Outlet /></RequireAuth>}
-          <Toaster richColors position="top-right" />
-        </AuthProvider>
+        <BrandProvider>
+          <AuthProvider>
+            {isPublic ? <Outlet /> : <RequireAuth><Outlet /></RequireAuth>}
+            <Toaster richColors position="top-right" />
+          </AuthProvider>
+        </BrandProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
