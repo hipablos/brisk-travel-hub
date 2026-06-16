@@ -576,8 +576,14 @@ function ProximosAlertas({ alertas }: { alertas: Alerta[] }) {
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="text-sm font-semibold">{a.cliente}</div>
-          <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <div className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
             <Bell className="size-3" /> {a.tipo}
+            {a.trecho && (
+              <>
+                <span className="text-muted-foreground/50">•</span>
+                <span className="font-medium text-foreground/80">{a.trecho}</span>
+              </>
+            )}
             {a.numeroVoo && (
               <>
                 <span className="text-muted-foreground/50">•</span>
