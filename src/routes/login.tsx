@@ -197,7 +197,7 @@ function LoginPage() {
                     className="pl-9" placeholder="seu@email.com" required />
                 </div>
               </div>
-              <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" disabled={loading}>
+              <Button type="submit" className="w-full hover:opacity-90" style={btnStyle} disabled={loading}>
                 {loading && <Loader2 className="size-4 animate-spin" />}
                 Enviar link
               </Button>
@@ -239,7 +239,7 @@ function LoginPage() {
                     <div className="flex items-center justify-between">
                       <Label htmlFor="l-password">Senha</Label>
                       <button type="button" onClick={() => setForgotOpen(true)}
-                        className="text-xs text-secondary hover:underline">
+                        className="text-xs hover:underline" style={{ color: linkColor }}>
                         Esqueci minha senha
                       </button>
                     </div>
@@ -251,13 +251,13 @@ function LoginPage() {
                     </div>
                     {lErrors.password && <p className="text-xs text-destructive">{lErrors.password}</p>}
                   </div>
-                  <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" disabled={loading}>
+                  <Button type="submit" className="w-full hover:opacity-90" style={btnStyle} disabled={loading}>
                     {loading && <Loader2 className="size-4 animate-spin" />}
                     Entrar
                   </Button>
                   <p className="text-sm text-center text-muted-foreground">
                     Não tem conta?{" "}
-                    <button type="button" onClick={() => setTab("signup")} className="text-secondary hover:underline font-medium">
+                    <button type="button" onClick={() => setTab("signup")} className="hover:underline font-medium" style={{ color: linkColor }}>
                       Criar conta
                     </button>
                   </p>
@@ -305,13 +305,13 @@ function LoginPage() {
                     </div>
                     {sErrors.confirm && <p className="text-xs text-destructive">{sErrors.confirm}</p>}
                   </div>
-                  <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" disabled={loading}>
+                  <Button type="submit" className="w-full hover:opacity-90" style={btnStyle} disabled={loading}>
                     {loading && <Loader2 className="size-4 animate-spin" />}
                     Criar conta
                   </Button>
                   <p className="text-sm text-center text-muted-foreground">
                     Já tem conta?{" "}
-                    <button type="button" onClick={() => setTab("login")} className="text-secondary hover:underline font-medium">
+                    <button type="button" onClick={() => setTab("login")} className="hover:underline font-medium" style={{ color: linkColor }}>
                       Entrar
                     </button>
                   </p>
