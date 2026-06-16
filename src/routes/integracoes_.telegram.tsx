@@ -197,7 +197,7 @@ function TelegramPage() {
 
     const { data: pending } = await supabase
       .from("telegram_alertas")
-      .select("id, tipo, cliente, numero_voo, origem, destino, evento_em, enviar_em, status")
+      .select("id, tipo, cliente, numero_voo, origem, destino, evento_em, enviar_em, status, metadata")
       .eq("user_id", uid)
       .eq("status", "Pendente")
       .order("enviar_em", { ascending: true });
@@ -206,6 +206,7 @@ function TelegramPage() {
       ((pending ?? []) as any[]).map((a) => ({
         key: a.id,
         tipo: a.tipo,
+        trecho: a.metadata?.trecho_label ?? undefined,
         cliente: a.cliente,
         numeroVoo: a.numero_voo ?? undefined,
         origem: a.origem ?? undefined,
