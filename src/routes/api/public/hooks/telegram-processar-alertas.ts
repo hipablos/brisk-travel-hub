@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildCheckinAlertFromCotacao } from "@/lib/telegram-alertas";
+import { buildCheckinAlertsFromCotacao } from "@/lib/telegram-alertas";
 
 type TelegramConfig = {
   user_id: string;
@@ -88,35 +88,21 @@ export const Route = createFileRoute("/api/public/hooks/telegram-processar-alert
             .eq("status", "aprovado");
 
           for (const cotacao of cotacoes ?? []) {
-            const alert = buildCheckinAlertFromCotacao(cotacao);
-            if (!alert || alert.eventoEm.getTime() < Date.now()) continue;
-
-            const { data: existing } = await supabaseAdmin
-              .from("telegram_alertas")
-              .select("id, status")
-              .eq("user_id", cfg.user_id)
-              .eq("tipo", alert.tipo)
-              .eq("referencia", alert.referencia)
-              .maybeSingle();
-
-            if (!existing) {
-              await supabaseAdmin.from("telegram_alertas").insert({
-                user_id: cfg.user_id,
-                tipo: alert.tipo,
-                referencia: alert.referencia,
-                cliente: alert.cliente,
-                numero_voo: alert.numeroVoo,
-                origem: alert.origem,
-                destino: alert.destino,
-                evento_em: alert.eventoEm.toISOString(),
-                enviar_em: alert.enviarEm.toISOString(),
-                mensagem: alert.mensagem,
-                metadata: alert.metadata as any,
-              });
-            } else if (existing.status === "Pendente") {
-              await supabaseAdmin
+            const alerts = buildCheckinAlertsFromCotacao(cotacao);
+            for (const alert of alerts) {
+              const { data: existing } = await supabaseAdmin
                 .from("telegram_alertas")
-                .update({
+                .select("id, status")
+                .eq("user_id", cfg.user_id)
+                .eq("tipo", alert.tipo)
+                .eq("referencia", alert.referencia)
+                .maybeSingle();
+
+              if (!existing) {
+                await supabaseAdmin.from("telegram_alertas").insert({
+                  user_id: cfg.user_id,
+                  tipo: alert.tipo,
+                  referencia: alert.referencia,
                   cliente: alert.cliente,
                   numero_voo: alert.numeroVoo,
                   origem: alert.origem,
@@ -125,9 +111,23 @@ export const Route = createFileRoute("/api/public/hooks/telegram-processar-alert
                   enviar_em: alert.enviarEm.toISOString(),
                   mensagem: alert.mensagem,
                   metadata: alert.metadata as any,
-                  erro: null,
-                })
-                .eq("id", existing.id);
+                });
+              } else if (existing.status === "Pendente") {
+                await supabaseAdmin
+                  .from("telegram_alertas")
+                  .update({
+                    cliente: alert.cliente,
+                    numero_voo: alert.numeroVoo,
+                    origem: alert.origem,
+                    destino: alert.destino,
+                    evento_em: alert.eventoEm.toISOString(),
+                    enviar_em: alert.enviarEm.toISOString(),
+                    mensagem: alert.mensagem,
+                    metadata: alert.metadata as any,
+                    erro: null,
+                  })
+                  .eq("id", existing.id);
+              }
             }
           }
         }
