@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      brand_settings: {
+        Row: {
+          cnpj: string | null
+          cor_botoes: string
+          cor_destaque: string
+          cor_links: string
+          cor_primaria: string
+          cor_secundaria: string
+          created_at: string
+          email: string | null
+          empresa_nome: string | null
+          endereco: string | null
+          favicon_url: string | null
+          fundo_login_tipo: string
+          fundo_login_valor: string
+          fundo_pdf_tipo: string | null
+          fundo_pdf_valor: string | null
+          id: string
+          imagem_institucional_url: string | null
+          logo_url: string | null
+          nome_sistema: string
+          singleton: boolean
+          site: string | null
+          telefone: string | null
+          tema_padrao: string
+          updated_at: string
+        }
+        Insert: {
+          cnpj?: string | null
+          cor_botoes?: string
+          cor_destaque?: string
+          cor_links?: string
+          cor_primaria?: string
+          cor_secundaria?: string
+          created_at?: string
+          email?: string | null
+          empresa_nome?: string | null
+          endereco?: string | null
+          favicon_url?: string | null
+          fundo_login_tipo?: string
+          fundo_login_valor?: string
+          fundo_pdf_tipo?: string | null
+          fundo_pdf_valor?: string | null
+          id?: string
+          imagem_institucional_url?: string | null
+          logo_url?: string | null
+          nome_sistema?: string
+          singleton?: boolean
+          site?: string | null
+          telefone?: string | null
+          tema_padrao?: string
+          updated_at?: string
+        }
+        Update: {
+          cnpj?: string | null
+          cor_botoes?: string
+          cor_destaque?: string
+          cor_links?: string
+          cor_primaria?: string
+          cor_secundaria?: string
+          created_at?: string
+          email?: string | null
+          empresa_nome?: string | null
+          endereco?: string | null
+          favicon_url?: string | null
+          fundo_login_tipo?: string
+          fundo_login_valor?: string
+          fundo_pdf_tipo?: string | null
+          fundo_pdf_valor?: string | null
+          id?: string
+          imagem_institucional_url?: string | null
+          logo_url?: string | null
+          nome_sistema?: string
+          singleton?: boolean
+          site?: string | null
+          telefone?: string | null
+          tema_padrao?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clientes: {
         Row: {
           created_at: string
@@ -185,6 +266,75 @@ export type Database = {
           id?: string
           name?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      login_layout_settings: {
+        Row: {
+          cor_botao: string
+          cor_botao_texto: string
+          cor_campos: string
+          cor_card: string
+          cor_icones: string
+          cor_links: string
+          cor_secundaria: string
+          cor_textos: string
+          created_at: string
+          fundo_tipo: string
+          fundo_valor: string
+          id: string
+          logo_alinhamento: string
+          logo_altura: number
+          logo_largura: number
+          logo_url: string | null
+          singleton: boolean
+          subtitulo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          cor_botao?: string
+          cor_botao_texto?: string
+          cor_campos?: string
+          cor_card?: string
+          cor_icones?: string
+          cor_links?: string
+          cor_secundaria?: string
+          cor_textos?: string
+          created_at?: string
+          fundo_tipo?: string
+          fundo_valor?: string
+          id?: string
+          logo_alinhamento?: string
+          logo_altura?: number
+          logo_largura?: number
+          logo_url?: string | null
+          singleton?: boolean
+          subtitulo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Update: {
+          cor_botao?: string
+          cor_botao_texto?: string
+          cor_campos?: string
+          cor_card?: string
+          cor_icones?: string
+          cor_links?: string
+          cor_secundaria?: string
+          cor_textos?: string
+          created_at?: string
+          fundo_tipo?: string
+          fundo_valor?: string
+          id?: string
+          logo_alinhamento?: string
+          logo_altura?: number
+          logo_largura?: number
+          logo_url?: string | null
+          singleton?: boolean
+          subtitulo?: string
+          titulo?: string
+          updated_at?: string
         }
         Relationships: []
       }
