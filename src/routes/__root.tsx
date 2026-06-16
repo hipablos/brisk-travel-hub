@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import faviconAsset from "@/assets/brisk-favicon.png.asset.json";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider, RequireAuth } from "@/hooks/use-auth";
 import { useRouterState } from "@tanstack/react-router";
@@ -96,6 +97,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/png", href: faviconAsset.url },
+      { rel: "shortcut icon", type: "image/png", href: faviconAsset.url },
+      { rel: "apple-touch-icon", href: faviconAsset.url },
     ],
   }),
   shellComponent: RootShell,

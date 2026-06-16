@@ -1,16 +1,36 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Bell, Moon, Sun, Menu } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Moon, Sun, Menu, ChevronDown, User as UserIcon, LogOut } from "lucide-react";
 import { MobileSidebar } from "./Sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Topbar() {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const { theme, toggle } = useTheme();
+  const navigate = useNavigate();
   const initial = (user?.user_metadata?.full_name || user?.email || "U").charAt(0).toUpperCase();
   const displayName = (user?.user_metadata?.full_name as string) || user?.email?.split("@")[0] || "USUÁRIO";
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    try {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith("sb-"))
+        .forEach((k) => localStorage.removeItem(k));
+    } catch {}
+    navigate({ to: "/login", replace: true });
+  };
 
   return (
     <>
@@ -42,18 +62,37 @@ export function Topbar() {
           >
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>
-          <button
-            className="relative size-9 grid place-items-center rounded-full hover:bg-accent/10 text-foreground/70"
-            aria-label="Notificações"
-          >
-            <Bell className="size-4" />
-          </button>
-          <div className="flex items-center gap-2 pl-3 border-l border-border">
-            <div className="size-9 rounded-full bg-gradient-to-br from-secondary to-secondary/60 grid place-items-center font-bold text-primary">
-              {initial}
-            </div>
-            <div className="hidden sm:block text-sm font-semibold text-foreground uppercase truncate max-w-[140px]">{displayName}</div>
-          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-2 pl-3 border-l border-border outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
+                aria-label="Menu do usuário"
+              >
+                <div className="size-9 rounded-full bg-gradient-to-br from-secondary to-secondary/60 grid place-items-center font-bold text-primary">
+                  {initial}
+                </div>
+                <div className="hidden sm:flex items-center gap-1">
+                  <span className="text-sm font-semibold text-foreground uppercase truncate max-w-[140px]">
+                    {displayName}
+                  </span>
+                  <ChevronDown className="size-3 text-foreground/60" />
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel className="truncate">{user?.email}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate({ to: "/perfil" })}>
+                <UserIcon className="size-4 mr-2" />
+                Perfil
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="size-4 mr-2" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
       <MobileSidebar open={open} onOpenChange={setOpen} />

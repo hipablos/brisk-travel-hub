@@ -4,16 +4,18 @@ import {
   LayoutDashboard, FileText, Calendar, Plane, Hotel,
   MapPin, ShoppingCart, ChevronDown, LogOut,
   Users, CreditCard, FileSignature, Plug, MessageCircle,
+  Settings, Palette, LogIn,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsAdmin } from "@/hooks/use-role";
 import { BriskLogo } from "@/components/BriskLogo";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 type Item = { icon: React.ComponentType<{ className?: string }>; label: string; badge?: string; href?: string };
-type Group = { title: string; items: Item[] };
+type Group = { title: string; items: Item[]; adminOnly?: boolean };
 
-const groups: Group[] = [
+const baseGroups: Group[] = [
   {
     title: "Principal",
     items: [
@@ -40,16 +42,26 @@ const groups: Group[] = [
     { icon: Users, label: "Clientes", href: "/clientes" },
     { icon: CreditCard, label: "Formas de Pagamento", href: "/formas-pagamento" },
     { icon: FileSignature, label: "Termos e Condições", href: "/termos-condicoes" },
-    { icon: Plug, label: "Integrações", href: "/integracoes" },
     { icon: MessageCircle, label: "Telegram", href: "/integracoes/telegram" },
   ] },
-
+  {
+    title: "Configurações",
+    adminOnly: true,
+    items: [
+      { icon: Palette, label: "Marca Brisk", href: "/configuracoes/marca" },
+      { icon: LogIn, label: "Layout Login", href: "/configuracoes/layout-login" },
+      { icon: Plug, label: "Integrações", href: "/integracoes" },
+    ],
+  },
 ];
 
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation();
   const { signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
+
+  const groups = baseGroups.filter((g) => !g.adminOnly || isAdmin);
 
   // Find which group contains the active route to start with that one open.
   const activeGroupTitle = groups.find((g) =>
