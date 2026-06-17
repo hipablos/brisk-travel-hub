@@ -30,7 +30,7 @@ const baseGroups: Group[] = [
     items: [
       { icon: Plane, label: "Voos", href: "/voos" },
       { icon: Hotel, label: "Hospedagens", href: "/hospedagens" },
-      { icon: MapPin, label: "Experiências Turísticas" },
+      { icon: MapPin, label: "Experiências Turísticas", href: "/experiencias" },
     ],
   },
   {
