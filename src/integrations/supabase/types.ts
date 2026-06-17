@@ -152,6 +152,102 @@ export type Database = {
         }
         Relationships: []
       }
+      experiencias: {
+        Row: {
+          categoria: string | null
+          cidade: string | null
+          cliente_id: string | null
+          cotacao_id: string | null
+          created_at: string
+          created_by: string | null
+          data: string | null
+          descricao: string | null
+          duracao_min: number | null
+          endereco: string | null
+          estado: string | null
+          google_maps_url: string | null
+          google_place_id: string | null
+          hora_inicio: string | null
+          hora_termino: string | null
+          id: string
+          idade_minima: number | null
+          idioma: string | null
+          lat: number | null
+          lng: number | null
+          nome: string
+          pais: string | null
+          participantes: number | null
+          updated_at: string
+        }
+        Insert: {
+          categoria?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: string | null
+          descricao?: string | null
+          duracao_min?: number | null
+          endereco?: string | null
+          estado?: string | null
+          google_maps_url?: string | null
+          google_place_id?: string | null
+          hora_inicio?: string | null
+          hora_termino?: string | null
+          id?: string
+          idade_minima?: number | null
+          idioma?: string | null
+          lat?: number | null
+          lng?: number | null
+          nome: string
+          pais?: string | null
+          participantes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: string | null
+          descricao?: string | null
+          duracao_min?: number | null
+          endereco?: string | null
+          estado?: string | null
+          google_maps_url?: string | null
+          google_place_id?: string | null
+          hora_inicio?: string | null
+          hora_termino?: string | null
+          id?: string
+          idade_minima?: number | null
+          idioma?: string | null
+          lat?: number | null
+          lng?: number | null
+          nome?: string
+          pais?: string | null
+          participantes?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experiencias_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "experiencias_cotacao_id_fkey"
+            columns: ["cotacao_id"]
+            isOneToOne: false
+            referencedRelation: "cotacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       formas_pagamento: {
         Row: {
           acrescimo: number
