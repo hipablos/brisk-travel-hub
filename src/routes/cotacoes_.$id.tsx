@@ -11,6 +11,32 @@ import {
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 import { dateOnlyToBR, normalizeDateOnly } from "@/lib/dates";
+import { supabase } from "@/integrations/supabase/client";
+import { Star } from "lucide-react";
+
+type HospedagemRow = {
+  id: string; nome_hotel: string; estrelas: number | null;
+  endereco: string | null; cidade: string | null; estado: string | null; pais: string | null;
+  checkin: string | null; checkout: string | null; noites: number | null;
+  hospedes: number | null; quartos: number | null; tipo_acomodacao: string | null;
+  regime_alimentar: string | null; numero_reserva: string | null; codigo_confirmacao: string | null;
+  observacoes_cliente: string | null; google_maps_url: string | null;
+};
+type ExperienciaRow = {
+  id: string; nome: string; categoria: string | null;
+  endereco: string | null; cidade: string | null; estado: string | null; pais: string | null;
+  data: string | null; hora_inicio: string | null; hora_termino: string | null;
+  duracao_min: number | null; participantes: number | null; idioma: string | null;
+  idade_minima: number | null; descricao: string | null;
+};
+
+const REGIME_LABEL: Record<string, string> = {
+  sem_alimentacao: "Sem alimentação",
+  cafe_da_manha: "Café da manhã",
+  meia_pensao: "Meia pensão",
+  pensao_completa: "Pensão completa",
+  all_inclusive: "All Inclusive",
+};
 
 export const Route = createFileRoute("/cotacoes_/$id")({
   component: VisualizarCotacao,
@@ -66,6 +92,8 @@ function VisualizarCotacao() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [cotacao, setCotacao] = useState<Cotacao | undefined>();
+  const [hospedagens, setHospedagens] = useState<HospedagemRow[]>([]);
+  const [experiencias, setExperiencias] = useState<ExperienciaRow[]>([]);
   const formasPagamento = useFormasPagamento();
 
   useEffect(() => {
@@ -73,6 +101,12 @@ function VisualizarCotacao() {
       if (!c) { navigate({ to: "/cotacoes" }); return; }
       setCotacao(c);
     });
+    (supabase.from as any)("hospedagens")
+      .select("*").eq("cotacao_id", id).order("checkin", { ascending: true })
+      .then(({ data }: any) => setHospedagens(data || []));
+    (supabase.from as any)("experiencias")
+      .select("*").eq("cotacao_id", id).order("data", { ascending: true })
+      .then(({ data }: any) => setExperiencias(data || []));
   }, [id, navigate]);
 
   if (!cotacao) return null;
@@ -166,6 +200,14 @@ function VisualizarCotacao() {
               {/* Voos */}
               {vooIda && <VooBlock direction="ida" voo={vooIda} />}
               {vooVolta && <VooBlock direction="volta" voo={vooVolta} />}
+
+              {/* Hospedagens */}
+              {hospedagens.map((h) => <HospedagemBlock key={h.id} h={h} />)}
+
+              {/* Experiências */}
+              {experiencias.map((e) => <ExperienciaBlock key={e.id} e={e} />)}
+
+
 
               {/* Valor e Forma de Pagamento */}
               <section className="border-t border-slate-200 pt-3">
@@ -434,5 +476,89 @@ function BagIcon({ icon: Icon, label, active }: { icon: React.ComponentType<{ cl
       <Icon className="size-3.5" />
       <span className="text-[10px] font-medium leading-none whitespace-nowrap">{label}</span>
     </div>
+  );
+}
+
+/* ---------- Hospedagem Block ---------- */
+function HospedagemBlock({ h }: { h: HospedagemRow }) {
+  const local = [h.cidade, h.estado, h.pais].filter(Boolean).join(", ");
+  const formatDT = (s: string | null) => {
+    if (!s) return "—";
+    const d = new Date(s);
+    return d.toLocaleDateString("pt-BR") + " " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  };
+  return (
+    <section className="space-y-1.5">
+      <div className="flex items-baseline gap-2 flex-wrap">
+        <Hotel className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
+        <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">Hospedagem</h3>
+        <span className="text-slate-300">·</span>
+        <span className="text-[12px] font-semibold text-slate-900">{h.nome_hotel}</span>
+        {h.estrelas ? (
+          <span className="inline-flex items-center text-amber-500">
+            {Array.from({ length: h.estrelas }).map((_, i) => <Star key={i} className="size-3 fill-current" />)}
+          </span>
+        ) : null}
+      </div>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
+        <div><span className="text-slate-500">Check-in:</span> <span className="font-medium text-slate-900">{formatDT(h.checkin)}</span></div>
+        <div><span className="text-slate-500">Check-out:</span> <span className="font-medium text-slate-900">{formatDT(h.checkout)}</span></div>
+        {h.noites != null && <div><span className="text-slate-500">Noites:</span> <span className="font-medium text-slate-900">{h.noites}</span></div>}
+        {(h.hospedes != null || h.quartos != null) && (
+          <div>
+            <span className="text-slate-500">Hóspedes:</span> <span className="font-medium text-slate-900">{h.hospedes ?? "—"}</span>
+            {h.quartos != null && <> · <span className="text-slate-500">Quartos:</span> <span className="font-medium text-slate-900">{h.quartos}</span></>}
+          </div>
+        )}
+        {h.tipo_acomodacao && <div><span className="text-slate-500">Acomodação:</span> <span className="font-medium text-slate-900">{h.tipo_acomodacao}</span></div>}
+        {h.regime_alimentar && <div><span className="text-slate-500">Regime:</span> <span className="font-medium text-slate-900">{REGIME_LABEL[h.regime_alimentar] || h.regime_alimentar}</span></div>}
+        {h.numero_reserva && <div><span className="text-slate-500">Nº reserva:</span> <span className="font-medium text-slate-900">{h.numero_reserva}</span></div>}
+        {h.codigo_confirmacao && <div><span className="text-slate-500">Confirmação:</span> <span className="font-medium text-slate-900">{h.codigo_confirmacao}</span></div>}
+      </div>
+      {(h.endereco || local) && (
+        <div className="text-[11px] text-slate-600">
+          <MapPin className="inline size-3 mr-0.5" />
+          {[h.endereco, local].filter(Boolean).join(" — ")}
+        </div>
+      )}
+      {h.observacoes_cliente && (
+        <div className="text-[11px] text-slate-700 italic">{h.observacoes_cliente}</div>
+      )}
+    </section>
+  );
+}
+
+/* ---------- Experiência Block ---------- */
+function ExperienciaBlock({ e }: { e: ExperienciaRow }) {
+  const local = [e.cidade, e.estado, e.pais].filter(Boolean).join(", ");
+  const data = e.data ? new Date(e.data + "T00:00:00").toLocaleDateString("pt-BR") : "—";
+  const horario = e.hora_inicio
+    ? `${e.hora_inicio.slice(0, 5)}${e.hora_termino ? " – " + e.hora_termino.slice(0, 5) : ""}`
+    : "—";
+  return (
+    <section className="space-y-1.5">
+      <div className="flex items-baseline gap-2 flex-wrap">
+        <MapPin className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
+        <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">Experiência</h3>
+        <span className="text-slate-300">·</span>
+        <span className="text-[12px] font-semibold text-slate-900">{e.nome}</span>
+        {e.categoria && <span className="text-[10px] text-slate-500">({e.categoria})</span>}
+      </div>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
+        <div><span className="text-slate-500">Data:</span> <span className="font-medium text-slate-900">{data}</span></div>
+        <div><span className="text-slate-500">Horário:</span> <span className="font-medium text-slate-900">{horario}</span></div>
+        {e.duracao_min != null && <div><span className="text-slate-500">Duração:</span> <span className="font-medium text-slate-900">{e.duracao_min} min</span></div>}
+        {e.participantes != null && <div><span className="text-slate-500">Participantes:</span> <span className="font-medium text-slate-900">{e.participantes}</span></div>}
+        {e.idioma && <div><span className="text-slate-500">Idioma:</span> <span className="font-medium text-slate-900">{e.idioma}</span></div>}
+        {e.idade_minima != null && <div><span className="text-slate-500">Idade mínima:</span> <span className="font-medium text-slate-900">{e.idade_minima}+</span></div>}
+      </div>
+      {(e.endereco || local) && (
+        <div className="text-[11px] text-slate-600">
+          <MapPin className="inline size-3 mr-0.5" />
+          {[e.endereco, local].filter(Boolean).join(" — ")}
+        </div>
+      )}
+      {e.descricao && <div className="text-[11px] text-slate-700 italic">{e.descricao}</div>}
+    </section>
   );
 }
