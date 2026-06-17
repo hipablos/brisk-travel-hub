@@ -194,6 +194,114 @@ export type Database = {
         }
         Relationships: []
       }
+      hospedagens: {
+        Row: {
+          checkin: string | null
+          checkout: string | null
+          cidade: string | null
+          cliente_id: string | null
+          codigo_confirmacao: string | null
+          cotacao_id: string | null
+          created_at: string
+          created_by: string | null
+          endereco: string | null
+          estado: string | null
+          estrelas: number | null
+          google_maps_url: string | null
+          google_place_id: string | null
+          hospedes: number | null
+          id: string
+          lat: number | null
+          lng: number | null
+          noites: number | null
+          nome_hotel: string
+          numero_reserva: string | null
+          observacoes_cliente: string | null
+          pais: string | null
+          quartos: number | null
+          regime_alimentar:
+            | Database["public"]["Enums"]["regime_alimentar"]
+            | null
+          tipo_acomodacao: string | null
+          updated_at: string
+        }
+        Insert: {
+          checkin?: string | null
+          checkout?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
+          codigo_confirmacao?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          endereco?: string | null
+          estado?: string | null
+          estrelas?: number | null
+          google_maps_url?: string | null
+          google_place_id?: string | null
+          hospedes?: number | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          noites?: number | null
+          nome_hotel: string
+          numero_reserva?: string | null
+          observacoes_cliente?: string | null
+          pais?: string | null
+          quartos?: number | null
+          regime_alimentar?:
+            | Database["public"]["Enums"]["regime_alimentar"]
+            | null
+          tipo_acomodacao?: string | null
+          updated_at?: string
+        }
+        Update: {
+          checkin?: string | null
+          checkout?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
+          codigo_confirmacao?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          endereco?: string | null
+          estado?: string | null
+          estrelas?: number | null
+          google_maps_url?: string | null
+          google_place_id?: string | null
+          hospedes?: number | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          noites?: number | null
+          nome_hotel?: string
+          numero_reserva?: string | null
+          observacoes_cliente?: string | null
+          pais?: string | null
+          quartos?: number | null
+          regime_alimentar?:
+            | Database["public"]["Enums"]["regime_alimentar"]
+            | null
+          tipo_acomodacao?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hospedagens_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hospedagens_cotacao_id_fkey"
+            columns: ["cotacao_id"]
+            isOneToOne: false
+            referencedRelation: "cotacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       integracoes: {
         Row: {
           ambiente: string
@@ -620,6 +728,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      regime_alimentar:
+        | "sem_alimentacao"
+        | "cafe_da_manha"
+        | "meia_pensao"
+        | "pensao_completa"
+        | "all_inclusive"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -748,6 +862,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      regime_alimentar: [
+        "sem_alimentacao",
+        "cafe_da_manha",
+        "meia_pensao",
+        "pensao_completa",
+        "all_inclusive",
+      ],
     },
   },
 } as const
