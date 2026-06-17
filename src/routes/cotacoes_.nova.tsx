@@ -149,13 +149,15 @@ function NovaCotacao() {
       setFormasPagamentoIds(c.formasPagamentoIds ?? []);
       setServices(
         c.servicos.length
-          ? c.servicos.map((s) => ({
-              id: s.id,
-              type: s.type as ServiceType,
-              description: s.description,
-              value: String(s.value),
-            }))
-          : [{ id: "1", type: "voo", description: "", value: "" }]
+          ? c.servicos
+              .filter((s) => serviceOptions.some((o) => o.id === (s.type as ServiceType)))
+              .map((s) => ({
+                id: s.id,
+                type: s.type as ServiceType,
+                description: s.description,
+                value: String(s.value),
+              }))
+          : []
       );
       setValoresCusto(c.valoresCusto ?? []);
       setValoresVenda(c.valoresVenda ?? []);
