@@ -33,6 +33,9 @@ import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard"
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
 import { VendaLinhaDialog } from "@/components/cotacoes/VendaLinhaDialog";
 import { TelegramAlertDiagnostic } from "@/components/cotacoes/TelegramAlertDiagnostic";
+import { HospedagemInlineForm, novaHospedagem, type HospedagemDraft } from "@/components/hospedagens/HospedagemInlineForm";
+import { ExperienciaInlineForm, novaExperiencia, type ExperienciaDraft } from "@/components/places/ExperienciaInlineForm";
+import { supabase } from "@/integrations/supabase/client";
 import { Users, Eye } from "lucide-react";
 
 import { toast } from "sonner";
