@@ -92,6 +92,8 @@ function VisualizarCotacao() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [cotacao, setCotacao] = useState<Cotacao | undefined>();
+  const [hospedagens, setHospedagens] = useState<HospedagemRow[]>([]);
+  const [experiencias, setExperiencias] = useState<ExperienciaRow[]>([]);
   const formasPagamento = useFormasPagamento();
 
   useEffect(() => {
@@ -99,6 +101,12 @@ function VisualizarCotacao() {
       if (!c) { navigate({ to: "/cotacoes" }); return; }
       setCotacao(c);
     });
+    (supabase.from as any)("hospedagens")
+      .select("*").eq("cotacao_id", id).order("checkin", { ascending: true })
+      .then(({ data }: any) => setHospedagens(data || []));
+    (supabase.from as any)("experiencias")
+      .select("*").eq("cotacao_id", id).order("data", { ascending: true })
+      .then(({ data }: any) => setExperiencias(data || []));
   }, [id, navigate]);
 
   if (!cotacao) return null;
