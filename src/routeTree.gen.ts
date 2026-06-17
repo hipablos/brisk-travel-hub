@@ -17,6 +17,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegracoesRouteImport } from './routes/integracoes'
 import { Route as HospedagensRouteImport } from './routes/hospedagens'
 import { Route as FormasPagamentoRouteImport } from './routes/formas-pagamento'
+import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as IndexRouteImport } from './routes/index'
@@ -70,6 +71,11 @@ const HospedagensRoute = HospedagensRouteImport.update({
 const FormasPagamentoRoute = FormasPagamentoRouteImport.update({
   id: '/formas-pagamento',
   path: '/formas-pagamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienciasRoute = ExperienciasRouteImport.update({
+  id: '/experiencias',
+  path: '/experiencias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CotacoesRoute = CotacoesRouteImport.update({
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
+  '/experiencias': typeof ExperienciasRoute
   '/formas-pagamento': typeof FormasPagamentoRoute
   '/hospedagens': typeof HospedagensRoute
   '/integracoes': typeof IntegracoesRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
+  '/experiencias': typeof ExperienciasRoute
   '/formas-pagamento': typeof FormasPagamentoRoute
   '/hospedagens': typeof HospedagensRoute
   '/integracoes': typeof IntegracoesRoute
@@ -199,6 +207,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
+  '/experiencias': typeof ExperienciasRoute
   '/formas-pagamento': typeof FormasPagamentoRoute
   '/hospedagens': typeof HospedagensRoute
   '/integracoes': typeof IntegracoesRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/'
     | '/clientes'
     | '/cotacoes'
+    | '/experiencias'
     | '/formas-pagamento'
     | '/hospedagens'
     | '/integracoes'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/'
     | '/clientes'
     | '/cotacoes'
+    | '/experiencias'
     | '/formas-pagamento'
     | '/hospedagens'
     | '/integracoes'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/'
     | '/clientes'
     | '/cotacoes'
+    | '/experiencias'
     | '/formas-pagamento'
     | '/hospedagens'
     | '/integracoes'
@@ -298,6 +310,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClientesRoute: typeof ClientesRoute
   CotacoesRoute: typeof CotacoesRoute
+  ExperienciasRoute: typeof ExperienciasRoute
   FormasPagamentoRoute: typeof FormasPagamentoRoute
   HospedagensRoute: typeof HospedagensRoute
   IntegracoesRoute: typeof IntegracoesRoute
@@ -375,6 +388,13 @@ declare module '@tanstack/react-router' {
       path: '/formas-pagamento'
       fullPath: '/formas-pagamento'
       preLoaderRoute: typeof FormasPagamentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiencias': {
+      id: '/experiencias'
+      path: '/experiencias'
+      fullPath: '/experiencias'
+      preLoaderRoute: typeof ExperienciasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cotacoes': {
@@ -482,6 +502,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClientesRoute: ClientesRoute,
   CotacoesRoute: CotacoesRoute,
+  ExperienciasRoute: ExperienciasRoute,
   FormasPagamentoRoute: FormasPagamentoRoute,
   HospedagensRoute: HospedagensRoute,
   IntegracoesRoute: IntegracoesRoute,
