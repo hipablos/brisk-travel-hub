@@ -60,9 +60,7 @@ type ServiceType = "voo" | "hospedagem" | "transporte" | "experiencia" | "cruzei
 
 const serviceOptions: { id: ServiceType; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "voo", label: "Voo", icon: Plane },
-  { id: "hospedagem", label: "Hospedagem", icon: Hotel },
   { id: "transporte", label: "Transporte", icon: Car },
-  { id: "experiencia", label: "Experiência", icon: MapPin },
   { id: "cruzeiro", label: "Cruzeiro", icon: Ship },
   { id: "seguro", label: "Seguro", icon: Shield },
 ];
