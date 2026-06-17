@@ -104,6 +104,12 @@ function NovaCotacao() {
   const [vooIdas, setVooIdas] = useState<Voo[]>(() => [novoVoo()]);
   const [vooVoltas, setVooVoltas] = useState<Voo[]>([]);
 
+  // Hospedagens e Experiências vinculadas a esta cotação
+  const [hospedagens, setHospedagens] = useState<HospedagemDraft[]>([]);
+  const [experiencias, setExperiencias] = useState<ExperienciaDraft[]>([]);
+  const [hospedagensRemovidas, setHospedagensRemovidas] = useState<string[]>([]);
+  const [experienciasRemovidas, setExperienciasRemovidas] = useState<string[]>([]);
+
   // Valores tab
   const [valoresCusto, setValoresCusto] = useState<ValorCusto[]>([]);
   const [valoresVenda, setValoresVenda] = useState<ValorVenda[]>([]);
