@@ -328,3 +328,84 @@ function PaxBlock({ nome, idaVoo, voltaVoo }: { nome: string; idaVoo: any; volta
   );
 }
 
+function HospedagemBlock({ h }: { h: Hospedagem }) {
+  const enderecoCompleto = [h.endereco, h.cidade, h.estado, h.pais].filter(Boolean).join(", ");
+  return (
+    <div className="border border-slate-200 rounded overflow-hidden">
+      <div className="bg-[oklch(0.18_0.08_255)] text-white px-3 py-1.5 flex items-center justify-between print-bg">
+        <div className="flex items-center gap-1.5 font-semibold text-xs">
+          <Hotel className="size-3.5" /> {h.nome_hotel}
+          {h.estrelas ? (
+            <span className="ml-1 flex items-center gap-0.5">
+              {Array.from({ length: h.estrelas }).map((_, i) => <Star key={i} className="size-2.5 fill-amber-300 text-amber-300" />)}
+            </span>
+          ) : null}
+        </div>
+        <div className="text-[10px] opacity-90">
+          {h.checkin ? fmtShortDate(h.checkin) : "—"} → {h.checkout ? fmtShortDate(h.checkout) : "—"}
+          {h.noites ? ` · ${h.noites} ${h.noites === 1 ? "noite" : "noites"}` : ""}
+        </div>
+      </div>
+      <div className="bg-slate-50 px-3 py-2 text-[11px] text-slate-700 grid grid-cols-12 gap-2 print-bg">
+        <div className="col-span-7 flex items-start gap-1">
+          <MapPin className="size-3 mt-0.5 text-slate-500 shrink-0" />
+          <span className="truncate">{enderecoCompleto || "Endereço não informado"}</span>
+        </div>
+        <div className="col-span-5 text-right text-slate-600">
+          {h.tipo_acomodacao ? <span>{h.tipo_acomodacao} · </span> : null}
+          {h.quartos ? <span>{h.quartos} qto · </span> : null}
+          {h.hospedes ? <span>{h.hospedes} hósp.</span> : null}
+        </div>
+        {(h.numero_reserva || h.codigo_confirmacao || h.regime_alimentar) && (
+          <div className="col-span-12 flex gap-3 text-[10px] text-slate-500 border-t border-slate-200 pt-1 mt-1">
+            {h.numero_reserva && <span><b className="text-slate-700">Reserva:</b> {h.numero_reserva}</span>}
+            {h.codigo_confirmacao && <span><b className="text-slate-700">Confirmação:</b> {h.codigo_confirmacao}</span>}
+            {h.regime_alimentar && <span><b className="text-slate-700">Regime:</b> {h.regime_alimentar}</span>}
+          </div>
+        )}
+        {h.observacoes_cliente && (
+          <div className="col-span-12 text-[10px] text-slate-600 italic">{h.observacoes_cliente}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ExperienciaBlock({ e }: { e: Experiencia }) {
+  const local = [e.endereco, e.cidade, e.estado, e.pais].filter(Boolean).join(", ");
+  return (
+    <div className="border border-slate-200 rounded overflow-hidden">
+      <div className="bg-emerald-700 text-white px-3 py-1.5 flex items-center justify-between print-bg">
+        <div className="flex items-center gap-1.5 font-semibold text-xs">
+          <Compass className="size-3.5" /> {e.nome}
+          {e.categoria ? <span className="ml-1 text-[10px] opacity-90">· {e.categoria}</span> : null}
+        </div>
+        <div className="text-[10px] opacity-90 flex items-center gap-2">
+          {e.data && <span>{fmtShortDate(e.data)}</span>}
+          {(e.hora_inicio || e.hora_termino) && (
+            <span className="flex items-center gap-0.5"><Clock className="size-2.5" />
+              {e.hora_inicio ?? "--"}{e.hora_termino ? ` → ${e.hora_termino}` : ""}
+            </span>
+          )}
+          {e.duracao_min ? <span>· {e.duracao_min} min</span> : null}
+        </div>
+      </div>
+      <div className="bg-slate-50 px-3 py-2 text-[11px] text-slate-700 grid grid-cols-12 gap-2 print-bg">
+        <div className="col-span-8 flex items-start gap-1">
+          <MapPin className="size-3 mt-0.5 text-slate-500 shrink-0" />
+          <span className="truncate">{local || "Local não informado"}</span>
+        </div>
+        <div className="col-span-4 text-right text-slate-600 flex items-center justify-end gap-2">
+          {e.participantes ? <span className="flex items-center gap-0.5"><Users className="size-3" />{e.participantes}</span> : null}
+          {e.idioma ? <span>· {e.idioma}</span> : null}
+          {e.idade_minima ? <span>· {e.idade_minima}+</span> : null}
+        </div>
+        {e.descricao && (
+          <div className="col-span-12 text-[10px] text-slate-600 border-t border-slate-200 pt-1 mt-1">{e.descricao}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
