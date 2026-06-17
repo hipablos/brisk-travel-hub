@@ -201,6 +201,14 @@ function VisualizarCotacao() {
               {vooIda && <VooBlock direction="ida" voo={vooIda} />}
               {vooVolta && <VooBlock direction="volta" voo={vooVolta} />}
 
+              {/* Hospedagens */}
+              {hospedagens.map((h) => <HospedagemBlock key={h.id} h={h} />)}
+
+              {/* Experiências */}
+              {experiencias.map((e) => <ExperienciaBlock key={e.id} e={e} />)}
+
+
+
               {/* Valor e Forma de Pagamento */}
               <section className="border-t border-slate-200 pt-3">
                 <h3 className="flex items-center gap-1.5 text-sm font-bold text-[oklch(0.22_0.08_255)] mb-2">
