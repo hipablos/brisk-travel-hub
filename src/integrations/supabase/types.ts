@@ -95,6 +95,87 @@ export type Database = {
         }
         Relationships: []
       }
+      calendario_eventos: {
+        Row: {
+          categoria: string
+          cliente_id: string | null
+          cotacao_id: string | null
+          created_at: string
+          created_by: string | null
+          data: string
+          descricao: string | null
+          hora: string | null
+          id: string
+          notif_duas_horas_antes: boolean
+          notif_duas_horas_enviado_em: string | null
+          notif_no_horario: boolean
+          notif_no_horario_enviado_em: string | null
+          notif_um_dia_antes: boolean
+          notif_um_dia_enviado_em: string | null
+          prioridade: string
+          responsavel: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          categoria?: string
+          cliente_id?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data: string
+          descricao?: string | null
+          hora?: string | null
+          id?: string
+          notif_duas_horas_antes?: boolean
+          notif_duas_horas_enviado_em?: string | null
+          notif_no_horario?: boolean
+          notif_no_horario_enviado_em?: string | null
+          notif_um_dia_antes?: boolean
+          notif_um_dia_enviado_em?: string | null
+          prioridade?: string
+          responsavel?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string
+          cliente_id?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          descricao?: string | null
+          hora?: string | null
+          id?: string
+          notif_duas_horas_antes?: boolean
+          notif_duas_horas_enviado_em?: string | null
+          notif_no_horario?: boolean
+          notif_no_horario_enviado_em?: string | null
+          notif_um_dia_antes?: boolean
+          notif_um_dia_enviado_em?: string | null
+          prioridade?: string
+          responsavel?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendario_eventos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calendario_eventos_cotacao_id_fkey"
+            columns: ["cotacao_id"]
+            isOneToOne: false
+            referencedRelation: "cotacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clientes: {
         Row: {
           created_at: string
