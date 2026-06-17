@@ -33,6 +33,9 @@ import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard"
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
 import { VendaLinhaDialog } from "@/components/cotacoes/VendaLinhaDialog";
 import { TelegramAlertDiagnostic } from "@/components/cotacoes/TelegramAlertDiagnostic";
+import { HospedagemInlineForm, novaHospedagem, type HospedagemDraft } from "@/components/hospedagens/HospedagemInlineForm";
+import { ExperienciaInlineForm, novaExperiencia, type ExperienciaDraft } from "@/components/places/ExperienciaInlineForm";
+import { supabase } from "@/integrations/supabase/client";
 import { Users, Eye } from "lucide-react";
 
 import { toast } from "sonner";
@@ -57,9 +60,7 @@ type ServiceType = "voo" | "hospedagem" | "transporte" | "experiencia" | "cruzei
 
 const serviceOptions: { id: ServiceType; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "voo", label: "Voo", icon: Plane },
-  { id: "hospedagem", label: "Hospedagem", icon: Hotel },
   { id: "transporte", label: "Transporte", icon: Car },
-  { id: "experiencia", label: "Experiência", icon: MapPin },
   { id: "cruzeiro", label: "Cruzeiro", icon: Ship },
   { id: "seguro", label: "Seguro", icon: Shield },
 ];
@@ -102,6 +103,12 @@ function NovaCotacao() {
 
   const [vooIdas, setVooIdas] = useState<Voo[]>(() => [novoVoo()]);
   const [vooVoltas, setVooVoltas] = useState<Voo[]>([]);
+
+  // Hospedagens e Experiências vinculadas a esta cotação
+  const [hospedagens, setHospedagens] = useState<HospedagemDraft[]>([]);
+  const [experiencias, setExperiencias] = useState<ExperienciaDraft[]>([]);
+  const [hospedagensRemovidas, setHospedagensRemovidas] = useState<string[]>([]);
+  const [experienciasRemovidas, setExperienciasRemovidas] = useState<string[]>([]);
 
   // Valores tab
   const [valoresCusto, setValoresCusto] = useState<ValorCusto[]>([]);
@@ -165,6 +172,26 @@ function NovaCotacao() {
       setVooIdas(idasArr.length ? idasArr : [novoVoo()]);
       setVooVoltas(voltasArr);
     });
+
+    // Carrega hospedagens e experiências já vinculadas
+    (supabase.from as any)("hospedagens")
+      .select("*").eq("cotacao_id", editId).order("checkin", { ascending: true })
+      .then(({ data }: any) => {
+        if (data) setHospedagens(data.map((h: any) => ({
+          ...h,
+          checkin: h.checkin ? h.checkin.slice(0, 16) : "",
+          checkout: h.checkout ? h.checkout.slice(0, 16) : "",
+        })));
+      });
+    (supabase.from as any)("experiencias")
+      .select("*").eq("cotacao_id", editId).order("data", { ascending: true })
+      .then(({ data }: any) => {
+        if (data) setExperiencias(data.map((e: any) => ({
+          ...e,
+          hora_inicio: e.hora_inicio ? e.hora_inicio.slice(0, 5) : "",
+          hora_termino: e.hora_termino ? e.hora_termino.slice(0, 5) : "",
+        })));
+      });
   }, [editId]);
 
   // Aplica modelo padrão em novas cotações quando os modelos carregam
@@ -286,6 +313,58 @@ function NovaCotacao() {
     };
   };
 
+  const syncHospedagensExperiencias = async (cotacaoId: string, clienteIdFinal: string | null) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    // Remoções
+    if (hospedagensRemovidas.length) {
+      await (supabase.from as any)("hospedagens").delete().in("id", hospedagensRemovidas);
+    }
+    if (experienciasRemovidas.length) {
+      await (supabase.from as any)("experiencias").delete().in("id", experienciasRemovidas);
+    }
+    // Hospedagens
+    for (const h of hospedagens) {
+      if (!h.nome_hotel?.trim()) continue;
+      const noites = h.checkin && h.checkout
+        ? Math.max(0, Math.round((new Date(h.checkout).getTime() - new Date(h.checkin).getTime()) / 86400000))
+        : (h.noites ?? null);
+      const payload: any = {
+        ...h,
+        noites,
+        checkin: h.checkin ? new Date(h.checkin).toISOString() : null,
+        checkout: h.checkout ? new Date(h.checkout).toISOString() : null,
+        cotacao_id: cotacaoId,
+        cliente_id: clienteIdFinal,
+      };
+      if (h.id) {
+        await (supabase.from as any)("hospedagens").update(payload).eq("id", h.id);
+      } else {
+        payload.created_by = userId;
+        await (supabase.from as any)("hospedagens").insert(payload);
+      }
+    }
+    // Experiências
+    for (const ex of experiencias) {
+      if (!ex.nome?.trim()) continue;
+      const payload: any = {
+        ...ex,
+        data: ex.data || null,
+        hora_inicio: ex.hora_inicio || null,
+        hora_termino: ex.hora_termino || null,
+        cotacao_id: cotacaoId,
+        cliente_id: clienteIdFinal,
+      };
+      if (ex.id) {
+        await (supabase.from as any)("experiencias").update(payload).eq("id", ex.id);
+      } else {
+        payload.created_by = userId;
+        await (supabase.from as any)("experiencias").insert(payload);
+      }
+    }
+    setHospedagensRemovidas([]);
+    setExperienciasRemovidas([]);
+  };
+
   const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const cotacao = await buildCotacao();
@@ -295,6 +374,7 @@ function NovaCotacao() {
       toast.error("Não foi possível salvar a cotação");
       return;
     }
+    await syncHospedagensExperiencias(saved.id, clienteId || null);
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
     // Não navega mais automaticamente para o PDF
     if (!editing) {
@@ -577,6 +657,77 @@ function NovaCotacao() {
                   })}
                 </div>
               </section>
+
+              <section className="bg-card border border-border/50 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
+                      <Hotel className="size-4" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-foreground">Hospedagens</h2>
+                  </div>
+                  <Button type="button" size="sm" variant="outline" className="gap-2"
+                    onClick={() => setHospedagens((l) => [...l, novaHospedagem()])}>
+                    <Plus className="size-4" /> Adicionar hospedagem
+                  </Button>
+                </div>
+                {hospedagens.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Nenhuma hospedagem. Clique acima para adicionar — será salva e aparecerá no PDF.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {hospedagens.map((h, idx) => (
+                      <HospedagemInlineForm
+                        key={h.id ?? `new-${idx}`}
+                        value={h}
+                        index={idx}
+                        onChange={(patch) => setHospedagens((l) => l.map((x, i) => i === idx ? { ...x, ...patch } : x))}
+                        onRemove={() => {
+                          if (h.id) setHospedagensRemovidas((r) => [...r, h.id!]);
+                          setHospedagens((l) => l.filter((_, i) => i !== idx));
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="bg-card border border-border/50 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
+                      <MapPin className="size-4" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-foreground">Experiências Turísticas</h2>
+                  </div>
+                  <Button type="button" size="sm" variant="outline" className="gap-2"
+                    onClick={() => setExperiencias((l) => [...l, novaExperiencia()])}>
+                    <Plus className="size-4" /> Adicionar experiência
+                  </Button>
+                </div>
+                {experiencias.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Nenhuma experiência. Clique acima para adicionar — será salva e aparecerá no PDF.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {experiencias.map((ex, idx) => (
+                      <ExperienciaInlineForm
+                        key={ex.id ?? `new-${idx}`}
+                        value={ex}
+                        index={idx}
+                        onChange={(patch) => setExperiencias((l) => l.map((x, i) => i === idx ? { ...x, ...patch } : x))}
+                        onRemove={() => {
+                          if (ex.id) setExperienciasRemovidas((r) => [...r, ex.id!]);
+                          setExperiencias((l) => l.filter((_, i) => i !== idx));
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
 
               <section className="bg-card border border-border/50 rounded-xl p-6 space-y-5">
                 <div>
