@@ -313,6 +313,58 @@ function NovaCotacao() {
     };
   };
 
+  const syncHospedagensExperiencias = async (cotacaoId: string, clienteIdFinal: string | null) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    // Remoções
+    if (hospedagensRemovidas.length) {
+      await (supabase.from as any)("hospedagens").delete().in("id", hospedagensRemovidas);
+    }
+    if (experienciasRemovidas.length) {
+      await (supabase.from as any)("experiencias").delete().in("id", experienciasRemovidas);
+    }
+    // Hospedagens
+    for (const h of hospedagens) {
+      if (!h.nome_hotel?.trim()) continue;
+      const noites = h.checkin && h.checkout
+        ? Math.max(0, Math.round((new Date(h.checkout).getTime() - new Date(h.checkin).getTime()) / 86400000))
+        : (h.noites ?? null);
+      const payload: any = {
+        ...h,
+        noites,
+        checkin: h.checkin ? new Date(h.checkin).toISOString() : null,
+        checkout: h.checkout ? new Date(h.checkout).toISOString() : null,
+        cotacao_id: cotacaoId,
+        cliente_id: clienteIdFinal,
+      };
+      if (h.id) {
+        await (supabase.from as any)("hospedagens").update(payload).eq("id", h.id);
+      } else {
+        payload.created_by = userId;
+        await (supabase.from as any)("hospedagens").insert(payload);
+      }
+    }
+    // Experiências
+    for (const ex of experiencias) {
+      if (!ex.nome?.trim()) continue;
+      const payload: any = {
+        ...ex,
+        data: ex.data || null,
+        hora_inicio: ex.hora_inicio || null,
+        hora_termino: ex.hora_termino || null,
+        cotacao_id: cotacaoId,
+        cliente_id: clienteIdFinal,
+      };
+      if (ex.id) {
+        await (supabase.from as any)("experiencias").update(payload).eq("id", ex.id);
+      } else {
+        payload.created_by = userId;
+        await (supabase.from as any)("experiencias").insert(payload);
+      }
+    }
+    setHospedagensRemovidas([]);
+    setExperienciasRemovidas([]);
+  };
+
   const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const cotacao = await buildCotacao();
@@ -322,6 +374,7 @@ function NovaCotacao() {
       toast.error("Não foi possível salvar a cotação");
       return;
     }
+    await syncHospedagensExperiencias(saved.id, clienteId || null);
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
     // Não navega mais automaticamente para o PDF
     if (!editing) {
