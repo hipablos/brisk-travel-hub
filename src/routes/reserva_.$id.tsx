@@ -182,6 +182,24 @@ function ReservaPage() {
                   return <PaxBlock key={i} nome={nome} idaVoo={vooIda} voltaVoo={trechosVolta.length > 0 ? vooVolta : null} />;
                 })}
               </section>
+
+              {hospedagens.length > 0 && (
+                <section className="pt-2">
+                  <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">Hospedagens</h2>
+                  <div className="space-y-2">
+                    {hospedagens.map((h) => <HospedagemBlock key={h.id} h={h} />)}
+                  </div>
+                </section>
+              )}
+
+              {experiencias.length > 0 && (
+                <section className="pt-2">
+                  <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">Experiências</h2>
+                  <div className="space-y-2">
+                    {experiencias.map((e) => <ExperienciaBlock key={e.id} e={e} />)}
+                  </div>
+                </section>
+              )}
             </div>
           </div>
         </main>
