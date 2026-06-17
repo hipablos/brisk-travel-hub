@@ -172,6 +172,26 @@ function NovaCotacao() {
       setVooIdas(idasArr.length ? idasArr : [novoVoo()]);
       setVooVoltas(voltasArr);
     });
+
+    // Carrega hospedagens e experiências já vinculadas
+    (supabase.from as any)("hospedagens")
+      .select("*").eq("cotacao_id", editId).order("checkin", { ascending: true })
+      .then(({ data }: any) => {
+        if (data) setHospedagens(data.map((h: any) => ({
+          ...h,
+          checkin: h.checkin ? h.checkin.slice(0, 16) : "",
+          checkout: h.checkout ? h.checkout.slice(0, 16) : "",
+        })));
+      });
+    (supabase.from as any)("experiencias")
+      .select("*").eq("cotacao_id", editId).order("data", { ascending: true })
+      .then(({ data }: any) => {
+        if (data) setExperiencias(data.map((e: any) => ({
+          ...e,
+          hora_inicio: e.hora_inicio ? e.hora_inicio.slice(0, 5) : "",
+          hora_termino: e.hora_termino ? e.hora_termino.slice(0, 5) : "",
+        })));
+      });
   }, [editId]);
 
   // Aplica modelo padrão em novas cotações quando os modelos carregam
