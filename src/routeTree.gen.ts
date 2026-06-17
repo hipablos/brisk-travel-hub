@@ -20,6 +20,7 @@ import { Route as FormasPagamentoRouteImport } from './routes/formas-pagamento'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as ClientesRouteImport } from './routes/clientes'
+import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReservaIdRouteImport } from './routes/reserva_.$id'
 import { Route as ReservaEditarIdRouteImport } from './routes/reserva-editar_.$id'
@@ -32,6 +33,7 @@ import { Route as ConfiguracoesLayoutLoginRouteImport } from './routes/configura
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
 import { Route as ApiPublicHooksTelegramProcessarAlertasRouteImport } from './routes/api/public/hooks/telegram-processar-alertas'
 import { Route as ApiPublicHooksTelegramCheckinRouteImport } from './routes/api/public/hooks/telegram-checkin'
+import { Route as ApiPublicHooksCalendarioNotificarRouteImport } from './routes/api/public/hooks/calendario-notificar'
 
 const VoosRoute = VoosRouteImport.update({
   id: '/voos',
@@ -86,6 +88,11 @@ const CotacoesRoute = CotacoesRouteImport.update({
 const ClientesRoute = ClientesRouteImport.update({
   id: '/clientes',
   path: '/clientes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarioRoute = CalendarioRouteImport.update({
+  id: '/calendario',
+  path: '/calendario',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -151,9 +158,16 @@ const ApiPublicHooksTelegramCheckinRoute =
     path: '/api/public/hooks/telegram-checkin',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksCalendarioNotificarRoute =
+  ApiPublicHooksCalendarioNotificarRouteImport.update({
+    id: '/api/public/hooks/calendario-notificar',
+    path: '/api/public/hooks/calendario-notificar',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
   '/experiencias': typeof ExperienciasRoute
@@ -174,11 +188,13 @@ export interface FileRoutesByFullPath {
   '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
+  '/api/public/hooks/calendario-notificar': typeof ApiPublicHooksCalendarioNotificarRoute
   '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
   '/api/public/hooks/telegram-processar-alertas': typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
   '/experiencias': typeof ExperienciasRoute
@@ -199,12 +215,14 @@ export interface FileRoutesByTo {
   '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
+  '/api/public/hooks/calendario-notificar': typeof ApiPublicHooksCalendarioNotificarRoute
   '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
   '/api/public/hooks/telegram-processar-alertas': typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
   '/experiencias': typeof ExperienciasRoute
@@ -225,6 +243,7 @@ export interface FileRoutesById {
   '/integracoes_/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar_/$id': typeof ReservaEditarIdRoute
   '/reserva_/$id': typeof ReservaIdRoute
+  '/api/public/hooks/calendario-notificar': typeof ApiPublicHooksCalendarioNotificarRoute
   '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
   '/api/public/hooks/telegram-processar-alertas': typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
@@ -232,6 +251,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/calendario'
     | '/clientes'
     | '/cotacoes'
     | '/experiencias'
@@ -252,11 +272,13 @@ export interface FileRouteTypes {
     | '/integracoes/telegram'
     | '/reserva-editar/$id'
     | '/reserva/$id'
+    | '/api/public/hooks/calendario-notificar'
     | '/api/public/hooks/telegram-checkin'
     | '/api/public/hooks/telegram-processar-alertas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/calendario'
     | '/clientes'
     | '/cotacoes'
     | '/experiencias'
@@ -277,11 +299,13 @@ export interface FileRouteTypes {
     | '/integracoes/telegram'
     | '/reserva-editar/$id'
     | '/reserva/$id'
+    | '/api/public/hooks/calendario-notificar'
     | '/api/public/hooks/telegram-checkin'
     | '/api/public/hooks/telegram-processar-alertas'
   id:
     | '__root__'
     | '/'
+    | '/calendario'
     | '/clientes'
     | '/cotacoes'
     | '/experiencias'
@@ -302,12 +326,14 @@ export interface FileRouteTypes {
     | '/integracoes_/telegram'
     | '/reserva-editar_/$id'
     | '/reserva_/$id'
+    | '/api/public/hooks/calendario-notificar'
     | '/api/public/hooks/telegram-checkin'
     | '/api/public/hooks/telegram-processar-alertas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CalendarioRoute: typeof CalendarioRoute
   ClientesRoute: typeof ClientesRoute
   CotacoesRoute: typeof CotacoesRoute
   ExperienciasRoute: typeof ExperienciasRoute
@@ -328,6 +354,7 @@ export interface RootRouteChildren {
   IntegracoesTelegramRoute: typeof IntegracoesTelegramRoute
   ReservaEditarIdRoute: typeof ReservaEditarIdRoute
   ReservaIdRoute: typeof ReservaIdRoute
+  ApiPublicHooksCalendarioNotificarRoute: typeof ApiPublicHooksCalendarioNotificarRoute
   ApiPublicHooksTelegramCheckinRoute: typeof ApiPublicHooksTelegramCheckinRoute
   ApiPublicHooksTelegramProcessarAlertasRoute: typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
@@ -409,6 +436,13 @@ declare module '@tanstack/react-router' {
       path: '/clientes'
       fullPath: '/clientes'
       preLoaderRoute: typeof ClientesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendario': {
+      id: '/calendario'
+      path: '/calendario'
+      fullPath: '/calendario'
+      preLoaderRoute: typeof CalendarioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -495,11 +529,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTelegramCheckinRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/calendario-notificar': {
+      id: '/api/public/hooks/calendario-notificar'
+      path: '/api/public/hooks/calendario-notificar'
+      fullPath: '/api/public/hooks/calendario-notificar'
+      preLoaderRoute: typeof ApiPublicHooksCalendarioNotificarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CalendarioRoute: CalendarioRoute,
   ClientesRoute: ClientesRoute,
   CotacoesRoute: CotacoesRoute,
   ExperienciasRoute: ExperienciasRoute,
@@ -520,6 +562,8 @@ const rootRouteChildren: RootRouteChildren = {
   IntegracoesTelegramRoute: IntegracoesTelegramRoute,
   ReservaEditarIdRoute: ReservaEditarIdRoute,
   ReservaIdRoute: ReservaIdRoute,
+  ApiPublicHooksCalendarioNotificarRoute:
+    ApiPublicHooksCalendarioNotificarRoute,
   ApiPublicHooksTelegramCheckinRoute: ApiPublicHooksTelegramCheckinRoute,
   ApiPublicHooksTelegramProcessarAlertasRoute:
     ApiPublicHooksTelegramProcessarAlertasRoute,

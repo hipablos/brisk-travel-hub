@@ -22,7 +22,7 @@ const baseGroups: Group[] = [
     items: [
       { icon: LayoutDashboard, label: "Dashboard", href: "/" },
       { icon: FileText, label: "Cotações", href: "/cotacoes" },
-      { icon: Calendar, label: "Calendário" },
+      { icon: Calendar, label: "Calendário", href: "/calendario" },
     ],
   },
   {
