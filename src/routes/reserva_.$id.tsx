@@ -75,10 +75,20 @@ function ReservaPage() {
   const navigate = useNavigate();
   const [cotacao, setCotacao] = useState<Cotacao | undefined>();
 
+  const [hospedagens, setHospedagens] = useState<Hospedagem[]>([]);
+  const [experiencias, setExperiencias] = useState<Experiencia[]>([]);
+
   useEffect(() => {
-    getCotacao(id).then((c) => {
+    getCotacao(id).then(async (c) => {
       if (!c) { navigate({ to: "/voos" }); return; }
       setCotacao(c);
+      const cotacaoId = (c as any).id ?? id;
+      const [{ data: hosp }, { data: exps }] = await Promise.all([
+        supabase.from("hospedagens").select("*").eq("cotacao_id", cotacaoId).order("checkin", { ascending: true }),
+        supabase.from("experiencias").select("*").eq("cotacao_id", cotacaoId).order("data", { ascending: true }),
+      ]);
+      setHospedagens(hosp ?? []);
+      setExperiencias(exps ?? []);
     });
   }, [id, navigate]);
 
