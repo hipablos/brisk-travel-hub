@@ -33,6 +33,7 @@ import { Route as ConfiguracoesLayoutLoginRouteImport } from './routes/configura
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
 import { Route as ApiPublicHooksTelegramProcessarAlertasRouteImport } from './routes/api/public/hooks/telegram-processar-alertas'
 import { Route as ApiPublicHooksTelegramCheckinRouteImport } from './routes/api/public/hooks/telegram-checkin'
+import { Route as ApiPublicHooksCalendarioNotificarRouteImport } from './routes/api/public/hooks/calendario-notificar'
 
 const VoosRoute = VoosRouteImport.update({
   id: '/voos',
@@ -157,6 +158,12 @@ const ApiPublicHooksTelegramCheckinRoute =
     path: '/api/public/hooks/telegram-checkin',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksCalendarioNotificarRoute =
+  ApiPublicHooksCalendarioNotificarRouteImport.update({
+    id: '/api/public/hooks/calendario-notificar',
+    path: '/api/public/hooks/calendario-notificar',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
+  '/api/public/hooks/calendario-notificar': typeof ApiPublicHooksCalendarioNotificarRoute
   '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
   '/api/public/hooks/telegram-processar-alertas': typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
@@ -207,6 +215,7 @@ export interface FileRoutesByTo {
   '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
   '/reserva/$id': typeof ReservaIdRoute
+  '/api/public/hooks/calendario-notificar': typeof ApiPublicHooksCalendarioNotificarRoute
   '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
   '/api/public/hooks/telegram-processar-alertas': typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
@@ -234,6 +243,7 @@ export interface FileRoutesById {
   '/integracoes_/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar_/$id': typeof ReservaEditarIdRoute
   '/reserva_/$id': typeof ReservaIdRoute
+  '/api/public/hooks/calendario-notificar': typeof ApiPublicHooksCalendarioNotificarRoute
   '/api/public/hooks/telegram-checkin': typeof ApiPublicHooksTelegramCheckinRoute
   '/api/public/hooks/telegram-processar-alertas': typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/integracoes/telegram'
     | '/reserva-editar/$id'
     | '/reserva/$id'
+    | '/api/public/hooks/calendario-notificar'
     | '/api/public/hooks/telegram-checkin'
     | '/api/public/hooks/telegram-processar-alertas'
   fileRoutesByTo: FileRoutesByTo
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/integracoes/telegram'
     | '/reserva-editar/$id'
     | '/reserva/$id'
+    | '/api/public/hooks/calendario-notificar'
     | '/api/public/hooks/telegram-checkin'
     | '/api/public/hooks/telegram-processar-alertas'
   id:
@@ -314,6 +326,7 @@ export interface FileRouteTypes {
     | '/integracoes_/telegram'
     | '/reserva-editar_/$id'
     | '/reserva_/$id'
+    | '/api/public/hooks/calendario-notificar'
     | '/api/public/hooks/telegram-checkin'
     | '/api/public/hooks/telegram-processar-alertas'
   fileRoutesById: FileRoutesById
@@ -341,6 +354,7 @@ export interface RootRouteChildren {
   IntegracoesTelegramRoute: typeof IntegracoesTelegramRoute
   ReservaEditarIdRoute: typeof ReservaEditarIdRoute
   ReservaIdRoute: typeof ReservaIdRoute
+  ApiPublicHooksCalendarioNotificarRoute: typeof ApiPublicHooksCalendarioNotificarRoute
   ApiPublicHooksTelegramCheckinRoute: typeof ApiPublicHooksTelegramCheckinRoute
   ApiPublicHooksTelegramProcessarAlertasRoute: typeof ApiPublicHooksTelegramProcessarAlertasRoute
 }
@@ -515,6 +529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTelegramCheckinRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/calendario-notificar': {
+      id: '/api/public/hooks/calendario-notificar'
+      path: '/api/public/hooks/calendario-notificar'
+      fullPath: '/api/public/hooks/calendario-notificar'
+      preLoaderRoute: typeof ApiPublicHooksCalendarioNotificarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -541,6 +562,8 @@ const rootRouteChildren: RootRouteChildren = {
   IntegracoesTelegramRoute: IntegracoesTelegramRoute,
   ReservaEditarIdRoute: ReservaEditarIdRoute,
   ReservaIdRoute: ReservaIdRoute,
+  ApiPublicHooksCalendarioNotificarRoute:
+    ApiPublicHooksCalendarioNotificarRoute,
   ApiPublicHooksTelegramCheckinRoute: ApiPublicHooksTelegramCheckinRoute,
   ApiPublicHooksTelegramProcessarAlertasRoute:
     ApiPublicHooksTelegramProcessarAlertasRoute,
