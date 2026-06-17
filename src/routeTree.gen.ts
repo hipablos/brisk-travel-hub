@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegracoesRouteImport } from './routes/integracoes'
+import { Route as HospedagensRouteImport } from './routes/hospedagens'
 import { Route as FormasPagamentoRouteImport } from './routes/formas-pagamento'
 import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as ClientesRouteImport } from './routes/clientes'
@@ -59,6 +60,11 @@ const LoginRoute = LoginRouteImport.update({
 const IntegracoesRoute = IntegracoesRouteImport.update({
   id: '/integracoes',
   path: '/integracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HospedagensRoute = HospedagensRouteImport.update({
+  id: '/hospedagens',
+  path: '/hospedagens',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FormasPagamentoRoute = FormasPagamentoRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
   '/formas-pagamento': typeof FormasPagamentoRoute
+  '/hospedagens': typeof HospedagensRoute
   '/integracoes': typeof IntegracoesRoute
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
   '/formas-pagamento': typeof FormasPagamentoRoute
+  '/hospedagens': typeof HospedagensRoute
   '/integracoes': typeof IntegracoesRoute
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/clientes': typeof ClientesRoute
   '/cotacoes': typeof CotacoesRoute
   '/formas-pagamento': typeof FormasPagamentoRoute
+  '/hospedagens': typeof HospedagensRoute
   '/integracoes': typeof IntegracoesRoute
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/cotacoes'
     | '/formas-pagamento'
+    | '/hospedagens'
     | '/integracoes'
     | '/login'
     | '/perfil'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/cotacoes'
     | '/formas-pagamento'
+    | '/hospedagens'
     | '/integracoes'
     | '/login'
     | '/perfil'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/cotacoes'
     | '/formas-pagamento'
+    | '/hospedagens'
     | '/integracoes'
     | '/login'
     | '/perfil'
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   ClientesRoute: typeof ClientesRoute
   CotacoesRoute: typeof CotacoesRoute
   FormasPagamentoRoute: typeof FormasPagamentoRoute
+  HospedagensRoute: typeof HospedagensRoute
   IntegracoesRoute: typeof IntegracoesRoute
   LoginRoute: typeof LoginRoute
   PerfilRoute: typeof PerfilRoute
@@ -348,6 +361,13 @@ declare module '@tanstack/react-router' {
       path: '/integracoes'
       fullPath: '/integracoes'
       preLoaderRoute: typeof IntegracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hospedagens': {
+      id: '/hospedagens'
+      path: '/hospedagens'
+      fullPath: '/hospedagens'
+      preLoaderRoute: typeof HospedagensRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/formas-pagamento': {
@@ -463,6 +483,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesRoute: ClientesRoute,
   CotacoesRoute: CotacoesRoute,
   FormasPagamentoRoute: FormasPagamentoRoute,
+  HospedagensRoute: HospedagensRoute,
   IntegracoesRoute: IntegracoesRoute,
   LoginRoute: LoginRoute,
   PerfilRoute: PerfilRoute,
@@ -485,13 +506,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
