@@ -3,12 +3,18 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer, Download, Plane, Briefcase, Luggage } from "lucide-react";
+import { ArrowLeft, Printer, Download, Plane, Briefcase, Luggage, Hotel, Star, MapPin, Compass, Clock, Users } from "lucide-react";
 import { BriskLogo } from "@/components/BriskLogo";
 import { getCotacao, type Cotacao } from "@/lib/cotacoes-store";
 import { getAirlineBrand } from "@/lib/airlines";
 import { AirlineLogo } from "@/components/AirlineLogo";
 import { dateOnlyToBR, weekdayName } from "@/lib/dates";
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type Hospedagem = Database["public"]["Tables"]["hospedagens"]["Row"];
+type Experiencia = Database["public"]["Tables"]["experiencias"]["Row"];
+
 
 export const Route = createFileRoute("/reserva_/$id")({
   component: ReservaPage,
