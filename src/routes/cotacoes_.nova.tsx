@@ -658,6 +658,77 @@ function NovaCotacao() {
                 </div>
               </section>
 
+              <section className="bg-card border border-border/50 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
+                      <Hotel className="size-4" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-foreground">Hospedagens</h2>
+                  </div>
+                  <Button type="button" size="sm" variant="outline" className="gap-2"
+                    onClick={() => setHospedagens((l) => [...l, novaHospedagem()])}>
+                    <Plus className="size-4" /> Adicionar hospedagem
+                  </Button>
+                </div>
+                {hospedagens.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Nenhuma hospedagem. Clique acima para adicionar — será salva e aparecerá no PDF.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {hospedagens.map((h, idx) => (
+                      <HospedagemInlineForm
+                        key={h.id ?? `new-${idx}`}
+                        value={h}
+                        index={idx}
+                        onChange={(patch) => setHospedagens((l) => l.map((x, i) => i === idx ? { ...x, ...patch } : x))}
+                        onRemove={() => {
+                          if (h.id) setHospedagensRemovidas((r) => [...r, h.id!]);
+                          setHospedagens((l) => l.filter((_, i) => i !== idx));
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="bg-card border border-border/50 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
+                      <MapPin className="size-4" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-foreground">Experiências Turísticas</h2>
+                  </div>
+                  <Button type="button" size="sm" variant="outline" className="gap-2"
+                    onClick={() => setExperiencias((l) => [...l, novaExperiencia()])}>
+                    <Plus className="size-4" /> Adicionar experiência
+                  </Button>
+                </div>
+                {experiencias.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Nenhuma experiência. Clique acima para adicionar — será salva e aparecerá no PDF.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {experiencias.map((ex, idx) => (
+                      <ExperienciaInlineForm
+                        key={ex.id ?? `new-${idx}`}
+                        value={ex}
+                        index={idx}
+                        onChange={(patch) => setExperiencias((l) => l.map((x, i) => i === idx ? { ...x, ...patch } : x))}
+                        onRemove={() => {
+                          if (ex.id) setExperienciasRemovidas((r) => [...r, ex.id!]);
+                          setExperiencias((l) => l.filter((_, i) => i !== idx));
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+
               <section className="bg-card border border-border/50 rounded-xl p-6 space-y-5">
                 <div>
                   <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
