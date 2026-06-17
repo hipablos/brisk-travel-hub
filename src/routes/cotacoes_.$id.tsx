@@ -11,6 +11,32 @@ import {
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 import { dateOnlyToBR, normalizeDateOnly } from "@/lib/dates";
+import { supabase } from "@/integrations/supabase/client";
+import { Star } from "lucide-react";
+
+type HospedagemRow = {
+  id: string; nome_hotel: string; estrelas: number | null;
+  endereco: string | null; cidade: string | null; estado: string | null; pais: string | null;
+  checkin: string | null; checkout: string | null; noites: number | null;
+  hospedes: number | null; quartos: number | null; tipo_acomodacao: string | null;
+  regime_alimentar: string | null; numero_reserva: string | null; codigo_confirmacao: string | null;
+  observacoes_cliente: string | null; google_maps_url: string | null;
+};
+type ExperienciaRow = {
+  id: string; nome: string; categoria: string | null;
+  endereco: string | null; cidade: string | null; estado: string | null; pais: string | null;
+  data: string | null; hora_inicio: string | null; hora_termino: string | null;
+  duracao_min: number | null; participantes: number | null; idioma: string | null;
+  idade_minima: number | null; descricao: string | null;
+};
+
+const REGIME_LABEL: Record<string, string> = {
+  sem_alimentacao: "Sem alimentação",
+  cafe_da_manha: "Café da manhã",
+  meia_pensao: "Meia pensão",
+  pensao_completa: "Pensão completa",
+  all_inclusive: "All Inclusive",
+};
 
 export const Route = createFileRoute("/cotacoes_/$id")({
   component: VisualizarCotacao,
