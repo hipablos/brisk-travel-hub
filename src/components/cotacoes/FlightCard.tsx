@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR } from "@/lib/dates";
-import { calcDuracaoVoo } from "@/lib/voos";
+import { calcDuracaoVoo, calcDuracaoEscala } from "@/lib/voos";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -166,6 +166,30 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoCalculada]);
+
+  // Mantém duracaoEscala (espera) e duracaoTrecho (saída desta escala → chegada da próxima/destino)
+  // sincronizados automaticamente em cada escala.
+  useEffect(() => {
+    if (voo.tipo !== "com_escala") return;
+    const patches: Array<{ id: string; patch: Partial<Escala> }> = [];
+    voo.escalas.forEach((e, i) => {
+      const duracaoEscala = calcDuracaoEscala(e.chegada, e.saida);
+      const proxChegada = voo.escalas[i + 1]?.chegada ?? voo.horaChegada;
+      const duracaoTrecho = calcDuracaoVoo(e.saida, proxChegada);
+      const patch: Partial<Escala> = {};
+      if (e.duracaoEscala !== duracaoEscala) patch.duracaoEscala = duracaoEscala;
+      if (e.duracaoTrecho !== duracaoTrecho) patch.duracaoTrecho = duracaoTrecho;
+      if (Object.keys(patch).length) patches.push({ id: e.id, patch });
+    });
+    if (patches.length === 0) return;
+    onChange({
+      escalas: voo.escalas.map((e) => {
+        const p = patches.find((x) => x.id === e.id);
+        return p ? { ...e, ...p.patch } : e;
+      }),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [voo.escalas, voo.horaChegada, voo.tipo]);
 
   const setBag = (k: keyof Bagagens, n: number) =>
     onChange({ bagagens: { ...voo.bagagens, [k]: n } });
@@ -385,8 +409,18 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       <div className="space-y-1"><Label className="text-xs">Nº do voo</Label><Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} /></div>
                       <div className="space-y-1"><Label className="text-xs">Chegada</Label><Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} /></div>
                       <div className="space-y-1"><Label className="text-xs">Saída</Label><Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} /></div>
-                      <div className="space-y-1"><Label className="text-xs">Duração escala</Label><Input value={e.duracaoEscala ?? ""} onChange={(ev) => updEscala(e.id, { duracaoEscala: ev.target.value })} placeholder="1h 20m" /></div>
-                      <div className="space-y-1"><Label className="text-xs">Duração trecho</Label><Input value={e.duracaoTrecho ?? ""} onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })} placeholder="2h 10m" /></div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Duração escala</Label>
+                        <div className="h-9 px-3 flex items-center rounded-md border border-border/60 bg-muted text-sm text-muted-foreground">
+                          {e.duracaoEscala || "—"}
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Duração trecho</Label>
+                        <div className="h-9 px-3 flex items-center rounded-md border border-border/60 bg-muted text-sm text-muted-foreground">
+                          {e.duracaoTrecho || "—"}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}

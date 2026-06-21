@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 import { dateOnlyToBR, normalizeDateOnly, parseDateOnly } from "@/lib/dates";
-import { calcDuracaoTotalVoo } from "@/lib/voos";
+import { calcDuracaoTotalVoo, calcDuracaoVoo, calcDuracaoEscala } from "@/lib/voos";
 import { supabase } from "@/integrations/supabase/client";
 import { Star } from "lucide-react";
 
@@ -411,15 +411,23 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
     : [{ from: origem, to: destino, dep: voo?.horaSaida, arr: voo?.horaChegada, conexao: undefined }];
 
   // Trechos completos (cada perna do voo, ponta a ponta) — usado só no bloco "Itinerário" de voos com escala.
-  const legs: { from: string; to: string; dep?: string; arr?: string }[] = escalas.length === 0
-    ? [{ from: voo?.origem || "—", to: voo?.destino || "—", dep: voo?.horaSaida, arr: voo?.horaChegada }]
+  type Leg = { from: string; to: string; dep?: string; arr?: string; duracaoTrecho: string; duracaoEscalaAteProximo?: string };
+  const legs: Leg[] = escalas.length === 0
+    ? [{
+        from: voo?.origem || "—",
+        to: voo?.destino || "—",
+        dep: voo?.horaSaida,
+        arr: voo?.horaChegada,
+        duracaoTrecho: calcDuracaoVoo(voo?.horaSaida, voo?.horaChegada),
+      }]
     : (() => {
-        const out: { from: string; to: string; dep?: string; arr?: string }[] = [];
+        const out: Leg[] = [];
         out.push({
           from: voo?.origem || "—",
           to: escalas[0]?.destino || voo?.destino || "—",
           dep: voo?.horaSaida,
           arr: escalas[0]?.chegada,
+          duracaoTrecho: calcDuracaoVoo(voo?.horaSaida, escalas[0]?.chegada),
         });
         for (let i = 1; i < escalas.length; i++) {
           out.push({
@@ -427,6 +435,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
             to: escalas[i]?.destino || "—",
             dep: escalas[i - 1]?.saida,
             arr: escalas[i]?.chegada,
+            duracaoTrecho: calcDuracaoVoo(escalas[i - 1]?.saida, escalas[i]?.chegada),
           });
         }
         const last = escalas[escalas.length - 1];
@@ -435,7 +444,11 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
           to: voo?.destino || "—",
           dep: last?.saida,
           arr: voo?.horaChegada,
+          duracaoTrecho: calcDuracaoVoo(last?.saida, voo?.horaChegada),
         });
+        for (let i = 0; i < out.length - 1; i++) {
+          out[i].duracaoEscalaAteProximo = calcDuracaoEscala(out[i].arr, out[i + 1].dep);
+        }
         return out;
       })();
   const isComEscala = voo?.tipo === "com_escala" && escalas.length > 0;
@@ -478,29 +491,41 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
               <span className="text-slate-600">
                 {[weekdayLabel(voo?.data), fmtDate(voo?.data)].filter(Boolean).join(", ")}
               </span>
-              <span className="inline-flex items-center gap-1 text-slate-600"><Clock className="size-3" /> {duracaoTotal}</span>
+              <span className="inline-flex items-center gap-1 text-slate-600"><Clock className="size-3" /> Tempo de voo: <strong className="text-slate-800">{duracaoTotal}</strong></span>
               <span className="text-slate-500">{legs.length} {legs.length === 1 ? "Trecho" : "Trechos"}</span>
             </div>
             <div className="px-3 py-2 space-y-2">
               {legs.map((leg, i) => (
-                <div key={i} className="grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-2 text-[11px]">
-                  <div className="text-center">
-                    <div className="font-bold text-slate-900">{leg.dep || "—"}</div>
-                    <div className="text-[9px] text-slate-500">{fmtDate(voo?.data)}</div>
+                <div key={i}>
+                  <div className="grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-2 text-[11px]">
+                    <div className="text-center">
+                      <div className="font-bold text-slate-900">{leg.dep || "—"}</div>
+                      <div className="text-[9px] text-slate-500">{fmtDate(voo?.data)}</div>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[9px] uppercase tracking-wider text-slate-500">Aeroporto</div>
+                      <div className="font-semibold text-slate-900 truncate">{leg.from}</div>
+                    </div>
+                    <div className="flex flex-col items-center shrink-0">
+                      <ArrowRight className="size-3 text-slate-400" />
+                      <span className="text-[9px] text-slate-500 whitespace-nowrap">{leg.duracaoTrecho}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[9px] uppercase tracking-wider text-slate-500">Aeroporto</div>
+                      <div className="font-semibold text-slate-900 truncate">{leg.to}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-slate-900">{leg.arr || "—"}</div>
+                      <div className="text-[9px] text-slate-500">{fmtDate(voo?.data)}</div>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <div className="text-[9px] uppercase tracking-wider text-slate-500">Aeroporto</div>
-                    <div className="font-semibold text-slate-900 truncate">{leg.from}</div>
-                  </div>
-                  <ArrowRight className="size-3 text-slate-400" />
-                  <div className="min-w-0">
-                    <div className="text-[9px] uppercase tracking-wider text-slate-500">Aeroporto</div>
-                    <div className="font-semibold text-slate-900 truncate">{leg.to}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-bold text-slate-900">{leg.arr || "—"}</div>
-                    <div className="text-[9px] text-slate-500">{fmtDate(voo?.data)}</div>
-                  </div>
+                  {leg.duracaoEscalaAteProximo && (
+                    <div className="mt-1 bg-slate-50 px-2 py-1 text-[10px] text-slate-600 flex items-center gap-1.5 border border-dashed border-slate-200 rounded">
+                      <Clock className="size-2.5 text-slate-400" />
+                      Conexão em <strong className="text-slate-800">{leg.to}</strong> — espera de{" "}
+                      <strong className="text-slate-800">{leg.duracaoEscalaAteProximo}</strong>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
