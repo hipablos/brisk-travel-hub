@@ -409,6 +409,36 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
       }))
     : [{ from: origem, to: destino, dep: voo?.horaSaida, arr: voo?.horaChegada, conexao: undefined }];
 
+  // Trechos completos (cada perna do voo, ponta a ponta) — usado só no bloco "Itinerário" de voos com escala.
+  const legs: { from: string; to: string; dep?: string; arr?: string }[] = escalas.length === 0
+    ? [{ from: voo?.origem || "—", to: voo?.destino || "—", dep: voo?.horaSaida, arr: voo?.horaChegada }]
+    : (() => {
+        const out: { from: string; to: string; dep?: string; arr?: string }[] = [];
+        out.push({
+          from: voo?.origem || "—",
+          to: escalas[0]?.destino || voo?.destino || "—",
+          dep: voo?.horaSaida,
+          arr: escalas[0]?.chegada,
+        });
+        for (let i = 1; i < escalas.length; i++) {
+          out.push({
+            from: escalas[i - 1]?.origem || escalas[i - 1]?.destino || "—",
+            to: escalas[i]?.destino || "—",
+            dep: escalas[i - 1]?.saida,
+            arr: escalas[i]?.chegada,
+          });
+        }
+        const last = escalas[escalas.length - 1];
+        out.push({
+          from: last?.origem || last?.destino || "—",
+          to: voo?.destino || "—",
+          dep: last?.saida,
+          arr: voo?.horaChegada,
+        });
+        return out;
+      })();
+  const isComEscala = voo?.tipo === "com_escala" && escalas.length > 0;
+
   return (
     <section className="space-y-1.5">
       {/* Cabeçalho compacto: título + companhia + bagagens, tudo em uma linha */}
