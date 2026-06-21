@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR } from "@/lib/dates";
+import { calcDuracaoVoo } from "@/lib/voos";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -144,15 +145,27 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   };
 
   const totalEscalas = voo.escalas.length;
+  const duracaoCalculada = useMemo(
+    () => calcDuracaoVoo(voo.horaSaida, voo.horaChegada),
+    [voo.horaSaida, voo.horaChegada],
+  );
   const duracaoTotal = useMemo(() => {
-    if (voo.tipo !== "com_escala") return voo.duracao;
-    const base = parseDur(voo.duracao);
+    if (voo.tipo !== "com_escala") return duracaoCalculada;
+    const base = parseDur(duracaoCalculada);
     const extra = voo.escalas.reduce(
       (s, e) => s + parseDur(e.duracaoEscala) + parseDur(e.duracaoTrecho),
       0,
     );
     return formatDur(base + extra);
-  }, [voo.duracao, voo.escalas, voo.tipo]);
+  }, [duracaoCalculada, voo.escalas, voo.tipo]);
+
+  // Mantém voo.duracao sincronizado com o cálculo automático.
+  useEffect(() => {
+    if (voo.duracao !== duracaoCalculada) {
+      onChange({ duracao: duracaoCalculada });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duracaoCalculada]);
 
   const setBag = (k: keyof Bagagens, n: number) =>
     onChange({ bagagens: { ...voo.bagagens, [k]: n } });
@@ -269,12 +282,22 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   <div className="space-y-1.5">
                     <Label>Duração total do voo</Label>
                     <div className="relative">
-                      <Input value={voo.duracao ?? ""} onChange={(e) => onChange({ duracao: e.target.value })} placeholder="08h 30m" className="pl-9" />
+                      <Input
+                        value={duracaoCalculada}
+                        readOnly
+                        tabIndex={-1}
+                        placeholder="—"
+                        className="pl-9 bg-muted text-muted-foreground cursor-not-allowed"
+                        aria-label="Duração calculada automaticamente a partir dos horários"
+                      />
                       <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
-                    {voo.tipo === "com_escala" && duracaoTotal && (
-                      <p className="text-[11px] text-muted-foreground">Total c/ escalas: <span className="font-semibold text-foreground">{duracaoTotal}</span></p>
-                    )}
+                    <p className="text-[11px] text-muted-foreground">
+                      Calculada automaticamente a partir dos horários de saída e chegada.
+                      {voo.tipo === "com_escala" && duracaoTotal && (
+                        <> Total c/ escalas: <span className="font-semibold text-foreground">{duracaoTotal}</span></>
+                      )}
+                    </p>
                   </div>
                   <div className="space-y-1.5">
                     <Label>Companhia aérea</Label>

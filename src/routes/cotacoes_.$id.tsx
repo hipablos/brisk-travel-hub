@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 import { dateOnlyToBR, normalizeDateOnly, parseDateOnly } from "@/lib/dates";
+import { calcDuracaoTotalVoo } from "@/lib/voos";
 import { supabase } from "@/integrations/supabase/client";
 import { Star } from "lucide-react";
 
@@ -438,6 +439,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
         return out;
       })();
   const isComEscala = voo?.tipo === "com_escala" && escalas.length > 0;
+  const duracaoTotal = calcDuracaoTotalVoo(voo);
 
   return (
     <section className="space-y-1.5">
@@ -476,6 +478,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
               <span className="text-slate-600">
                 {[weekdayLabel(voo?.data), fmtDate(voo?.data)].filter(Boolean).join(", ")}
               </span>
+              <span className="inline-flex items-center gap-1 text-slate-600"><Clock className="size-3" /> {duracaoTotal}</span>
               <span className="text-slate-500">{legs.length} {legs.length === 1 ? "Trecho" : "Trechos"}</span>
             </div>
             <div className="px-3 py-2 space-y-2">
@@ -512,7 +515,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
             <div className="grid grid-cols-5 gap-2 px-3 py-2 items-center">
               <InfoCol label="Partida" value={`${fmtShortDate(voo?.data)} ${voo?.horaSaida ? voo.horaSaida.replace(":", "h") : ""}`.trim()} />
               <InfoCol label="Chegada" value={`${fmtShortDate(voo?.data)} ${voo?.horaChegada ? voo.horaChegada.replace(":", "h") : ""}`.trim()} />
-              <InfoCol label="Duração" value={voo?.duracao || "—"} />
+              <InfoCol label="Duração" value={duracaoTotal} />
               <InfoCol label="Paradas" value={escalas.length === 0 ? "Direto" : `${escalas.length} ${escalas.length === 1 ? "parada" : "paradas"}`} />
               <InfoCol label="Voo" value={voo?.numeroVoo || "—"} />
             </div>
