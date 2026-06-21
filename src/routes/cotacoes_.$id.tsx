@@ -10,7 +10,7 @@ import {
   ShoppingBag, Briefcase, Luggage, UtensilsCrossed, Armchair, BellRing, PlaneTakeoff, PlaneLanding,
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
-import { dateOnlyToBR, normalizeDateOnly } from "@/lib/dates";
+import { dateOnlyToBR, normalizeDateOnly, parseDateOnly } from "@/lib/dates";
 import { supabase } from "@/integrations/supabase/client";
 import { Star } from "lucide-react";
 
@@ -70,6 +70,16 @@ function fmtShortDate(s?: string) {
   const br = dateOnlyToBR(normalizeDateOnly(s));
   return br === "—" ? (s ?? "") : br.slice(0, 5);
 }
+
+// Usado apenas pelo novo bloco "Itinerário" (voos com escala): nome do dia da semana por extenso.
+function weekdayLabel(s?: string): string {
+  const v = parseDateOnly(normalizeDateOnly(s));
+  if (!v.ok) return "";
+  const d = new Date(`${v.iso}T00:00:00`);
+  const wd = d.toLocaleDateString("pt-BR", { weekday: "long" });
+  return wd.charAt(0).toUpperCase() + wd.slice(1);
+}
+
 
 function classeLabel(c?: string) {
   if (!c) return "";
@@ -399,6 +409,36 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
       }))
     : [{ from: origem, to: destino, dep: voo?.horaSaida, arr: voo?.horaChegada, conexao: undefined }];
 
+  // Trechos completos (cada perna do voo, ponta a ponta) — usado só no bloco "Itinerário" de voos com escala.
+  const legs: { from: string; to: string; dep?: string; arr?: string }[] = escalas.length === 0
+    ? [{ from: voo?.origem || "—", to: voo?.destino || "—", dep: voo?.horaSaida, arr: voo?.horaChegada }]
+    : (() => {
+        const out: { from: string; to: string; dep?: string; arr?: string }[] = [];
+        out.push({
+          from: voo?.origem || "—",
+          to: escalas[0]?.destino || voo?.destino || "—",
+          dep: voo?.horaSaida,
+          arr: escalas[0]?.chegada,
+        });
+        for (let i = 1; i < escalas.length; i++) {
+          out.push({
+            from: escalas[i - 1]?.origem || escalas[i - 1]?.destino || "—",
+            to: escalas[i]?.destino || "—",
+            dep: escalas[i - 1]?.saida,
+            arr: escalas[i]?.chegada,
+          });
+        }
+        const last = escalas[escalas.length - 1];
+        out.push({
+          from: last?.origem || last?.destino || "—",
+          to: voo?.destino || "—",
+          dep: last?.saida,
+          arr: voo?.horaChegada,
+        });
+        return out;
+      })();
+  const isComEscala = voo?.tipo === "com_escala" && escalas.length > 0;
+
   return (
     <section className="space-y-1.5">
       {/* Cabeçalho compacto: título + companhia + bagagens, tudo em uma linha */}
@@ -426,39 +466,79 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
 
       {/* Card principal compacto */}
       <div className="border border-slate-200 rounded-md overflow-hidden">
-        <div className="bg-slate-50 px-3 py-1.5 border-b border-slate-200 text-[11px] flex items-center gap-1.5">
-          <strong className="text-slate-900">{origem}</strong>
-          <ArrowRight className="size-3 text-slate-400" />
-          <strong className="text-slate-900">{destino}</strong>
-        </div>
-        <div className="grid grid-cols-5 gap-2 px-3 py-2 items-center">
-          <InfoCol label="Partida" value={`${fmtShortDate(voo?.data)} ${voo?.horaSaida ? voo.horaSaida.replace(":", "h") : ""}`.trim()} />
-          <InfoCol label="Chegada" value={`${fmtShortDate(voo?.data)} ${voo?.horaChegada ? voo.horaChegada.replace(":", "h") : ""}`.trim()} />
-          <InfoCol label="Duração" value={voo?.duracao || "—"} />
-          <InfoCol label="Paradas" value={escalas.length === 0 ? "Direto" : `${escalas.length} ${escalas.length === 1 ? "parada" : "paradas"}`} />
-          <InfoCol label="Voo" value={voo?.numeroVoo || "—"} />
-        </div>
-
-        {/* Segmentos / escalas */}
-        {escalas.length > 0 && (
-          <div className="border-t border-slate-200 bg-white px-3 py-1.5 space-y-1">
-            {segments.map((seg, i) => (
-              <div key={i}>
-                <div className="flex items-center justify-between gap-2 text-[10px]">
-                  <div className="flex items-center gap-1.5 flex-wrap text-slate-700">
-                    <strong className="text-slate-900">{seg.from}</strong>
-                    <span className="inline-flex items-center gap-0.5 text-slate-500"><Clock className="size-2.5" /> {seg.dep ? seg.dep.replace(":", "h") : "—"}</span>
-                    <ArrowRight className="size-2.5 text-slate-400" />
-                    <strong className="text-slate-900">{seg.to}</strong>
-                    <span className="inline-flex items-center gap-0.5 text-slate-500"><Clock className="size-2.5" /> {seg.arr ? seg.arr.replace(":", "h") : "—"}</span>
+        {isComEscala ? (
+          <>
+            {/* Itinerário detalhado — só para voos com escala (cada trecho completo, ponta a ponta) */}
+            <div className="bg-slate-50 px-3 py-1.5 border-b border-slate-200 text-[11px] flex items-center justify-between gap-2 flex-wrap">
+              <span className="font-semibold text-slate-900">
+                <PlaneTakeoff className="inline size-3 mr-1" /> Itinerário de {isIda ? "Ida" : "Volta"}
+              </span>
+              <span className="text-slate-600">
+                {[weekdayLabel(voo?.data), fmtDate(voo?.data)].filter(Boolean).join(", ")}
+              </span>
+              <span className="text-slate-500">{legs.length} {legs.length === 1 ? "Trecho" : "Trechos"}</span>
+            </div>
+            <div className="px-3 py-2 space-y-2">
+              {legs.map((leg, i) => (
+                <div key={i} className="grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-2 text-[11px]">
+                  <div className="text-center">
+                    <div className="font-bold text-slate-900">{leg.dep || "—"}</div>
+                    <div className="text-[9px] text-slate-500">{fmtDate(voo?.data)}</div>
                   </div>
-                  {seg.conexao && i < segments.length - 1 && (
-                    <span className="text-slate-500">Conexão <strong className="text-slate-700">{seg.conexao}</strong></span>
-                  )}
+                  <div className="min-w-0">
+                    <div className="text-[9px] uppercase tracking-wider text-slate-500">Aeroporto</div>
+                    <div className="font-semibold text-slate-900 truncate">{leg.from}</div>
+                  </div>
+                  <ArrowRight className="size-3 text-slate-400" />
+                  <div className="min-w-0">
+                    <div className="text-[9px] uppercase tracking-wider text-slate-500">Aeroporto</div>
+                    <div className="font-semibold text-slate-900 truncate">{leg.to}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-slate-900">{leg.arr || "—"}</div>
+                    <div className="text-[9px] text-slate-500">{fmtDate(voo?.data)}</div>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="bg-slate-50 px-3 py-1.5 border-b border-slate-200 text-[11px] flex items-center gap-1.5">
+              <strong className="text-slate-900">{origem}</strong>
+              <ArrowRight className="size-3 text-slate-400" />
+              <strong className="text-slate-900">{destino}</strong>
+            </div>
+            <div className="grid grid-cols-5 gap-2 px-3 py-2 items-center">
+              <InfoCol label="Partida" value={`${fmtShortDate(voo?.data)} ${voo?.horaSaida ? voo.horaSaida.replace(":", "h") : ""}`.trim()} />
+              <InfoCol label="Chegada" value={`${fmtShortDate(voo?.data)} ${voo?.horaChegada ? voo.horaChegada.replace(":", "h") : ""}`.trim()} />
+              <InfoCol label="Duração" value={voo?.duracao || "—"} />
+              <InfoCol label="Paradas" value={escalas.length === 0 ? "Direto" : `${escalas.length} ${escalas.length === 1 ? "parada" : "paradas"}`} />
+              <InfoCol label="Voo" value={voo?.numeroVoo || "—"} />
+            </div>
+
+            {/* Segmentos / escalas */}
+            {escalas.length > 0 && (
+              <div className="border-t border-slate-200 bg-white px-3 py-1.5 space-y-1">
+                {segments.map((seg, i) => (
+                  <div key={i}>
+                    <div className="flex items-center justify-between gap-2 text-[10px]">
+                      <div className="flex items-center gap-1.5 flex-wrap text-slate-700">
+                        <strong className="text-slate-900">{seg.from}</strong>
+                        <span className="inline-flex items-center gap-0.5 text-slate-500"><Clock className="size-2.5" /> {seg.dep ? seg.dep.replace(":", "h") : "—"}</span>
+                        <ArrowRight className="size-2.5 text-slate-400" />
+                        <strong className="text-slate-900">{seg.to}</strong>
+                        <span className="inline-flex items-center gap-0.5 text-slate-500"><Clock className="size-2.5" /> {seg.arr ? seg.arr.replace(":", "h") : "—"}</span>
+                      </div>
+                      {seg.conexao && i < segments.length - 1 && (
+                        <span className="text-slate-500">Conexão <strong className="text-slate-700">{seg.conexao}</strong></span>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
         {/* Extras */}
