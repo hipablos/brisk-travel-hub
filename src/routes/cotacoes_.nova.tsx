@@ -125,8 +125,9 @@ function NovaCotacao() {
   const [linkPagamento, setLinkPagamento] = useState("");
 
   // Tipo de documento (Orçamento x Venda) — controla a aba ativa
-  const [activeTab, setActiveTab] = useState<"orcamento" | "valores" | "venda">("orcamento");
-  const tipoDocumento: "orcamento" | "venda" = activeTab === "venda" ? "venda" : "orcamento";
+  const [activeTab, setActiveTab] = useState<"orcamento" | "venda">("orcamento");
+  const tipoDocumento: "orcamento" | "venda" = activeTab;
+
 
 
 
