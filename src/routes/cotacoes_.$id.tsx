@@ -71,6 +71,16 @@ function fmtShortDate(s?: string) {
   return br === "—" ? (s ?? "") : br.slice(0, 5);
 }
 
+// Usado apenas pelo novo bloco "Itinerário" (voos com escala): nome do dia da semana por extenso.
+function weekdayLabel(s?: string): string {
+  const v = parseDateOnly(normalizeDateOnly(s));
+  if (!v.ok) return "";
+  const d = new Date(`${v.iso}T00:00:00`);
+  const wd = d.toLocaleDateString("pt-BR", { weekday: "long" });
+  return wd.charAt(0).toUpperCase() + wd.slice(1);
+}
+
+
 function classeLabel(c?: string) {
   if (!c) return "";
   const map: Record<string, string> = {
