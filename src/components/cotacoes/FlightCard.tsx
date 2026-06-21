@@ -309,9 +309,18 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     <p className="text-[11px] text-muted-foreground">
                       Calculada automaticamente a partir dos horários de saída e chegada.
                       {voo.tipo === "com_escala" && duracaoTotal && (
-                        <> Total c/ escalas: <span className="font-semibold text-foreground">{duracaoTotal}</span></>
+                        <> Tempo de voo (trechos + escalas): <span className="font-semibold text-foreground">{duracaoTotal}</span></>
                       )}
                     </p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Duração do trecho {voo.tipo === "com_escala" ? "(origem → 1ª escala)" : ""}</Label>
+                    <Input
+                      placeholder="ex: 1h 30m"
+                      value={voo.duracaoTrecho ?? ""}
+                      onChange={(e) => onChange({ duracaoTrecho: e.target.value })}
+                    />
+                    <p className="text-[11px] text-muted-foreground">Informe manualmente (ex: 21h, 1h 30m).</p>
                   </div>
                   <div className="space-y-1.5">
                     <Label>Companhia aérea</Label>
@@ -407,9 +416,11 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs text-muted-foreground">Duração trecho</Label>
-                        <div className="h-9 px-3 flex items-center rounded-md border border-border/60 bg-muted text-sm text-muted-foreground">
-                          {e.duracaoTrecho || "—"}
-                        </div>
+                        <Input
+                          placeholder="ex: 1h 30m"
+                          value={e.duracaoTrecho ?? ""}
+                          onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })}
+                        />
                       </div>
                     </div>
                   </div>
