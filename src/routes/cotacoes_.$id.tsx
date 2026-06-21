@@ -478,6 +478,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
               <span className="text-slate-600">
                 {[weekdayLabel(voo?.data), fmtDate(voo?.data)].filter(Boolean).join(", ")}
               </span>
+              <span className="inline-flex items-center gap-1 text-slate-600"><Clock className="size-3" /> {duracaoTotal}</span>
               <span className="text-slate-500">{legs.length} {legs.length === 1 ? "Trecho" : "Trechos"}</span>
             </div>
             <div className="px-3 py-2 space-y-2">
