@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 import { dateOnlyToBR, normalizeDateOnly, parseDateOnly } from "@/lib/dates";
-import { calcDuracaoTotalVoo, calcDuracaoVoo, calcDuracaoEscala } from "@/lib/voos";
+import { calcDuracaoEscala, calcTempoDeVooTotal } from "@/lib/voos";
 import { supabase } from "@/integrations/supabase/client";
 import { Star } from "lucide-react";
 
@@ -418,7 +418,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
         to: voo?.destino || "—",
         dep: voo?.horaSaida,
         arr: voo?.horaChegada,
-        duracaoTrecho: calcDuracaoVoo(voo?.horaSaida, voo?.horaChegada),
+        duracaoTrecho: voo?.duracaoTrecho || "—",
       }]
     : (() => {
         const out: Leg[] = [];
@@ -427,7 +427,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
           to: escalas[0]?.destino || voo?.destino || "—",
           dep: voo?.horaSaida,
           arr: escalas[0]?.chegada,
-          duracaoTrecho: calcDuracaoVoo(voo?.horaSaida, escalas[0]?.chegada),
+          duracaoTrecho: voo?.duracaoTrecho || "—",
         });
         for (let i = 1; i < escalas.length; i++) {
           out.push({
@@ -435,7 +435,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
             to: escalas[i]?.destino || "—",
             dep: escalas[i - 1]?.saida,
             arr: escalas[i]?.chegada,
-            duracaoTrecho: calcDuracaoVoo(escalas[i - 1]?.saida, escalas[i]?.chegada),
+            duracaoTrecho: escalas[i - 1]?.duracaoTrecho || "—",
           });
         }
         const last = escalas[escalas.length - 1];
@@ -444,7 +444,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
           to: voo?.destino || "—",
           dep: last?.saida,
           arr: voo?.horaChegada,
-          duracaoTrecho: calcDuracaoVoo(last?.saida, voo?.horaChegada),
+          duracaoTrecho: last?.duracaoTrecho || "—",
         });
         for (let i = 0; i < out.length - 1; i++) {
           out[i].duracaoEscalaAteProximo = calcDuracaoEscala(out[i].arr, out[i + 1].dep);
@@ -452,7 +452,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
         return out;
       })();
   const isComEscala = voo?.tipo === "com_escala" && escalas.length > 0;
-  const duracaoTotal = calcDuracaoTotalVoo(voo);
+  const duracaoTotal = calcTempoDeVooTotal(voo);
 
   return (
     <section className="space-y-1.5">
