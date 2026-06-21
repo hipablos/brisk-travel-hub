@@ -938,39 +938,6 @@ function NovaCotacao() {
                     </section>
                   )}
 
-                  <section className="bg-card border border-border/50 rounded-xl p-6">
-                    <div className="flex flex-wrap items-center gap-2 mb-4">
-                      <Button type="button" variant="outline" size="sm" className="gap-2"><Star className="size-4" />Avaliação</Button>
-                      <Button type="button" variant="outline" size="sm" className="gap-2"><FileSignature className="size-4" />Contrato</Button>
-                      <Button type="button" variant="outline" size="sm" className="gap-2"><BookmarkCheck className="size-4" />Reserva</Button>
-                      <Button type="button" variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive"><Trash2 className="size-4" />Excluir Venda</Button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-1.5">
-                        <Label>Data da Venda</Label>
-                        <div className="relative">
-                          <DateInput className="pl-9" value={dataVenda} onChange={(iso) => setDataVenda(iso)} />
-                          <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
-                        </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label>Total Vendas</Label>
-                        <div className="h-9 px-3 rounded-md border border-border/40 bg-secondary/5 flex items-center font-semibold text-secondary">
-                          R$ {formatBRL(vendaVendas.reduce((s, v) => s + (v.valor || 0), 0))}
-                        </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label>Lucro</Label>
-                        <div className="h-9 px-3 rounded-md border border-border/40 bg-secondary/5 flex items-center font-semibold text-secondary">
-                          R$ {formatBRL(
-                            vendaVendas.reduce((s, v) => s + (v.valor || 0), 0) -
-                            vendaCustos.reduce((s, v) => s + (v.valor || 0), 0)
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </section>
 
                   {/* LOCALIZADOR DO VOO */}
                   <section className="bg-card border border-border/50 rounded-xl p-6">
