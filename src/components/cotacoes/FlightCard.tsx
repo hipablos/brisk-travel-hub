@@ -167,6 +167,30 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoCalculada]);
 
+  // Mantém duracaoEscala (espera) e duracaoTrecho (saída desta escala → chegada da próxima/destino)
+  // sincronizados automaticamente em cada escala.
+  useEffect(() => {
+    if (voo.tipo !== "com_escala") return;
+    const patches: Array<{ id: string; patch: Partial<Escala> }> = [];
+    voo.escalas.forEach((e, i) => {
+      const duracaoEscala = calcDuracaoEscala(e.chegada, e.saida);
+      const proxChegada = voo.escalas[i + 1]?.chegada ?? voo.horaChegada;
+      const duracaoTrecho = calcDuracaoVoo(e.saida, proxChegada);
+      const patch: Partial<Escala> = {};
+      if (e.duracaoEscala !== duracaoEscala) patch.duracaoEscala = duracaoEscala;
+      if (e.duracaoTrecho !== duracaoTrecho) patch.duracaoTrecho = duracaoTrecho;
+      if (Object.keys(patch).length) patches.push({ id: e.id, patch });
+    });
+    if (patches.length === 0) return;
+    onChange({
+      escalas: voo.escalas.map((e) => {
+        const p = patches.find((x) => x.id === e.id);
+        return p ? { ...e, ...p.patch } : e;
+      }),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [voo.escalas, voo.horaChegada, voo.tipo]);
+
   const setBag = (k: keyof Bagagens, n: number) =>
     onChange({ bagagens: { ...voo.bagagens, [k]: n } });
 
