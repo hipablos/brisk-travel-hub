@@ -897,7 +897,7 @@ function NovaCotacao() {
                         size="sm"
                         variant="outline"
                         className="gap-2"
-                        onClick={() => setCustoDialog({ open: true, edit: null })}
+                        onClick={addVendaCusto}
                       >
                         <Plus className="size-4" /> Adicionar Custo
                       </Button>
@@ -911,7 +911,7 @@ function NovaCotacao() {
                           size="sm"
                           variant="ghost"
                           className="mt-2 gap-2 text-secondary"
-                          onClick={() => setCustoDialog({ open: true, edit: null })}
+                          onClick={addVendaCusto}
                         >
                           <Plus className="size-4" /> Adicionar primeiro custo
                         </Button>
@@ -921,50 +921,39 @@ function NovaCotacao() {
                         {vendaCustos.map((v) => (
                           <div
                             key={v.id}
-                            className="group flex items-center gap-3 rounded-lg border border-border/50 bg-background/40 px-4 py-3 hover:border-border transition-colors"
+                            className="flex items-center gap-2 rounded-lg border border-border/50 bg-background/40 px-3 py-2"
                           >
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-medium text-sm text-foreground truncate">
-                                  {v.descricao || v.categoria || "Custo sem descrição"}
-                                </span>
-                                {v.pago && (
-                                  <span className="text-[10px] uppercase font-semibold tracking-wide text-secondary bg-secondary/10 px-1.5 py-0.5 rounded">
-                                    Pago
-                                  </span>
-                                )}
-                              </div>
-                              <div className="text-xs text-muted-foreground mt-0.5 truncate">
-                                {[v.parte, v.forma, v.vencimento].filter(Boolean).join(" · ") || "—"}
-                              </div>
+                            <Input
+                              placeholder="Observação"
+                              value={v.descricao ?? ""}
+                              onChange={(e) => updVendaCusto(v.id, { descricao: e.target.value })}
+                              className="flex-1"
+                            />
+                            <div className="flex items-center gap-1 w-44">
+                              <span className="px-2 h-9 flex items-center rounded-md border border-border/40 bg-muted text-xs text-muted-foreground">R$</span>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                placeholder="0,00"
+                                value={v.valor || ""}
+                                onChange={(e) => updVendaCusto(v.id, { valor: parseFloat(e.target.value) || 0 })}
+                              />
                             </div>
-                            <div className="text-right">
-                              <div className="font-semibold text-sm text-foreground">R$ {formatBRL(v.valor || 0)}</div>
-                            </div>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setCustoDialog({ open: true, edit: v })}
-                              >
-                                Editar
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => delVendaCusto(v.id)}
-                                className="text-muted-foreground hover:text-destructive"
-                              >
-                                <Trash2 className="size-4" />
-                              </Button>
-                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => delVendaCusto(v.id)}
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
                           </div>
                         ))}
                       </div>
                     )}
                   </section>
+
 
                   {/* VENDAS */}
                   <section className="bg-card border border-border/50 rounded-xl p-6">
