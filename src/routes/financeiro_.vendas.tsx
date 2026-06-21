@@ -12,9 +12,7 @@ import {
 } from "@/components/ui/table";
 import { useCotacoes, useClientes, formatBRL, type Cotacao } from "@/lib/cotacoes-store";
 import { ShoppingCart, Filter, X, ExternalLink } from "lucide-react";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
 
 export const Route = createFileRoute("/financeiro_/vendas")({
   component: VendasPage,
@@ -84,11 +82,18 @@ function VendasPage() {
   }, [cotacoes]);
 
   const filtered = useMemo(() => {
-    return rows.filter((r) => {
+    const out = rows.filter((r) => {
       if (clienteId !== "__all" && r.cotacao.cliente?.id !== clienteId) return false;
       if (de && (!r.dataVenda || compareDateOnly(r.dataVenda, de) < 0)) return false;
       if (ate && (!r.dataVenda || compareDateOnly(r.dataVenda, ate) > 0)) return false;
       return true;
+    });
+    // Ordena por data (mais recente primeiro). Vendas sem data vão pro fim.
+    return out.sort((a, b) => {
+      if (!a.dataVenda && !b.dataVenda) return 0;
+      if (!a.dataVenda) return 1;
+      if (!b.dataVenda) return -1;
+      return -compareDateOnly(a.dataVenda, b.dataVenda);
     });
   }, [rows, de, ate, clienteId]);
 
@@ -161,15 +166,12 @@ function VendasPage() {
               </div>
               <div className="space-y-1.5 md:col-span-2">
                 <Label className="text-xs">Cliente</Label>
-                <Select value={clienteId} onValueChange={setClienteId}>
-                  <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__all">Todos os clientes</SelectItem>
-                    {clientes.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ClienteAutocomplete
+                  clientes={clientes}
+                  value={clienteId === "__all" ? "" : (clientes.find((c) => c.id === clienteId)?.nome ?? "")}
+                  onSelect={(c) => setClienteId(c.id)}
+                  placeholder="Buscar cliente por nome..."
+                />
               </div>
             </div>
           </section>
