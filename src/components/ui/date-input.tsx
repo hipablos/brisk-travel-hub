@@ -99,7 +99,7 @@ export const DateInput = React.forwardRef<HTMLInputElement, Props>(function Date
             <Calendar
               mode="single"
               selected={selectedDate}
-              defaultMonth={selectedDate ?? minDate ?? undefined}
+              defaultMonth={selectedDate ?? new Date()}
               fromDate={minDate ?? undefined}
               toDate={maxDate ?? undefined}
               onSelect={(date) => {
