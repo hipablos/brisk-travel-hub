@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR } from "@/lib/dates";
-import { calcDuracaoVoo, calcDuracaoEscala } from "@/lib/voos";
+import { calcDuracaoVoo, calcDuracaoEscala, calcTempoDeVooTotal } from "@/lib/voos";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -55,6 +55,7 @@ export type Voo = {
   horaSaida?: string;
   horaChegada?: string;
   duracao?: string;
+  duracaoTrecho?: string;
   companhia?: string;
   numeroVoo?: string;
   classe?: string;
@@ -149,17 +150,9 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     () => calcDuracaoVoo(voo.horaSaida, voo.horaChegada),
     [voo.horaSaida, voo.horaChegada],
   );
-  const duracaoTotal = useMemo(() => {
-    if (voo.tipo !== "com_escala") return duracaoCalculada;
-    const base = parseDur(duracaoCalculada);
-    const extra = voo.escalas.reduce(
-      (s, e) => s + parseDur(e.duracaoEscala) + parseDur(e.duracaoTrecho),
-      0,
-    );
-    return formatDur(base + extra);
-  }, [duracaoCalculada, voo.escalas, voo.tipo]);
+  const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
 
-  // Mantém voo.duracao sincronizado com o cálculo automático.
+  // Mantém voo.duracao sincronizado com o cálculo automático (porta-a-porta).
   useEffect(() => {
     if (voo.duracao !== duracaoCalculada) {
       onChange({ duracao: duracaoCalculada });
@@ -167,19 +160,16 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoCalculada]);
 
-  // Mantém duracaoEscala (espera) e duracaoTrecho (saída desta escala → chegada da próxima/destino)
-  // sincronizados automaticamente em cada escala.
+  // Apenas a duração de ESCALA (espera no aeroporto) é calculada automaticamente.
+  // duracaoTrecho passa a ser editado manualmente pelo usuário.
   useEffect(() => {
     if (voo.tipo !== "com_escala") return;
     const patches: Array<{ id: string; patch: Partial<Escala> }> = [];
-    voo.escalas.forEach((e, i) => {
+    voo.escalas.forEach((e) => {
       const duracaoEscala = calcDuracaoEscala(e.chegada, e.saida);
-      const proxChegada = voo.escalas[i + 1]?.chegada ?? voo.horaChegada;
-      const duracaoTrecho = calcDuracaoVoo(e.saida, proxChegada);
-      const patch: Partial<Escala> = {};
-      if (e.duracaoEscala !== duracaoEscala) patch.duracaoEscala = duracaoEscala;
-      if (e.duracaoTrecho !== duracaoTrecho) patch.duracaoTrecho = duracaoTrecho;
-      if (Object.keys(patch).length) patches.push({ id: e.id, patch });
+      if (e.duracaoEscala !== duracaoEscala) {
+        patches.push({ id: e.id, patch: { duracaoEscala } });
+      }
     });
     if (patches.length === 0) return;
     onChange({
@@ -189,7 +179,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
       }),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [voo.escalas, voo.horaChegada, voo.tipo]);
+  }, [voo.escalas, voo.tipo]);
 
   const setBag = (k: keyof Bagagens, n: number) =>
     onChange({ bagagens: { ...voo.bagagens, [k]: n } });
@@ -319,9 +309,18 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     <p className="text-[11px] text-muted-foreground">
                       Calculada automaticamente a partir dos horários de saída e chegada.
                       {voo.tipo === "com_escala" && duracaoTotal && (
-                        <> Total c/ escalas: <span className="font-semibold text-foreground">{duracaoTotal}</span></>
+                        <> Tempo de voo (trechos + escalas): <span className="font-semibold text-foreground">{duracaoTotal}</span></>
                       )}
                     </p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Duração do trecho {voo.tipo === "com_escala" ? "(origem → 1ª escala)" : ""}</Label>
+                    <Input
+                      placeholder="ex: 1h 30m"
+                      value={voo.duracaoTrecho ?? ""}
+                      onChange={(e) => onChange({ duracaoTrecho: e.target.value })}
+                    />
+                    <p className="text-[11px] text-muted-foreground">Informe manualmente (ex: 21h, 1h 30m).</p>
                   </div>
                   <div className="space-y-1.5">
                     <Label>Companhia aérea</Label>
@@ -417,9 +416,11 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs text-muted-foreground">Duração trecho</Label>
-                        <div className="h-9 px-3 flex items-center rounded-md border border-border/60 bg-muted text-sm text-muted-foreground">
-                          {e.duracaoTrecho || "—"}
-                        </div>
+                        <Input
+                          placeholder="ex: 1h 30m"
+                          value={e.duracaoTrecho ?? ""}
+                          onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })}
+                        />
                       </div>
                     </div>
                   </div>
