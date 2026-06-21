@@ -1,0 +1,1 @@
+ALTER TABLE public.hospedagens ADD COLUMN IF NOT EXISTS fotos text[] DEFAULT '{}'::text[];

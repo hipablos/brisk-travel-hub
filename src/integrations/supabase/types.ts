@@ -384,6 +384,7 @@ export type Database = {
           endereco: string | null
           estado: string | null
           estrelas: number | null
+          fotos: string[] | null
           google_maps_url: string | null
           google_place_id: string | null
           hospedes: number | null
@@ -414,6 +415,7 @@ export type Database = {
           endereco?: string | null
           estado?: string | null
           estrelas?: number | null
+          fotos?: string[] | null
           google_maps_url?: string | null
           google_place_id?: string | null
           hospedes?: number | null
@@ -444,6 +446,7 @@ export type Database = {
           endereco?: string | null
           estado?: string | null
           estrelas?: number | null
+          fotos?: string[] | null
           google_maps_url?: string | null
           google_place_id?: string | null
           hospedes?: number | null
