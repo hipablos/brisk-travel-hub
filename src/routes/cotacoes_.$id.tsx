@@ -411,15 +411,23 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
     : [{ from: origem, to: destino, dep: voo?.horaSaida, arr: voo?.horaChegada, conexao: undefined }];
 
   // Trechos completos (cada perna do voo, ponta a ponta) — usado só no bloco "Itinerário" de voos com escala.
-  const legs: { from: string; to: string; dep?: string; arr?: string }[] = escalas.length === 0
-    ? [{ from: voo?.origem || "—", to: voo?.destino || "—", dep: voo?.horaSaida, arr: voo?.horaChegada }]
+  type Leg = { from: string; to: string; dep?: string; arr?: string; duracaoTrecho: string; duracaoEscalaAteProximo?: string };
+  const legs: Leg[] = escalas.length === 0
+    ? [{
+        from: voo?.origem || "—",
+        to: voo?.destino || "—",
+        dep: voo?.horaSaida,
+        arr: voo?.horaChegada,
+        duracaoTrecho: calcDuracaoVoo(voo?.horaSaida, voo?.horaChegada),
+      }]
     : (() => {
-        const out: { from: string; to: string; dep?: string; arr?: string }[] = [];
+        const out: Leg[] = [];
         out.push({
           from: voo?.origem || "—",
           to: escalas[0]?.destino || voo?.destino || "—",
           dep: voo?.horaSaida,
           arr: escalas[0]?.chegada,
+          duracaoTrecho: calcDuracaoVoo(voo?.horaSaida, escalas[0]?.chegada),
         });
         for (let i = 1; i < escalas.length; i++) {
           out.push({
@@ -427,6 +435,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
             to: escalas[i]?.destino || "—",
             dep: escalas[i - 1]?.saida,
             arr: escalas[i]?.chegada,
+            duracaoTrecho: calcDuracaoVoo(escalas[i - 1]?.saida, escalas[i]?.chegada),
           });
         }
         const last = escalas[escalas.length - 1];
@@ -435,7 +444,11 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
           to: voo?.destino || "—",
           dep: last?.saida,
           arr: voo?.horaChegada,
+          duracaoTrecho: calcDuracaoVoo(last?.saida, voo?.horaChegada),
         });
+        for (let i = 0; i < out.length - 1; i++) {
+          out[i].duracaoEscalaAteProximo = calcDuracaoEscala(out[i].arr, out[i + 1].dep);
+        }
         return out;
       })();
   const isComEscala = voo?.tipo === "com_escala" && escalas.length > 0;
