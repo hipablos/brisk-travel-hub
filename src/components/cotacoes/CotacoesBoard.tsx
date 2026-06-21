@@ -182,9 +182,33 @@ function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, on
   );
 }
 
-export function CotacoesBoard() {
+type BoardFiltros = {
+  clienteId: string | null;
+  clienteNomeBusca: string;
+  dataInicio: Date | undefined;
+  dataFim: Date | undefined;
+};
+
+export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
   const saved = useCotacoes();
-  const all = saved;
+  const all = saved.filter((c) => {
+    if (!filtros) return true;
+    if (filtros.clienteId && c.cliente?.id !== filtros.clienteId) return false;
+    if (!filtros.clienteId && filtros.clienteNomeBusca.trim()) {
+      const q = filtros.clienteNomeBusca.trim().toLowerCase();
+      if (!c.cliente?.nome?.toLowerCase().includes(q)) return false;
+    }
+    if (filtros.dataInicio || filtros.dataFim) {
+      const d = new Date(c.createdAt);
+      if (filtros.dataInicio && d < filtros.dataInicio) return false;
+      if (filtros.dataFim) {
+        const end = new Date(filtros.dataFim);
+        end.setHours(23, 59, 59, 999);
+        if (d > end) return false;
+      }
+    }
+    return true;
+  });
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const statuses: { status: CotacaoStatus; title: string; colorClass: string }[] = [

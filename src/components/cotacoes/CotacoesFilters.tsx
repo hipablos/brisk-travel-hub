@@ -1,26 +1,72 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Filter, CalendarIcon, Link as LinkIcon, Plus } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Calendar as CalendarIcon, Plus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { ClienteAutocomplete } from "./ClienteAutocomplete";
+import { useClientes } from "@/lib/cotacoes-store";
+import { cn } from "@/lib/utils";
 
-export function CotacoesFilters() {
+export type CotacoesFiltrosState = {
+  clienteId: string | null;
+  clienteNomeBusca: string;
+  dataInicio: Date | undefined;
+  dataFim: Date | undefined;
+};
+
+export const filtrosVazios: CotacoesFiltrosState = {
+  clienteId: null,
+  clienteNomeBusca: "",
+  dataInicio: undefined,
+  dataFim: undefined,
+};
+
+function DateField({
+  label, value, onChange,
+}: { label: string; value: Date | undefined; onChange: (d: Date | undefined) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="space-y-1.5 min-w-0">
+      <label className="text-sm font-medium text-foreground">{label}</label>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn("w-full justify-start text-left font-normal", !value && "text-muted-foreground")}
+          >
+            <CalendarIcon className="size-4 mr-2" />
+            {value ? value.toLocaleDateString("pt-BR") : "Selecionar data"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={value}
+            onSelect={(d) => { onChange(d); setOpen(false); }}
+            initialFocus
+            className={cn("p-3 pointer-events-auto")}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+interface Props {
+  value: CotacoesFiltrosState;
+  onChange: (v: CotacoesFiltrosState) => void;
+  onPesquisar?: () => void;
+}
+
+export function CotacoesFilters({ value, onChange, onPesquisar }: Props) {
+  const clientes = useClientes();
+
   return (
     <div className="space-y-4">
-      {/* Top Header */}
       <div className="flex items-center justify-between gap-3 min-w-0">
         <h1 className="text-2xl font-bold text-foreground">Cotações</h1>
         <div className="flex items-center gap-2 shrink-0">
-          <Button variant="outline" className="gap-2">
-            <LinkIcon className="size-4" />
-            Links
-          </Button>
           <Button asChild className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
             <Link to="/cotacoes/nova">
               <Plus className="size-4" />
@@ -30,58 +76,40 @@ export function CotacoesFilters() {
         </div>
       </div>
 
-      {/* Filters Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-4 items-end bg-card p-4 rounded-xl border border-border/50 min-w-0">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-end bg-card p-4 rounded-xl border border-border/50 min-w-0">
         <div className="space-y-1.5 min-w-0">
           <label className="text-sm font-medium text-foreground">Cliente</label>
-          <Select defaultValue="todos">
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="1">Karla</SelectItem>
-              <SelectItem value="2">Junior Almeida</SelectItem>
-            </SelectContent>
-          </Select>
+          <ClienteAutocomplete
+            clientes={clientes}
+            value={value.clienteNomeBusca}
+            onSelect={(c) => onChange({ ...value, clienteId: c.id, clienteNomeBusca: c.nome })}
+            placeholder="Buscar cliente por nome..."
+          />
         </div>
 
-        <div className="space-y-1.5 min-w-0">
-          <label className="text-sm font-medium text-foreground">Tag/Identificador</label>
-          <Input placeholder="Tag ou Identificador" />
-        </div>
+        <DateField
+          label="Data inicial"
+          value={value.dataInicio}
+          onChange={(d) => onChange({ ...value, dataInicio: d })}
+        />
+        <DateField
+          label="Data final"
+          value={value.dataFim}
+          onChange={(d) => onChange({ ...value, dataFim: d })}
+        />
 
-        <div className="space-y-1.5 md:col-span-2 min-w-0">
-          <label className="text-sm font-medium text-foreground">Período da Cotação</label>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <Input placeholder="07/03/2026" className="pl-9" />
-              <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
-            </div>
-            <span className="text-sm text-muted-foreground">até</span>
-            <div className="relative flex-1">
-              <Input placeholder="06/05/2026" className="pl-9" />
-              <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-end gap-2 min-w-0 md:col-span-2 xl:col-span-1 2xl:col-span-1">
-          <div className="space-y-1.5 flex-1">
-            <label className="text-sm font-medium text-foreground">Usuário</label>
-            <Select defaultValue="todos">
-              <SelectTrigger>
-                <SelectValue placeholder="Todos" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Button variant="outline" size="icon" className="mb-0 shrink-0">
-            <Filter className="size-4" />
+        <div className="flex items-end gap-2">
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() => onChange(filtrosVazios)}
+          >
+            Limpar
           </Button>
-          <Button className="mb-0 shrink-0 bg-blue-600 hover:bg-blue-700 text-white">
+          <Button
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={() => onPesquisar?.()}
+          >
             Pesquisar
           </Button>
         </div>
