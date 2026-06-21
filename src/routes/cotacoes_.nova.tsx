@@ -454,12 +454,42 @@ function NovaCotacao() {
 
           <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <Tabs defaultValue="orcamento" className="w-full">
+              {/* Tipo de Documento */}
+              <section className="bg-card border border-border/50 rounded-xl p-4 mb-4">
+                <h2 className="text-sm font-semibold text-foreground mb-3">Tipo de Documento</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("orcamento")}
+                    className={`rounded-lg border-2 p-4 text-center transition-all ${
+                      tipoDocumento === "orcamento"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-muted/40 text-foreground hover:border-primary/60"
+                    }`}
+                  >
+                    <span className="block text-base font-semibold">📄 Orçamento</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("venda")}
+                    className={`rounded-lg border-2 p-4 text-center transition-all ${
+                      tipoDocumento === "venda"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-muted/40 text-foreground hover:border-primary/60"
+                    }`}
+                  >
+                    <span className="block text-base font-semibold">🛒 Venda</span>
+                  </button>
+                </div>
+              </section>
+
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="w-full">
                 <TabsList className="mb-4">
                   <TabsTrigger value="orcamento" className="gap-2"><FileText className="size-4" />Orçamento</TabsTrigger>
                   <TabsTrigger value="valores" className="gap-2"><DollarSign className="size-4" />Valores</TabsTrigger>
                   <TabsTrigger value="venda" className="gap-2"><ShoppingCart className="size-4" />Venda</TabsTrigger>
                 </TabsList>
+
 
                 <TabsContent value="orcamento" className="space-y-6 mt-0">
               <section className="bg-card border border-border/50 rounded-xl p-6">
