@@ -455,34 +455,6 @@ function NovaCotacao() {
 
           <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              {/* Tipo de Documento */}
-              <section className="bg-card border border-border/50 rounded-xl p-4 mb-4">
-                <h2 className="text-sm font-semibold text-foreground mb-3">Tipo de Documento</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("orcamento")}
-                    className={`rounded-lg border-2 p-4 text-center transition-all ${
-                      tipoDocumento === "orcamento"
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-muted/40 text-foreground hover:border-primary/60"
-                    }`}
-                  >
-                    <span className="block text-base font-semibold">📄 Orçamento</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("venda")}
-                    className={`rounded-lg border-2 p-4 text-center transition-all ${
-                      tipoDocumento === "venda"
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-muted/40 text-foreground hover:border-primary/60"
-                    }`}
-                  >
-                    <span className="block text-base font-semibold">🛒 Venda</span>
-                  </button>
-                </div>
-              </section>
 
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="w-full">
                 <TabsList className="mb-4">
