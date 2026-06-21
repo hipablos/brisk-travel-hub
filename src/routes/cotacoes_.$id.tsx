@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 import { dateOnlyToBR, normalizeDateOnly, parseDateOnly } from "@/lib/dates";
+import { calcDuracaoTotalVoo } from "@/lib/voos";
 import { supabase } from "@/integrations/supabase/client";
 import { Star } from "lucide-react";
 
