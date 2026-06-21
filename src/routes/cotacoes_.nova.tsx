@@ -125,8 +125,9 @@ function NovaCotacao() {
   const [linkPagamento, setLinkPagamento] = useState("");
 
   // Tipo de documento (Orçamento x Venda) — controla a aba ativa
-  const [activeTab, setActiveTab] = useState<"orcamento" | "valores" | "venda">("orcamento");
-  const tipoDocumento: "orcamento" | "venda" = activeTab === "venda" ? "venda" : "orcamento";
+  const [activeTab, setActiveTab] = useState<"orcamento" | "venda">("orcamento");
+  const tipoDocumento: "orcamento" | "venda" = activeTab;
+
 
 
 
@@ -486,9 +487,9 @@ function NovaCotacao() {
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="w-full">
                 <TabsList className="mb-4">
                   <TabsTrigger value="orcamento" className="gap-2"><FileText className="size-4" />Orçamento</TabsTrigger>
-                  <TabsTrigger value="valores" className="gap-2"><DollarSign className="size-4" />Valores</TabsTrigger>
                   <TabsTrigger value="venda" className="gap-2"><ShoppingCart className="size-4" />Venda</TabsTrigger>
                 </TabsList>
+
 
 
                 <TabsContent value="orcamento" className="space-y-6 mt-0">
@@ -853,9 +854,8 @@ function NovaCotacao() {
                   <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Notas internas sobre a cotação..." rows={3} />
                 </div>
               </section>
-                </TabsContent>
 
-                <TabsContent value="valores" className="space-y-6 mt-0">
+
                   <section className="bg-card border border-border/50 rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
