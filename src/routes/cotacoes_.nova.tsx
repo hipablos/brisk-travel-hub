@@ -124,6 +124,12 @@ function NovaCotacao() {
   const [instrucoesPagamento, setInstrucoesPagamento] = useState("");
   const [linkPagamento, setLinkPagamento] = useState("");
 
+  // Tipo de documento (Orçamento x Venda) — controla a aba ativa
+  const [activeTab, setActiveTab] = useState<"orcamento" | "valores" | "venda">("orcamento");
+  const tipoDocumento: "orcamento" | "venda" = activeTab === "venda" ? "venda" : "orcamento";
+
+
+
   // Load existing cotacao when editing
   useEffect(() => {
     if (!editId) return;
