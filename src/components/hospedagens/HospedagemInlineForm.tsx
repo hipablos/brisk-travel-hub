@@ -21,6 +21,7 @@ export type HospedagemDraft = {
   google_maps_url: string | null;
   lat: number | null;
   lng: number | null;
+  fotos: string[] | null;
   checkin: string | null;
   checkout: string | null;
   noites: number | null;
@@ -44,6 +45,7 @@ export const novaHospedagem = (): HospedagemDraft => ({
   google_maps_url: null,
   lat: null,
   lng: null,
+  fotos: [],
   checkin: "",
   checkout: "",
   noites: null,
@@ -93,6 +95,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
       google_maps_url: p.google_maps_url ?? null,
       lat: p.lat ?? null,
       lng: p.lng ?? null,
+      fotos: p.fotos && p.fotos.length > 0 ? p.fotos : f.fotos,
     });
   };
 
@@ -113,6 +116,24 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         onChange={(v) => onChange({ nome_hotel: v })}
         onPlaceSelected={handlePlace}
       />
+
+      {f.fotos && f.fotos.length > 0 && (
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">
+            Fotos do Google ({f.fotos.length}) — usadas no orçamento em PDF
+          </Label>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {f.fotos.map((url, i) => (
+              <img
+                key={i}
+                src={url}
+                alt={`${f.nome_hotel || "Hotel"} foto ${i + 1}`}
+                className="h-16 w-24 object-cover rounded-md border border-border/60 shrink-0"
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">

@@ -21,6 +21,7 @@ type HospedagemRow = {
   hospedes: number | null; quartos: number | null; tipo_acomodacao: string | null;
   regime_alimentar: string | null; numero_reserva: string | null; codigo_confirmacao: string | null;
   observacoes_cliente: string | null; google_maps_url: string | null;
+  fotos: string[] | null;
 };
 type ExperienciaRow = {
   id: string; nome: string; categoria: string | null;
@@ -111,8 +112,14 @@ function VisualizarCotacao() {
 
   if (!cotacao) return null;
 
-  const vooIda = cotacao.vooIda as any;
-  const vooVolta = cotacao.vooVolta as any;
+  // Lê os arrays com todos os voos (vooIdas/vooVoltas). Mantém fallback para
+  // cotações antigas que só tinham o campo singular vooIda/vooVolta.
+  const vooIdas: any[] = (cotacao as any).vooIdas?.length
+    ? (cotacao as any).vooIdas
+    : cotacao.vooIda ? [cotacao.vooIda] : [];
+  const vooVoltas: any[] = (cotacao as any).vooVoltas?.length
+    ? (cotacao as any).vooVoltas
+    : cotacao.vooVolta ? [cotacao.vooVolta] : [];
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -198,8 +205,12 @@ function VisualizarCotacao() {
               </section>
 
               {/* Voos */}
-              {vooIda && <VooBlock direction="ida" voo={vooIda} />}
-              {vooVolta && <VooBlock direction="volta" voo={vooVolta} />}
+              {vooIdas.map((v, idx) => (
+                <VooBlock key={v?.id ?? `ida-${idx}`} direction="ida" voo={v} index={idx} total={vooIdas.length} />
+              ))}
+              {vooVoltas.map((v, idx) => (
+                <VooBlock key={v?.id ?? `volta-${idx}`} direction="volta" voo={v} index={idx} total={vooVoltas.length} />
+              ))}
 
               {/* Hospedagens */}
               {hospedagens.map((h) => <HospedagemBlock key={h.id} h={h} />)}
@@ -365,10 +376,13 @@ function VisualizarCotacao() {
 
 /* ---------- Voo Block ---------- */
 
-function VooBlock({ direction, voo }: { direction: "ida" | "volta"; voo: any }) {
+function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"; voo: any; index?: number; total?: number }) {
   const isIda = direction === "ida";
   const Icon = isIda ? PlaneTakeoff : PlaneLanding;
-  const title = isIda ? "Voo de Ida" : "Voo de Volta";
+  const baseTitle = isIda ? "Voo de Ida" : "Voo de Volta";
+  const title = typeof index === "number" && typeof total === "number" && total > 1
+    ? `${baseTitle} ${index + 1}`
+    : baseTitle;
   const origem = voo?.origem ? airportShort(voo.origem) : "—";
   const destino = voo?.destino ? airportShort(voo.destino) : "—";
   const escalas: any[] = Array.isArray(voo?.escalas) ? voo.escalas : [];
@@ -500,6 +514,20 @@ function HospedagemBlock({ h }: { h: HospedagemRow }) {
           </span>
         ) : null}
       </div>
+
+      {h.fotos && h.fotos.length > 0 && (
+        <div className="grid grid-cols-4 gap-1.5">
+          {h.fotos.slice(0, 4).map((url, i) => (
+            <img
+              key={i}
+              src={url}
+              alt={`${h.nome_hotel} — foto ${i + 1}`}
+              className="w-full h-20 object-cover rounded-md border border-slate-200"
+            />
+          ))}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
         <div><span className="text-slate-500">Check-in:</span> <span className="font-medium text-slate-900">{formatDT(h.checkin)}</span></div>
         <div><span className="text-slate-500">Check-out:</span> <span className="font-medium text-slate-900">{formatDT(h.checkout)}</span></div>
