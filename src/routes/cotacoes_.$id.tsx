@@ -515,7 +515,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
             <div className="grid grid-cols-5 gap-2 px-3 py-2 items-center">
               <InfoCol label="Partida" value={`${fmtShortDate(voo?.data)} ${voo?.horaSaida ? voo.horaSaida.replace(":", "h") : ""}`.trim()} />
               <InfoCol label="Chegada" value={`${fmtShortDate(voo?.data)} ${voo?.horaChegada ? voo.horaChegada.replace(":", "h") : ""}`.trim()} />
-              <InfoCol label="Duração" value={voo?.duracao || "—"} />
+              <InfoCol label="Duração" value={duracaoTotal} />
               <InfoCol label="Paradas" value={escalas.length === 0 ? "Direto" : `${escalas.length} ${escalas.length === 1 ? "parada" : "paradas"}`} />
               <InfoCol label="Voo" value={voo?.numeroVoo || "—"} />
             </div>
