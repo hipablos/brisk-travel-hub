@@ -82,11 +82,18 @@ function VendasPage() {
   }, [cotacoes]);
 
   const filtered = useMemo(() => {
-    return rows.filter((r) => {
+    const out = rows.filter((r) => {
       if (clienteId !== "__all" && r.cotacao.cliente?.id !== clienteId) return false;
       if (de && (!r.dataVenda || compareDateOnly(r.dataVenda, de) < 0)) return false;
       if (ate && (!r.dataVenda || compareDateOnly(r.dataVenda, ate) > 0)) return false;
       return true;
+    });
+    // Ordena por data (mais recente primeiro). Vendas sem data vão pro fim.
+    return out.sort((a, b) => {
+      if (!a.dataVenda && !b.dataVenda) return 0;
+      if (!a.dataVenda) return 1;
+      if (!b.dataVenda) return -1;
+      return -compareDateOnly(a.dataVenda, b.dataVenda);
     });
   }, [rows, de, ate, clienteId]);
 
