@@ -32,6 +32,17 @@ export function calcDuracaoVoo(
   return formatDuracao(calcDuracaoMinutos(horaSaida, horaChegada));
 }
 
+/**
+ * Duração da ESCALA (tempo de espera em solo entre dois trechos).
+ * = saída do próximo trecho − chegada do trecho anterior.
+ */
+export function calcDuracaoEscala(
+  chegadaTrechoAnterior?: string | null,
+  saidaProximoTrecho?: string | null,
+): string {
+  return formatDuracao(calcDuracaoMinutos(chegadaTrechoAnterior, saidaProximoTrecho));
+}
+
 /** Duração porta-a-porta usando saída do primeiro trecho e chegada do último. */
 export function calcDuracaoTotalVoo(voo: any): string {
   return calcDuracaoVoo(voo?.horaSaida, voo?.horaChegada);
