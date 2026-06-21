@@ -282,12 +282,22 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   <div className="space-y-1.5">
                     <Label>Duração total do voo</Label>
                     <div className="relative">
-                      <Input value={voo.duracao ?? ""} onChange={(e) => onChange({ duracao: e.target.value })} placeholder="08h 30m" className="pl-9" />
+                      <Input
+                        value={duracaoCalculada}
+                        readOnly
+                        tabIndex={-1}
+                        placeholder="—"
+                        className="pl-9 bg-muted text-muted-foreground cursor-not-allowed"
+                        aria-label="Duração calculada automaticamente a partir dos horários"
+                      />
                       <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
-                    {voo.tipo === "com_escala" && duracaoTotal && (
-                      <p className="text-[11px] text-muted-foreground">Total c/ escalas: <span className="font-semibold text-foreground">{duracaoTotal}</span></p>
-                    )}
+                    <p className="text-[11px] text-muted-foreground">
+                      Calculada automaticamente a partir dos horários de saída e chegada.
+                      {voo.tipo === "com_escala" && duracaoTotal && (
+                        <> Total c/ escalas: <span className="font-semibold text-foreground">{duracaoTotal}</span></>
+                      )}
+                    </p>
                   </div>
                   <div className="space-y-1.5">
                     <Label>Companhia aérea</Label>
