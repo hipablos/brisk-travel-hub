@@ -12,9 +12,7 @@ import {
 } from "@/components/ui/table";
 import { useCotacoes, useClientes, formatBRL, type Cotacao } from "@/lib/cotacoes-store";
 import { ShoppingCart, Filter, X, ExternalLink } from "lucide-react";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
 
 export const Route = createFileRoute("/financeiro_/vendas")({
   component: VendasPage,
