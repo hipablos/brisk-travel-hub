@@ -145,15 +145,27 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   };
 
   const totalEscalas = voo.escalas.length;
+  const duracaoCalculada = useMemo(
+    () => calcDuracaoVoo(voo.horaSaida, voo.horaChegada),
+    [voo.horaSaida, voo.horaChegada],
+  );
   const duracaoTotal = useMemo(() => {
-    if (voo.tipo !== "com_escala") return voo.duracao;
-    const base = parseDur(voo.duracao);
+    if (voo.tipo !== "com_escala") return duracaoCalculada;
+    const base = parseDur(duracaoCalculada);
     const extra = voo.escalas.reduce(
       (s, e) => s + parseDur(e.duracaoEscala) + parseDur(e.duracaoTrecho),
       0,
     );
     return formatDur(base + extra);
-  }, [voo.duracao, voo.escalas, voo.tipo]);
+  }, [duracaoCalculada, voo.escalas, voo.tipo]);
+
+  // Mantém voo.duracao sincronizado com o cálculo automático.
+  useEffect(() => {
+    if (voo.duracao !== duracaoCalculada) {
+      onChange({ duracao: duracaoCalculada });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duracaoCalculada]);
 
   const setBag = (k: keyof Bagagens, n: number) =>
     onChange({ bagagens: { ...voo.bagagens, [k]: n } });
