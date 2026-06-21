@@ -409,8 +409,18 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       <div className="space-y-1"><Label className="text-xs">Nº do voo</Label><Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} /></div>
                       <div className="space-y-1"><Label className="text-xs">Chegada</Label><Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} /></div>
                       <div className="space-y-1"><Label className="text-xs">Saída</Label><Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} /></div>
-                      <div className="space-y-1"><Label className="text-xs">Duração escala</Label><Input value={e.duracaoEscala ?? ""} onChange={(ev) => updEscala(e.id, { duracaoEscala: ev.target.value })} placeholder="1h 20m" /></div>
-                      <div className="space-y-1"><Label className="text-xs">Duração trecho</Label><Input value={e.duracaoTrecho ?? ""} onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })} placeholder="2h 10m" /></div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Duração escala</Label>
+                        <div className="h-9 px-3 flex items-center rounded-md border border-border/60 bg-muted text-sm text-muted-foreground">
+                          {e.duracaoEscala || "—"}
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Duração trecho</Label>
+                        <div className="h-9 px-3 flex items-center rounded-md border border-border/60 bg-muted text-sm text-muted-foreground">
+                          {e.duracaoTrecho || "—"}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
