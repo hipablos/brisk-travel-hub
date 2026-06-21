@@ -854,9 +854,8 @@ function NovaCotacao() {
                   <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Notas internas sobre a cotação..." rows={3} />
                 </div>
               </section>
-                </TabsContent>
 
-                <TabsContent value="valores" className="space-y-6 mt-0">
+
                   <section className="bg-card border border-border/50 rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
