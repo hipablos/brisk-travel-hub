@@ -159,15 +159,12 @@ function VendasPage() {
               </div>
               <div className="space-y-1.5 md:col-span-2">
                 <Label className="text-xs">Cliente</Label>
-                <Select value={clienteId} onValueChange={setClienteId}>
-                  <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__all">Todos os clientes</SelectItem>
-                    {clientes.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ClienteAutocomplete
+                  clientes={clientes}
+                  value={clienteId === "__all" ? "" : (clientes.find((c) => c.id === clienteId)?.nome ?? "")}
+                  onSelect={(c) => setClienteId(c.id)}
+                  placeholder="Buscar cliente por nome..."
+                />
               </div>
             </div>
           </section>
