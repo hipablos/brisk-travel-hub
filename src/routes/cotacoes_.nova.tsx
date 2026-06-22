@@ -36,7 +36,9 @@ import { TelegramAlertDiagnostic } from "@/components/cotacoes/TelegramAlertDiag
 import { HospedagemInlineForm, novaHospedagem, type HospedagemDraft } from "@/components/hospedagens/HospedagemInlineForm";
 import { ExperienciaInlineForm, novaExperiencia, type ExperienciaDraft } from "@/components/places/ExperienciaInlineForm";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Eye } from "lucide-react";
+import { Users, Eye, Minus, Plus as PlusIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 
 import { toast } from "sonner";
 
