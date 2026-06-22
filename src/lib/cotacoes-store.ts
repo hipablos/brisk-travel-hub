@@ -536,21 +536,9 @@ export async function toggleFormaPagamentoAtivo(id: string, ativo: boolean) {
 }
 
 export function useFormasPagamento() {
-  const uid = useAuthUserId();
-  const [list, setList] = useState<FormaPagamento[]>([]);
-  useEffect(() => {
-    if (!uid) return;
-    let mounted = true;
-    const reload = () => fetchFormasPagamento().then((d) => mounted && setList(d));
-    reload();
-    const channel = supabase
-      .channel(`formas-changes-${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "formas_pagamento" }, reload)
-      .subscribe();
-    return () => { mounted = false; supabase.removeChannel(channel); };
-  }, [uid]);
-  return list;
+  return _useSharedTable<FormaPagamento>("formas_pagamento", "formas_pagamento", fetchFormasPagamento);
 }
+
 
 export function computeFormaTotal(baseTotal: number, f: FormaPagamento) {
   const desc = baseTotal * (f.desconto / 100);
