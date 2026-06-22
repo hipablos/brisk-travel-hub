@@ -427,22 +427,6 @@ export function useClientes() {
 }
 
 
-export function useClientes() {
-  const uid = useAuthUserId();
-  const [list, setList] = useState<Cliente[]>([]);
-  useEffect(() => {
-    if (!uid) return;
-    let mounted = true;
-    const reload = () => fetchClientes().then((d) => mounted && setList(d));
-    reload();
-    const channel = supabase
-      .channel(`clientes-changes-${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "clientes" }, reload)
-      .subscribe();
-    return () => { mounted = false; supabase.removeChannel(channel); };
-  }, [uid]);
-  return list;
-}
 
 
 // ---------- Utils ----------
