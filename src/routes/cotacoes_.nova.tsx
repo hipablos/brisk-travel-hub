@@ -1169,7 +1169,16 @@ function NovaCotacao() {
 
                 <div className="space-y-1.5 mb-4">
                   <Label>Status</Label>
-                  <Select value={status} onValueChange={(v) => setStatus(v as CotacaoStatus)}>
+                  <Select value={status} onValueChange={(v) => {
+                    const novo = v as CotacaoStatus;
+                    setStatus(novo);
+                    if (novo === "aprovado") {
+                      setActiveTab("venda");
+                      if (!validade) {
+                        setValidade(new Date().toISOString().slice(0, 10));
+                      }
+                    }
+                  }}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="aguardando">Aguardando</SelectItem>
@@ -1181,7 +1190,7 @@ function NovaCotacao() {
                 </div>
 
                 <div className="space-y-1.5 mb-4">
-                  <Label>Validade</Label>
+                  <Label>Data de Venda</Label>
                   <div className="relative">
                     <DateInput className="pl-9" value={validade} onChange={(iso) => setValidade(iso)} />
                     <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
