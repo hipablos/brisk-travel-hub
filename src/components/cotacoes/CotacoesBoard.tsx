@@ -194,7 +194,13 @@ type BoardFiltros = {
 
 export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
   const saved = useCotacoes();
-  const all = saved.filter((c) => {
+  const allLabels = useAllLabels();
+  const colorOf = useMemo(() => {
+    const map = new Map(allLabels.map((l) => [l.name, l.color]));
+    return (name: string) => map.get(name) ?? "#64748b";
+  }, [allLabels]);
+
+  const all = useMemo(() => saved.filter((c) => {
     if (!filtros) return true;
     if (filtros.clienteId && c.cliente?.id !== filtros.clienteId) return false;
     if (!filtros.clienteId && filtros.clienteNomeBusca.trim()) {
@@ -211,7 +217,7 @@ export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
       }
     }
     return true;
-  });
+  }), [saved, filtros]);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const statuses: { status: CotacaoStatus; title: string; colorClass: string }[] = [
@@ -230,7 +236,7 @@ export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
     toast.success(`Cotação movida para ${label}`);
   };
 
-  const columns: ColumnProps[] = statuses.map(({ status, title, colorClass }) => {
+  const columns = statuses.map(({ status, title, colorClass }) => {
     const items = all.filter((c) => c.status === status);
     const total = items.reduce((s, c) => s + c.total, 0);
     return {
@@ -259,8 +265,9 @@ export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
       onDragEnd={() => setDraggingId(null)}
     >
       {columns.map((col) => (
-        <KanbanColumn key={col.title} {...col} />
+        <KanbanColumn key={col.title} {...col} colorOf={colorOf} />
       ))}
+
       <button className="fixed bottom-6 right-6 size-12 bg-primary text-primary-foreground rounded-full grid place-items-center shadow-lg hover:scale-105 transition-transform">
         <MessageSquare className="size-5" />
       </button>
