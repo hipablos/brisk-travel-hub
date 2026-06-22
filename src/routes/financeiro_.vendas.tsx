@@ -29,21 +29,13 @@ type Row = {
   localizador: string;
   cliente: string;
   dataVenda: string;
-  orcado: number;
   custo: number;
   venda: number;
   lucro: number;
-  vencimento: string;
 };
 
 function sumLinhas(arr?: { valor?: number }[]) {
   return (arr ?? []).reduce((s, v) => s + (Number(v.valor) || 0), 0);
-}
-
-function earliestVencimento(arr?: { vencimento?: string }[]) {
-  const dates = (arr ?? []).map((v) => v.vencimento).filter(Boolean) as string[];
-  if (!dates.length) return "";
-  return dates.sort(compareDateOnly)[0];
 }
 
 function fmtData(d?: string) {
@@ -65,21 +57,20 @@ function VendasPage() {
         return hasVenda || c.status === "aprovado";
       })
       .map((c) => {
-        const venda = sumLinhas(c.vendaVendas);
         const custo = sumLinhas(c.vendaCustos);
+        const venda = Number(c.total) || 0;
         return {
           cotacao: c,
           localizador: c.localizador ?? "",
           cliente: c.cliente?.nome ?? "—",
           dataVenda: c.dataVenda ?? "",
-          orcado: Number(c.total) || 0,
           custo,
           venda,
           lucro: venda - custo,
-          vencimento: earliestVencimento(c.vendaVendas),
         };
       });
   }, [cotacoes]);
+
 
   const filtered = useMemo(() => {
     const out = rows.filter((r) => {
