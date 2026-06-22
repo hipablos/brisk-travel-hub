@@ -1,9 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
-import { ClipboardList, Plane, Hotel, StickyNote } from "lucide-react";
+import { ClipboardList, Plane, Hotel, StickyNote, Cake, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useCotacoes } from "@/lib/cotacoes-store";
+import { useCotacoes, useClientes, formatBRL } from "@/lib/cotacoes-store";
 
-type TipoItemDia = "voo" | "hospedagem_checkin" | "hospedagem_checkout" | "observacao";
+type TipoItemDia =
+  | "voo"
+  | "hospedagem_checkin"
+  | "hospedagem_checkout"
+  | "observacao"
+  | "aniversario"
+  | "cobranca";
 
 type ItemDia = {
   tipo: TipoItemDia;
@@ -18,6 +24,8 @@ const ICONS: Record<TipoItemDia, typeof Plane> = {
   hospedagem_checkin: Hotel,
   hospedagem_checkout: Hotel,
   observacao: StickyNote,
+  aniversario: Cake,
+  cobranca: DollarSign,
 };
 
 const LABELS: Record<TipoItemDia, string> = {
@@ -25,6 +33,8 @@ const LABELS: Record<TipoItemDia, string> = {
   hospedagem_checkin: "Check-in",
   hospedagem_checkout: "Check-out",
   observacao: "Observação",
+  aniversario: "Aniversário",
+  cobranca: "Cobrança",
 };
 
 function soDataISO(s?: string | null): string {
@@ -37,11 +47,17 @@ function horaDeISO(s?: string | null): string {
   if (!p) return "";
   return p.slice(0, 5);
 }
+function mmdd(s?: string | null): string {
+  if (!s) return "";
+  return s.slice(5, 10);
+}
 
 export function TasksCard() {
   const hoje = new Date().toISOString().slice(0, 10);
+  const hojeMMDD = hoje.slice(5, 10);
   const diaLabel = new Date().toLocaleDateString("pt-BR", { day: "2-digit" });
   const cotacoes = useCotacoes();
+  const clientes = useClientes();
   const [hospedagens, setHospedagens] = useState<any[]>([]);
   const [eventos, setEventos] = useState<any[]>([]);
 
@@ -78,6 +94,18 @@ export function TasksCard() {
           cotacaoId: c.id,
         });
       });
+
+      // Cobranças (vendaVendas) com vencimento hoje
+      for (const v of c.vendaVendas ?? []) {
+        if (soDataISO(v.vencimento) !== hoje) continue;
+        out.push({
+          tipo: "cobranca",
+          hora: "",
+          titulo: c.cliente?.nome ?? "Cliente",
+          subtitulo: `${v.descricao || v.categoria || "Pagamento"} — R$ ${formatBRL(v.valor || 0)}${v.pago ? " (recebido)" : ""}`,
+          cotacaoId: c.id,
+        });
+      }
     }
 
     for (const h of hospedagens) {
@@ -103,13 +131,25 @@ export function TasksCard() {
       });
     }
 
+    // Aniversários de clientes (mesmo dia/mês)
+    for (const cli of clientes) {
+      if (!cli.dataNascimento) continue;
+      if (mmdd(cli.dataNascimento) !== hojeMMDD) continue;
+      out.push({
+        tipo: "aniversario",
+        hora: "",
+        titulo: cli.nome,
+        subtitulo: "Aniversário do cliente 🎉",
+      });
+    }
+
     return out.sort((a, b) => {
       if (!a.hora && !b.hora) return 0;
       if (!a.hora) return 1;
       if (!b.hora) return -1;
       return a.hora.localeCompare(b.hora);
     });
-  }, [cotacoes, hospedagens, eventos, hoje]);
+  }, [cotacoes, hospedagens, eventos, clientes, hoje, hojeMMDD]);
 
   return (
     <div className="bg-card border border-border rounded-xl p-5 shadow-[var(--shadow-card)]">
@@ -142,3 +182,4 @@ export function TasksCard() {
     </div>
   );
 }
+
