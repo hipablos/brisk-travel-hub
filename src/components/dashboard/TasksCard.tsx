@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ClipboardList, Plane, Hotel, StickyNote, Cake, DollarSign } from "lucide-react";
+import { ClipboardList, Plane, Hotel, StickyNote, Cake, DollarSign, FileText, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCotacoes, useClientes, formatBRL } from "@/lib/cotacoes-store";
 
@@ -9,7 +9,9 @@ type TipoItemDia =
   | "hospedagem_checkout"
   | "observacao"
   | "aniversario"
-  | "cobranca";
+  | "cobranca"
+  | "cotacao_nova"
+  | "venda_aprovada";
 
 type ItemDia = {
   tipo: TipoItemDia;
@@ -26,16 +28,21 @@ const ICONS: Record<TipoItemDia, typeof Plane> = {
   observacao: StickyNote,
   aniversario: Cake,
   cobranca: DollarSign,
+  cotacao_nova: FileText,
+  venda_aprovada: CheckCircle2,
 };
 
 const LABELS: Record<TipoItemDia, string> = {
   voo: "Voo",
   hospedagem_checkin: "Check-in",
   hospedagem_checkout: "Check-out",
-  observacao: "Observação",
+  observacao: "Calendário",
   aniversario: "Aniversário",
   cobranca: "Cobrança",
+  cotacao_nova: "Cotação criada",
+  venda_aprovada: "Venda aprovada",
 };
+
 
 function soDataISO(s?: string | null): string {
   if (!s) return "";
