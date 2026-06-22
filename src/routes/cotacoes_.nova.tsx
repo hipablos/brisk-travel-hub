@@ -576,24 +576,56 @@ function NovaCotacao() {
               </button>
 
 
-              <section className="bg-card border border-border/50 rounded-xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
-                    <Users className="size-4" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-foreground">Passageiros</h2>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label>Adultos</Label>
-                    <Input type="number" min={1} value={adultos} onChange={(e) => setAdultos(parseInt(e.target.value) || 1)} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Crianças</Label>
-                    <Input type="number" min={0} value={criancas} onChange={(e) => setCriancas(parseInt(e.target.value) || 0)} />
-                  </div>
-                </div>
-              </section>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-between gap-3 bg-card border border-border/50 rounded-xl px-4 py-3 hover:border-border transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Users className="size-4 text-primary" />
+                      <span className="text-sm font-medium text-foreground">Passageiros</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {adultos} adulto{adultos === 1 ? "" : "s"}
+                      {criancas > 0 ? `, ${criancas} criança${criancas === 1 ? "" : "s"}` : ""}
+                    </span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-72 p-3 space-y-3" align="end">
+                  {[
+                    { label: "Adultos", value: adultos, set: setAdultos, min: 1 },
+                    { label: "Crianças", value: criancas, set: setCriancas, min: 0 },
+                  ].map((row) => (
+                    <div key={row.label} className="flex items-center justify-between">
+                      <span className="text-sm text-foreground">{row.label}</span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="size-7"
+                          onClick={() => row.set(Math.max(row.min, row.value - 1))}
+                          disabled={row.value <= row.min}
+                        >
+                          <Minus className="size-3" />
+                        </Button>
+                        <span className="w-6 text-center text-sm font-medium">{row.value}</span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="size-7"
+                          onClick={() => row.set(row.value + 1)}
+                        >
+                          <PlusIcon className="size-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </PopoverContent>
+              </Popover>
+
 
 
 
