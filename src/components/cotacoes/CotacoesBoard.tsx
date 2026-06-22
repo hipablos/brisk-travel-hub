@@ -149,9 +149,6 @@ const KanbanCard = memo(function KanbanCard({
 });
 
 function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, onDropCard, onDragCard, draggingId, colorOf }: ColumnProps & { colorOf: (name: string) => string }) {
-
-
-function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, onDropCard, onDragCard, draggingId }: ColumnProps) {
   const [over, setOver] = useState(false);
   return (
     <div className="flex flex-col w-full min-w-0 max-w-full">
@@ -175,8 +172,9 @@ function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, on
         )}
       >
         {cards.map((c) => (
-          <KanbanCard key={c.id} card={c} status={status} onDragCard={onDragCard} />
+          <KanbanCard key={c.id} card={c} status={status} onDragCard={onDragCard} colorOf={colorOf} />
         ))}
+
         {cards.length === 0 && (
           <div className="text-[11px] text-muted-foreground/70 text-center py-6 select-none">
             Arraste uma cotação para cá
