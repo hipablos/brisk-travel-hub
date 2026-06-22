@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ClipboardList, Plane, Hotel, StickyNote, Cake, DollarSign } from "lucide-react";
+import { ClipboardList, Plane, Hotel, StickyNote, Cake, DollarSign, FileText, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCotacoes, useClientes, formatBRL } from "@/lib/cotacoes-store";
 
@@ -9,7 +9,9 @@ type TipoItemDia =
   | "hospedagem_checkout"
   | "observacao"
   | "aniversario"
-  | "cobranca";
+  | "cobranca"
+  | "cotacao_nova"
+  | "venda_aprovada";
 
 type ItemDia = {
   tipo: TipoItemDia;
@@ -26,16 +28,21 @@ const ICONS: Record<TipoItemDia, typeof Plane> = {
   observacao: StickyNote,
   aniversario: Cake,
   cobranca: DollarSign,
+  cotacao_nova: FileText,
+  venda_aprovada: CheckCircle2,
 };
 
 const LABELS: Record<TipoItemDia, string> = {
   voo: "Voo",
   hospedagem_checkin: "Check-in",
   hospedagem_checkout: "Check-out",
-  observacao: "Observação",
+  observacao: "Calendário",
   aniversario: "Aniversário",
   cobranca: "Cobrança",
+  cotacao_nova: "Cotação criada",
+  venda_aprovada: "Venda aprovada",
 };
+
 
 function soDataISO(s?: string | null): string {
   if (!s) return "";
@@ -76,12 +83,35 @@ export function TasksCard() {
   }, [cotacoes.length]);
 
   const itens = useMemo<ItemDia[]>(() => {
-    const aprovadas = cotacoes.filter((c) => c.status === "aprovado");
-    const idsAprov = new Set(aprovadas.map((c) => c.id));
-    const nomePorId = new Map(aprovadas.map((c) => [c.id, c.cliente?.nome ?? "Cliente"]));
+    const nomePorId = new Map(cotacoes.map((c) => [c.id, c.cliente?.nome ?? "Cliente"]));
     const out: ItemDia[] = [];
 
-    for (const c of aprovadas) {
+    for (const c of cotacoes) {
+      const nome = c.cliente?.nome ?? "Cliente";
+
+      // Cotações criadas hoje
+      if (soDataISO(c.createdAt) === hoje) {
+        out.push({
+          tipo: "cotacao_nova",
+          hora: horaDeISO(c.createdAt),
+          titulo: nome,
+          subtitulo: `Cotação ${c.code || ""} criada${c.destino ? ` — ${c.destino}` : ""}`.trim(),
+          cotacaoId: c.id,
+        });
+      }
+
+      // Vendas aprovadas hoje (dataVenda hoje + status aprovado)
+      if (c.status === "aprovado" && soDataISO(c.dataVenda) === hoje) {
+        out.push({
+          tipo: "venda_aprovada",
+          hora: "",
+          titulo: nome,
+          subtitulo: `Venda aprovada — R$ ${formatBRL(c.total || 0)}`,
+          cotacaoId: c.id,
+        });
+      }
+
+      // Voos (idas/voltas) com data hoje — independente do status
       const idas = c.vooIdas?.length ? c.vooIdas : c.vooIda ? [c.vooIda] : [];
       const voltas = c.vooVoltas?.length ? c.vooVoltas : c.vooVolta ? [c.vooVolta] : [];
       [...idas, ...voltas].forEach((v: any) => {
@@ -89,7 +119,7 @@ export function TasksCard() {
         out.push({
           tipo: "voo",
           hora: v.horaSaida || "",
-          titulo: c.cliente?.nome ?? "Cliente",
+          titulo: nome,
           subtitulo: `${v.origem || "—"} → ${v.destino || "—"}`,
           cotacaoId: c.id,
         });
@@ -101,7 +131,7 @@ export function TasksCard() {
         out.push({
           tipo: "cobranca",
           hora: "",
-          titulo: c.cliente?.nome ?? "Cliente",
+          titulo: nome,
           subtitulo: `${v.descricao || v.categoria || "Pagamento"} — R$ ${formatBRL(v.valor || 0)}${v.pago ? " (recebido)" : ""}`,
           cotacaoId: c.id,
         });
@@ -109,7 +139,6 @@ export function TasksCard() {
     }
 
     for (const h of hospedagens) {
-      if (!idsAprov.has(h.cotacao_id)) continue;
       const nome = nomePorId.get(h.cotacao_id) || "Cliente";
       if (soDataISO(h.checkin) === hoje) {
         out.push({ tipo: "hospedagem_checkin", hora: horaDeISO(h.checkin), titulo: nome, subtitulo: `Check-in — ${h.nome_hotel}`, cotacaoId: h.cotacao_id });
@@ -121,7 +150,6 @@ export function TasksCard() {
 
     for (const ev of eventos) {
       if (ev.data !== hoje) continue;
-      if (ev.cotacao_id && !idsAprov.has(ev.cotacao_id)) continue;
       out.push({
         tipo: "observacao",
         hora: ev.hora || "",
@@ -148,6 +176,7 @@ export function TasksCard() {
       if (!a.hora) return 1;
       if (!b.hora) return -1;
       return a.hora.localeCompare(b.hora);
+
     });
   }, [cotacoes, hospedagens, eventos, clientes, hoje, hojeMMDD]);
 
