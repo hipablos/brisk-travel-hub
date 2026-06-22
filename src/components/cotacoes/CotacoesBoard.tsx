@@ -31,17 +31,18 @@ type ColumnProps = {
   draggingId: string | null;
 };
 
-function KanbanCard({
+const KanbanCard = memo(function KanbanCard({
   card,
   status,
   onDragCard,
+  colorOf,
 }: {
   card: QuoteCard;
   status: CotacaoStatus;
   onDragCard: (id: string) => void;
+  colorOf: (name: string) => string;
 }) {
-  const allLabels = useAllLabels();
-  const colorOf = (name: string) => allLabels.find((l) => l.name === name)?.color ?? "#64748b";
+
 
   return (
     <div
