@@ -1,6 +1,127 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { normalizeDateOnly } from "@/lib/dates";
+
+// ---------- Shared auth-user singleton ----------
+// Antes: cada hook de store chamava useAuthUserId(), que abria sua própria
+// chamada getSession() + onAuthStateChange. Em uma página com 6+ hooks isso
+// virava 6+ subscriptions duplicadas. Agora é uma única subscription global.
+let _authUid: string | null | undefined = undefined;
+const _authListeners = new Set<() => void>();
+let _authInited = false;
+function _initAuth() {
+  if (_authInited) return;
+  _authInited = true;
+  supabase.auth.getSession().then(({ data }) => {
+    _authUid = data.session?.user?.id ?? null;
+    _authListeners.forEach((fn) => fn());
+  });
+  supabase.auth.onAuthStateChange((_e, session) => {
+    _authUid = session?.user?.id ?? null;
+    _authListeners.forEach((fn) => fn());
+  });
+}
+function useAuthUserIdShared(): string | null | undefined {
+  return useSyncExternalStore(
+    (cb) => {
+      _initAuth();
+      _authListeners.add(cb);
+      return () => _authListeners.delete(cb);
+    },
+    () => _authUid,
+    () => undefined,
+  );
+}
+
+// ---------- Generic shared table cache ----------
+// Cada chamada cria UM cache compartilhado por (key+uid): UMA chamada de fetch
+// e UM canal Realtime para todos os componentes que usam o mesmo hook.
+type Cache<T> = {
+  data: T[];
+  listeners: Set<() => void>;
+  channel: ReturnType<typeof supabase.channel> | null;
+  uid: string | null;
+  loaded: boolean;
+  inflight: Promise<void> | null;
+};
+const _caches = new Map<string, Cache<any>>();
+
+function _ensureCache<T>(key: string): Cache<T> {
+  let c = _caches.get(key) as Cache<T> | undefined;
+  if (!c) {
+    c = { data: [], listeners: new Set(), channel: null, uid: null, loaded: false, inflight: null };
+    _caches.set(key, c);
+  }
+  return c;
+}
+
+function _bindCache<T>(
+  key: string,
+  table: string,
+  fetcher: () => Promise<T[]>,
+  uid: string | null,
+) {
+  const c = _ensureCache<T>(key);
+
+  // Mudou de usuário → recarrega e troca canal
+  if (c.uid !== uid) {
+    c.uid = uid;
+    c.loaded = false;
+    if (c.channel) {
+      supabase.removeChannel(c.channel);
+      c.channel = null;
+    }
+  }
+
+  if (!uid) return c;
+
+  const reload = () => {
+    if (c.inflight) return c.inflight;
+    c.inflight = fetcher()
+      .then((d) => {
+        c.data = d;
+        c.loaded = true;
+        c.listeners.forEach((fn) => fn());
+      })
+      .finally(() => { c.inflight = null; });
+    return c.inflight;
+  };
+
+  if (!c.loaded && !c.inflight) reload();
+  if (!c.channel) {
+    c.channel = supabase
+      .channel(`${key}-shared`)
+      .on("postgres_changes", { event: "*", schema: "public", table }, () => { reload(); })
+      .subscribe();
+  }
+  return c;
+}
+
+function _useSharedTable<T>(key: string, table: string, fetcher: () => Promise<T[]>): T[] {
+  const uid = useAuthUserIdShared();
+  const c = _ensureCache<T>(key);
+  // Faz o bind a cada render (no-op se já bound); barato.
+  _bindCache(key, table, fetcher, uid ?? null);
+  return useSyncExternalStore(
+    (cb) => {
+      c.listeners.add(cb);
+      return () => c.listeners.delete(cb);
+    },
+    () => c.data,
+    () => c.data,
+  );
+}
+
+/** Invalida o cache compartilhado de uma tabela e força um reload. */
+export function invalidateSharedTable(key: string) {
+  const c = _caches.get(key);
+  if (!c) return;
+  c.loaded = false;
+  // o próximo render dispara reload
+  c.listeners.forEach((fn) => fn());
+}
+
+
 
 export type CotacaoStatus = "aguardando" | "aguardando_cliente" | "aprovado" | "reprovado";
 
