@@ -218,9 +218,8 @@ function PerfilPage() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="pt-BR">Português (Brasil)</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
                   </SelectContent>
+
                 </Select>
               </div>
             </CardContent>
