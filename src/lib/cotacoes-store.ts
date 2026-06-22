@@ -640,19 +640,7 @@ export async function setTermoModeloPadrao(id: string, categoria: TermoCategoria
 }
 
 export function useTermosModelos() {
-  const uid = useAuthUserId();
-  const [list, setList] = useState<TermoModelo[]>([]);
-  useEffect(() => {
-    if (!uid) return;
-    let mounted = true;
-    const reload = () => fetchTermosModelos().then((d) => mounted && setList(d));
-    reload();
-    const channel = supabase
-      .channel(`termos-changes-${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "termos_modelos" }, reload)
-      .subscribe();
-    return () => { mounted = false; supabase.removeChannel(channel); };
-  }, [uid]);
-  return list;
+  return _useSharedTable<TermoModelo>("termos_modelos", "termos_modelos", fetchTermosModelos);
 }
+
 
