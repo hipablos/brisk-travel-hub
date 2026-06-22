@@ -414,9 +414,7 @@ export async function deleteCliente(id: string) {
 }
 
 // ---------- Hooks com Realtime (compartilhados) ----------
-function useAuthUserId() {
-  return useAuthUserIdShared();
-}
+
 
 export function useCotacoes() {
   return _useSharedTable<Cotacao>("cotacoes", "cotacoes", fetchCotacoes);
