@@ -146,7 +146,10 @@ const KanbanCard = memo(function KanbanCard({
       </div>
     </div>
   );
-}
+});
+
+function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, onDropCard, onDragCard, draggingId, colorOf }: ColumnProps & { colorOf: (name: string) => string }) {
+
 
 function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, onDropCard, onDragCard, draggingId }: ColumnProps) {
   const [over, setOver] = useState(false);
