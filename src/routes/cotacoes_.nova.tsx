@@ -1174,8 +1174,8 @@ function NovaCotacao() {
                     setStatus(novo);
                     if (novo === "aprovado") {
                       setActiveTab("venda");
-                      if (!validade) {
-                        setValidade(new Date().toISOString().slice(0, 10));
+                      if (!dataVenda) {
+                        setDataVenda(new Date().toISOString().slice(0, 10));
                       }
                     }
                   }}>
@@ -1192,7 +1192,7 @@ function NovaCotacao() {
                 <div className="space-y-1.5 mb-4">
                   <Label>Data de Venda</Label>
                   <div className="relative">
-                    <DateInput className="pl-9" value={validade} onChange={(iso) => setValidade(iso)} />
+                    <DateInput className="pl-9" value={dataVenda} onChange={(iso) => setDataVenda(iso)} />
                     <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                   </div>
                 </div>
