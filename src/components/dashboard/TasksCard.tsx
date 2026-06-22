@@ -80,7 +80,7 @@ export function TasksCard() {
       setEventos(e ?? []);
     })();
     return () => { active = false; };
-  }, [cotacoes.length]);
+  }, []);
 
   const itens = useMemo<ItemDia[]>(() => {
     const nomePorId = new Map(cotacoes.map((c) => [c.id, c.cliente?.nome ?? "Cliente"]));

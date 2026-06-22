@@ -127,7 +127,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
                     return (
                       <li key={it.label}>
                         {it.href ? (
-                          <Link to={it.href} onClick={onNavigate} className={cls}>{inner}</Link>
+                          <Link to={it.href} preload="intent" onClick={onNavigate} className={cls}>{inner}</Link>
                         ) : (
                           <a href="#" onClick={(e) => e.preventDefault()} className={cls}>{inner}</a>
                         )}

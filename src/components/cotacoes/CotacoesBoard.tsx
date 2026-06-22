@@ -1,8 +1,9 @@
 import { cn } from "@/lib/utils";
 import { Hash, Eye, Pencil, MoreVertical, MessageSquare, GripVertical, Trash2, Copy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, duplicateCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
+
 import { LabelsPopover } from "./LabelsPopover";
 import { toast } from "sonner";
 
@@ -30,17 +31,18 @@ type ColumnProps = {
   draggingId: string | null;
 };
 
-function KanbanCard({
+const KanbanCard = memo(function KanbanCard({
   card,
   status,
   onDragCard,
+  colorOf,
 }: {
   card: QuoteCard;
   status: CotacaoStatus;
   onDragCard: (id: string) => void;
+  colorOf: (name: string) => string;
 }) {
-  const allLabels = useAllLabels();
-  const colorOf = (name: string) => allLabels.find((l) => l.name === name)?.color ?? "#64748b";
+
 
   return (
     <div
@@ -144,9 +146,9 @@ function KanbanCard({
       </div>
     </div>
   );
-}
+});
 
-function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, onDropCard, onDragCard, draggingId }: ColumnProps) {
+function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, onDropCard, onDragCard, draggingId, colorOf }: ColumnProps & { colorOf: (name: string) => string }) {
   const [over, setOver] = useState(false);
   return (
     <div className="flex flex-col w-full min-w-0 max-w-full">
@@ -170,8 +172,9 @@ function KanbanColumn({ title, status, count, totalAmount, colorClass, cards, on
         )}
       >
         {cards.map((c) => (
-          <KanbanCard key={c.id} card={c} status={status} onDragCard={onDragCard} />
+          <KanbanCard key={c.id} card={c} status={status} onDragCard={onDragCard} colorOf={colorOf} />
         ))}
+
         {cards.length === 0 && (
           <div className="text-[11px] text-muted-foreground/70 text-center py-6 select-none">
             Arraste uma cotação para cá
@@ -191,7 +194,13 @@ type BoardFiltros = {
 
 export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
   const saved = useCotacoes();
-  const all = saved.filter((c) => {
+  const allLabels = useAllLabels();
+  const colorOf = useMemo(() => {
+    const map = new Map(allLabels.map((l) => [l.name, l.color]));
+    return (name: string) => map.get(name) ?? "#64748b";
+  }, [allLabels]);
+
+  const all = useMemo(() => saved.filter((c) => {
     if (!filtros) return true;
     if (filtros.clienteId && c.cliente?.id !== filtros.clienteId) return false;
     if (!filtros.clienteId && filtros.clienteNomeBusca.trim()) {
@@ -208,7 +217,7 @@ export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
       }
     }
     return true;
-  });
+  }), [saved, filtros]);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const statuses: { status: CotacaoStatus; title: string; colorClass: string }[] = [
@@ -227,7 +236,7 @@ export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
     toast.success(`Cotação movida para ${label}`);
   };
 
-  const columns: ColumnProps[] = statuses.map(({ status, title, colorClass }) => {
+  const columns = statuses.map(({ status, title, colorClass }) => {
     const items = all.filter((c) => c.status === status);
     const total = items.reduce((s, c) => s + c.total, 0);
     return {
@@ -256,8 +265,9 @@ export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
       onDragEnd={() => setDraggingId(null)}
     >
       {columns.map((col) => (
-        <KanbanColumn key={col.title} {...col} />
+        <KanbanColumn key={col.title} {...col} colorOf={colorOf} />
       ))}
+
       <button className="fixed bottom-6 right-6 size-12 bg-primary text-primary-foreground rounded-full grid place-items-center shadow-lg hover:scale-105 transition-transform">
         <MessageSquare className="size-5" />
       </button>
