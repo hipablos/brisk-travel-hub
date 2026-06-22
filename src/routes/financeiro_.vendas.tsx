@@ -175,18 +175,16 @@ function VendasPage() {
                   <TableHead className="w-[110px]">Localizador</TableHead>
                   <TableHead>Cliente</TableHead>
                   <TableHead className="w-[110px]">Data</TableHead>
-                  <TableHead className="text-right w-[120px]">Orçado</TableHead>
                   <TableHead className="text-right w-[120px]">Custo</TableHead>
                   <TableHead className="text-right w-[120px]">Venda</TableHead>
                   <TableHead className="text-right w-[120px]">Lucro</TableHead>
-                  <TableHead className="w-[110px]">Vencimento</TableHead>
                   <TableHead className="w-[60px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-12 text-sm text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-12 text-sm text-muted-foreground">
                       Nenhuma venda encontrada para os filtros aplicados.
                     </TableCell>
                   </TableRow>
@@ -204,13 +202,11 @@ function VendasPage() {
                       </TableCell>
                       <TableCell className="font-medium text-sm">{r.cliente}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{fmtData(r.dataVenda)}</TableCell>
-                      <TableCell className="text-right text-sm">R$ {formatBRL(r.orcado)}</TableCell>
                       <TableCell className="text-right text-sm text-rose-600">R$ {formatBRL(r.custo)}</TableCell>
                       <TableCell className="text-right text-sm font-semibold text-secondary">R$ {formatBRL(r.venda)}</TableCell>
                       <TableCell className={`text-right text-sm font-semibold ${r.lucro >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
                         R$ {formatBRL(r.lucro)}
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{fmtData(r.vencimento)}</TableCell>
                       <TableCell>
                         <Button asChild variant="ghost" size="icon" className="size-8">
                           <Link to="/cotacoes/nova" search={{ id: r.cotacao.id }}>
@@ -226,16 +222,16 @@ function VendasPage() {
                 <TableFooter>
                   <TableRow>
                     <TableCell colSpan={3} className="font-semibold text-sm">TOTAIS</TableCell>
-                    <TableCell className="text-right font-semibold text-sm">R$ {formatBRL(totals.orcado)}</TableCell>
                     <TableCell className="text-right font-semibold text-sm text-rose-600">R$ {formatBRL(totals.custo)}</TableCell>
                     <TableCell className="text-right font-semibold text-sm text-secondary">R$ {formatBRL(totals.venda)}</TableCell>
                     <TableCell className={`text-right font-bold text-sm ${totals.lucro >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
                       R$ {formatBRL(totals.lucro)}
                     </TableCell>
-                    <TableCell colSpan={2}></TableCell>
+                    <TableCell></TableCell>
                   </TableRow>
                 </TableFooter>
               )}
+
             </Table>
           </section>
         </main>
