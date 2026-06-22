@@ -413,38 +413,19 @@ export async function deleteCliente(id: string) {
   if (error) console.error("[clientes] delete error:", error);
 }
 
-// ---------- Hooks com Realtime ----------
+// ---------- Hooks com Realtime (compartilhados) ----------
 function useAuthUserId() {
-  const [uid, setUid] = useState<string | null | undefined>(undefined);
-  useEffect(() => {
-    let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (mounted) setUid(data.session?.user?.id ?? null);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (mounted) setUid(session?.user?.id ?? null);
-    });
-    return () => { mounted = false; sub.subscription.unsubscribe(); };
-  }, []);
-  return uid;
+  return useAuthUserIdShared();
 }
 
 export function useCotacoes() {
-  const uid = useAuthUserId();
-  const [list, setList] = useState<Cotacao[]>([]);
-  useEffect(() => {
-    if (!uid) return; // espera a sessão restaurar antes de consultar (RLS exige auth.uid())
-    let mounted = true;
-    const reload = () => fetchCotacoes().then((d) => mounted && setList(d));
-    reload();
-    const channel = supabase
-      .channel(`cotacoes-changes-${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "cotacoes" }, reload)
-      .subscribe();
-    return () => { mounted = false; supabase.removeChannel(channel); };
-  }, [uid]);
-  return list;
+  return _useSharedTable<Cotacao>("cotacoes", "cotacoes", fetchCotacoes);
 }
+
+export function useClientes() {
+  return _useSharedTable<Cliente>("clientes", "clientes", fetchClientes);
+}
+
 
 export function useClientes() {
   const uid = useAuthUserId();
