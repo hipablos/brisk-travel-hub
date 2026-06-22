@@ -91,14 +91,14 @@ function VendasPage() {
   const totals = useMemo(() => {
     return filtered.reduce(
       (acc, r) => ({
-        orcado: acc.orcado + r.orcado,
         custo: acc.custo + r.custo,
         venda: acc.venda + r.venda,
         lucro: acc.lucro + r.lucro,
       }),
-      { orcado: 0, custo: 0, venda: 0, lucro: 0 }
+      { custo: 0, venda: 0, lucro: 0 }
     );
   }, [filtered]);
+
 
   const limparFiltros = () => {
     setDe(""); setAte(""); setClienteId("__all");
