@@ -100,10 +100,17 @@ export function UpcomingFlights() {
                     {l.origem} → {l.destino}
                   </div>
                 </div>
-                <div className="text-right whitespace-nowrap">
+                <div className="text-right whitespace-nowrap leading-tight">
                   <div className="text-xs text-foreground/80 font-medium">{fmtData(l.dateKey)}</div>
-                  {l.hora && (
-                    <div className="text-[11px] text-muted-foreground">{l.hora}</div>
+                  {l.horaIda && (
+                    <div className="text-[11px] text-muted-foreground">
+                      Ida: <span className="text-foreground/80">{l.horaIda}</span>
+                    </div>
+                  )}
+                  {l.horaVolta && (
+                    <div className="text-[11px] text-muted-foreground">
+                      Volta: <span className="text-foreground/80">{l.horaVolta}</span>
+                    </div>
                   )}
                 </div>
               </Link>
