@@ -90,7 +90,8 @@ function mmdd(s?: string | null): string {
 }
 
 export function TasksCard() {
-  const hoje = new Date().toISOString().slice(0, 10);
+  const agora = new Date();
+  const hoje = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, "0")}-${String(agora.getDate()).padStart(2, "0")}`;
   const hojeMMDD = hoje.slice(5, 10);
   const diaLabel = new Date().toLocaleDateString("pt-BR", { day: "2-digit" });
   const cotacoes = useCotacoes();
