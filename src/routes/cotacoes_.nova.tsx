@@ -702,6 +702,39 @@ function NovaCotacao() {
                 )}
               </section>
 
+              <section className="bg-card border border-border/50 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
+                      <Car className="size-4" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-foreground">Carro / Transfer</h2>
+                  </div>
+                  <Button type="button" size="sm" variant="outline" className="gap-2"
+                    onClick={() => setTransfers((l) => [...l, novoTransfer()])}>
+                    <Plus className="size-4" /> Adicionar carro / transfer
+                  </Button>
+                </div>
+                {transfers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Nenhum transfer. Clique acima para adicionar — aparecerá no PDF.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {transfers.map((t, idx) => (
+                      <TransferInlineForm
+                        key={t.id ?? `transfer-${idx}`}
+                        value={t}
+                        index={idx}
+                        onChange={(patch) => setTransfers((l) => l.map((x, i) => i === idx ? { ...x, ...patch } : x))}
+                        onRemove={() => setTransfers((l) => l.filter((_, i) => i !== idx))}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+
 
               <section className="bg-card border border-border/50 rounded-xl p-6 space-y-5">
                 <div>
