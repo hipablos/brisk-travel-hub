@@ -83,12 +83,16 @@ function VoosPage() {
       const passageiros = (c.adultos ?? 0) + (c.criancas ?? 0);
       const localizador = (c.localizador ?? vIda?.localizador ?? vVolta?.localizador ?? "").trim() || "—";
 
+      const horaIda = vIda?.horaSaida || "";
+      const horaVolta = vVolta?.horaSaida || "";
+
       const ida = normalizeDateOnly(vIda?.data ?? c.ida);
       if (ida) {
         items.push({
           id: `${c.id}-ida`, cotacaoId: c.id, dateKey: ida,
           data: formatFlightDate(ida),
-          hora: vIda?.horaSaida || "—",
+          hora: horaIda || "—",
+          horaIda, horaVolta,
           localizador,
           cliente: c.cliente?.nome ?? "—", passageiros,
           origem: origemIda.nome, origemSigla: origemIda.sigla,
@@ -103,7 +107,8 @@ function VoosPage() {
         items.push({
           id: `${c.id}-volta`, cotacaoId: c.id, dateKey: volta,
           data: formatFlightDate(volta),
-          hora: vVolta?.horaSaida || "—",
+          hora: horaVolta || "—",
+          horaIda, horaVolta,
           localizador,
           cliente: c.cliente?.nome ?? "—", passageiros,
           origem: origemVolta.nome, origemSigla: origemVolta.sigla,
