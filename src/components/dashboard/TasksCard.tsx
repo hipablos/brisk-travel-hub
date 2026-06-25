@@ -31,6 +31,8 @@ type ItemDia = {
   titulo: string;
   subtitulo: string;
   cotacaoId?: string;
+  horaIda?: string;
+  horaVolta?: string;
 };
 
 const ICONS: Record<TipoItemDia, typeof Plane> = {
@@ -194,6 +196,9 @@ export function TasksCard() {
           ? [c.vooVolta]
           : [];
 
+        const horaIdaCot = (idas[0] as any)?.horaSaida || "";
+        const horaVoltaCot = (voltas[0] as any)?.horaSaida || "";
+
         [...idas, ...voltas].forEach((v: any) => {
           if (!v) return;
 
@@ -210,6 +215,8 @@ export function TasksCard() {
               titulo: nome,
               subtitulo: `${v.origem || "—"} → ${v.destino || "—"}${escalasInfo}`,
               cotacaoId: c.id,
+              horaIda: horaIdaCot,
+              horaVolta: horaVoltaCot,
             });
           }
 
@@ -223,12 +230,15 @@ export function TasksCard() {
                   titulo: nome,
                   subtitulo: `Conexão: ${e.origem || "—"} → ${e.destino || "—"}`,
                   cotacaoId: c.id,
+                  horaIda: horaIdaCot,
+                  horaVolta: horaVoltaCot,
                 });
               }
             });
           }
         });
       }
+
 
       // Cobranças com vencimento hoje (qualquer status)
       for (const v of c.vendaVendas ?? []) {
@@ -358,11 +368,24 @@ export function TasksCard() {
                     {item.subtitulo}
                   </div>
                 </div>
-                {item.hora && (
+                {item.tipo === "voo" && (item.horaIda || item.horaVolta) ? (
+                  <div className="text-right shrink-0 leading-tight">
+                    {item.horaIda && (
+                      <div className="text-[11px] text-muted-foreground">
+                        Ida: <span className="text-foreground/80 font-medium">{item.horaIda}</span>
+                      </div>
+                    )}
+                    {item.horaVolta && (
+                      <div className="text-[11px] text-muted-foreground">
+                        Volta: <span className="text-foreground/80 font-medium">{item.horaVolta}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : item.hora ? (
                   <span className="text-xs text-muted-foreground shrink-0">
                     {item.hora}
                   </span>
-                )}
+                ) : null}
               </li>
             );
           })}

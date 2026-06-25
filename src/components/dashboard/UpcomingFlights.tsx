@@ -14,6 +14,8 @@ type Leg = {
   cotacaoId: string;
   dateKey: string;
   hora: string;
+  horaIda: string;
+  horaVolta: string;
   cliente: string;
   origem: string;
   destino: string;
@@ -29,6 +31,8 @@ export function UpcomingFlights() {
       const vIda: any = (c as any).vooIda ?? null;
       const vVolta: any = (c as any).vooVolta ?? null;
       const cliente = c.cliente?.nome ?? "—";
+      const horaIda = vIda?.horaSaida || "";
+      const horaVolta = vVolta?.horaSaida || "";
 
       const ida = normalizeDateOnly(vIda?.data ?? c.ida);
       if (ida) {
@@ -36,7 +40,9 @@ export function UpcomingFlights() {
           id: `${c.id}-ida`,
           cotacaoId: c.id,
           dateKey: ida,
-          hora: vIda?.horaSaida || "",
+          hora: horaIda,
+          horaIda,
+          horaVolta,
           cliente,
           origem: vIda?.origem ?? c.origem ?? "—",
           destino: vIda?.destino ?? c.destino ?? "—",
@@ -48,7 +54,9 @@ export function UpcomingFlights() {
           id: `${c.id}-volta`,
           cotacaoId: c.id,
           dateKey: volta,
-          hora: vVolta?.horaSaida || "",
+          hora: horaVolta,
+          horaIda,
+          horaVolta,
           cliente,
           origem: vVolta?.origem ?? c.destino ?? "—",
           destino: vVolta?.destino ?? c.origem ?? "—",
@@ -92,10 +100,17 @@ export function UpcomingFlights() {
                     {l.origem} → {l.destino}
                   </div>
                 </div>
-                <div className="text-right whitespace-nowrap">
+                <div className="text-right whitespace-nowrap leading-tight">
                   <div className="text-xs text-foreground/80 font-medium">{fmtData(l.dateKey)}</div>
-                  {l.hora && (
-                    <div className="text-[11px] text-muted-foreground">{l.hora}</div>
+                  {l.horaIda && (
+                    <div className="text-[11px] text-muted-foreground">
+                      Ida: <span className="text-foreground/80">{l.horaIda}</span>
+                    </div>
+                  )}
+                  {l.horaVolta && (
+                    <div className="text-[11px] text-muted-foreground">
+                      Volta: <span className="text-foreground/80">{l.horaVolta}</span>
+                    </div>
                   )}
                 </div>
               </Link>
