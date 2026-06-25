@@ -35,6 +35,7 @@ import { VendaLinhaDialog } from "@/components/cotacoes/VendaLinhaDialog";
 import { TelegramAlertDiagnostic } from "@/components/cotacoes/TelegramAlertDiagnostic";
 import { HospedagemInlineForm, novaHospedagem, type HospedagemDraft } from "@/components/hospedagens/HospedagemInlineForm";
 import { ExperienciaInlineForm, novaExperiencia, type ExperienciaDraft } from "@/components/places/ExperienciaInlineForm";
+import { TransferInlineForm, novoTransfer, type TransferDraft } from "@/components/cotacoes/TransferInlineForm";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, Eye, Minus, Plus as PlusIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -111,6 +112,7 @@ function NovaCotacao() {
   const [experiencias, setExperiencias] = useState<ExperienciaDraft[]>([]);
   const [hospedagensRemovidas, setHospedagensRemovidas] = useState<string[]>([]);
   const [experienciasRemovidas, setExperienciasRemovidas] = useState<string[]>([]);
+  const [transfers, setTransfers] = useState<TransferDraft[]>([]);
 
   // Valores tab
   const [valoresCusto, setValoresCusto] = useState<ValorCusto[]>([]);
@@ -269,18 +271,21 @@ function NovaCotacao() {
   );
 
   const buildCotacao = async (): Promise<Cotacao | null> => {
-    const cliente = clientes.find((c) => c.id === clienteId);
-    if (!cliente) {
-      toast.error("Selecione ou cadastre um cliente");
-      return null;
-    }
+    const cliente = clientes.find((c) => c.id === clienteId) ?? {
+      id: clienteId || crypto.randomUUID(),
+      nome: "Cliente",
+      email: email || undefined,
+      telefone: telefone || undefined,
+      tipo: "cliente" as const,
+      dataNascimento: undefined,
+      cpf: undefined,
+      passaporte: undefined,
+      endereco: undefined,
+      createdAt: new Date().toISOString(),
+    };
     const vooIda = vooIdas[0];
     const vooVolta = vooVoltas[0] ?? null;
     const destinoFinal = (destino || vooIda?.destino || "").trim();
-    if (!destinoFinal) {
-      toast.error("Informe o destino do voo de ida");
-      return null;
-    }
     const existing = editId ? await getCotacao(editId) : undefined;
     return {
       id: existing?.id ?? crypto.randomUUID(),
@@ -484,7 +489,7 @@ function NovaCotacao() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label>Cliente *</Label>
+                    <Label>Cliente</Label>
                     <ClienteAutocomplete
                       clientes={clientes}
                       value={clientes.find((c) => c.id === clienteId)?.nome}
@@ -504,10 +509,8 @@ function NovaCotacao() {
                     <Label>Telefone / WhatsApp</Label>
                     <Input placeholder="(11) 99999-9999" value={telefone} onChange={(e) => setTelefone(e.target.value)} />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Tag / Identificador</Label>
-                    <Input placeholder="Ex.: Lua de Mel, Família..." value={tag} onChange={(e) => setTag(e.target.value)} />
-                  </div>
+
+
                 </div>
               </section>
 
@@ -698,6 +701,39 @@ function NovaCotacao() {
                   </div>
                 )}
               </section>
+
+              <section className="bg-card border border-border/50 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
+                      <Car className="size-4" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-foreground">Carro / Transfer</h2>
+                  </div>
+                  <Button type="button" size="sm" variant="outline" className="gap-2"
+                    onClick={() => setTransfers((l) => [...l, novoTransfer()])}>
+                    <Plus className="size-4" /> Adicionar carro / transfer
+                  </Button>
+                </div>
+                {transfers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Nenhum transfer. Clique acima para adicionar — aparecerá no PDF.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {transfers.map((t, idx) => (
+                      <TransferInlineForm
+                        key={t.id ?? `transfer-${idx}`}
+                        value={t}
+                        index={idx}
+                        onChange={(patch) => setTransfers((l) => l.map((x, i) => i === idx ? { ...x, ...patch } : x))}
+                        onRemove={() => setTransfers((l) => l.filter((_, i) => i !== idx))}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
 
 
               <section className="bg-card border border-border/50 rounded-xl p-6 space-y-5">
