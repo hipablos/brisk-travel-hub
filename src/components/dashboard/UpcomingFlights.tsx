@@ -2,21 +2,69 @@ import { useMemo } from "react";
 import { Plane } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useCotacoes } from "@/lib/cotacoes-store";
-import { compareDateOnly, dateOnlyToBR, todayDateOnly } from "@/lib/dates";
+import { compareDateOnly, dateOnlyToBR, normalizeDateOnly, todayDateOnly } from "@/lib/dates";
 
-function fmtData(value?: string) {
-  const br = dateOnlyToBR(value);
+function fmtData(value?: string | null) {
+  const br = dateOnlyToBR(value ?? undefined);
   return br === "—" ? "—" : br;
 }
+
+type Leg = {
+  id: string;
+  cotacaoId: string;
+  dateKey: string;
+  hora: string;
+  cliente: string;
+  origem: string;
+  destino: string;
+};
 
 export function UpcomingFlights() {
   const cotacoes = useCotacoes();
 
-  const proximos = useMemo(() => {
+  const proximos = useMemo<Leg[]>(() => {
     const hoje = todayDateOnly();
-    return cotacoes
-      .filter((c) => c.ida && compareDateOnly(c.ida, hoje) >= 0)
-      .sort((a, b) => compareDateOnly(a.ida, b.ida))
+    const legs: Leg[] = [];
+    for (const c of cotacoes) {
+      const vIda: any = (c as any).vooIda ?? null;
+      const vVolta: any = (c as any).vooVolta ?? null;
+      const cliente = c.cliente?.nome ?? "—";
+
+      const ida = normalizeDateOnly(vIda?.data ?? c.ida);
+      if (ida) {
+        legs.push({
+          id: `${c.id}-ida`,
+          cotacaoId: c.id,
+          dateKey: ida,
+          hora: vIda?.horaSaida || "",
+          cliente,
+          origem: vIda?.origem ?? c.origem ?? "—",
+          destino: vIda?.destino ?? c.destino ?? "—",
+        });
+      }
+      const volta = normalizeDateOnly(vVolta?.data ?? c.volta);
+      if (volta) {
+        legs.push({
+          id: `${c.id}-volta`,
+          cotacaoId: c.id,
+          dateKey: volta,
+          hora: vVolta?.horaSaida || "",
+          cliente,
+          origem: vVolta?.origem ?? c.destino ?? "—",
+          destino: vVolta?.destino ?? c.origem ?? "—",
+        });
+      }
+    }
+    return legs
+      .filter((l) => compareDateOnly(l.dateKey, hoje) >= 0)
+      .sort((a, b) => {
+        const d = compareDateOnly(a.dateKey, b.dateKey);
+        if (d !== 0) return d;
+        if (!a.hora && !b.hora) return 0;
+        if (!a.hora) return 1;
+        if (!b.hora) return -1;
+        return a.hora.localeCompare(b.hora);
+      })
       .slice(0, 6);
   }, [cotacoes]);
 
@@ -30,21 +78,26 @@ export function UpcomingFlights() {
         </div>
       ) : (
         <ul className="divide-y divide-border/60">
-          {proximos.map((c) => (
-            <li key={c.id}>
-              <Link to="/cotacoes/nova" search={{ id: c.id }} className="flex items-center gap-3 py-2.5 hover:bg-muted/40 rounded-md px-2 -mx-2 transition-colors">
+          {proximos.map((l) => (
+            <li key={l.id}>
+              <Link to="/cotacoes/nova" search={{ id: l.cotacaoId }} className="flex items-center gap-3 py-2.5 hover:bg-muted/40 rounded-md px-2 -mx-2 transition-colors">
                 <div className="size-9 rounded-lg bg-secondary/15 grid place-items-center">
                   <Plane className="size-4 text-secondary" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-foreground truncate">
-                    {c.cliente?.nome ?? "—"}
+                    {l.cliente}
                   </div>
                   <div className="text-[11px] text-muted-foreground">
-                    {(c.origem ?? "—")} → {(c.destino ?? "—")}
+                    {l.origem} → {l.destino}
                   </div>
                 </div>
-                <div className="text-xs text-foreground/80 font-medium whitespace-nowrap">{fmtData(c.ida)}</div>
+                <div className="text-right whitespace-nowrap">
+                  <div className="text-xs text-foreground/80 font-medium">{fmtData(l.dateKey)}</div>
+                  {l.hora && (
+                    <div className="text-[11px] text-muted-foreground">{l.hora}</div>
+                  )}
+                </div>
               </Link>
             </li>
           ))}
