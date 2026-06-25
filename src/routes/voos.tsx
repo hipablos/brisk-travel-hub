@@ -34,6 +34,8 @@ type VooItem = {
   cotacaoId: string;
   data: string;
   hora: string;
+  horaIda: string;
+  horaVolta: string;
   dateKey: string;
   localizador: string;
   cliente: string;
