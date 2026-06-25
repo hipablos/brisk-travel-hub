@@ -151,8 +151,8 @@ export function TasksCard() {
         });
       }
 
-      // Voos só de cotações aprovadas
-      if (c.status === "aprovado") {
+      // Voos de qualquer cotação
+      {
         const idas = c.vooIdas?.length ? c.vooIdas : c.vooIda ? [c.vooIda] : [];
         const voltas = c.vooVoltas?.length
           ? c.vooVoltas
@@ -196,31 +196,25 @@ export function TasksCard() {
         });
       }
 
-      // Cobranças (vencimento hoje) — só aprovadas
-      if (c.status === "aprovado") {
-        for (const v of c.vendaVendas ?? []) {
-          if (soDataISO(v.vencimento) !== hoje) continue;
-          out.push({
-            tipo: "cobranca",
-            hora: "",
-            titulo: nome,
-            subtitulo: `${
-              v.descricao || v.categoria || "Pagamento"
-            } — R$ ${formatBRL(v.valor || 0)}${v.pago ? " ✓ recebido" : ""}`,
-            cotacaoId: c.id,
-          });
-        }
+      // Cobranças com vencimento hoje (qualquer status)
+      for (const v of c.vendaVendas ?? []) {
+        if (soDataISO(v.vencimento) !== hoje) continue;
+        out.push({
+          tipo: "cobranca",
+          hora: "",
+          titulo: nome,
+          subtitulo: `${
+            v.descricao || v.categoria || "Pagamento"
+          } — R$ ${formatBRL(v.valor || 0)}${v.pago ? " ✓ recebido" : ""}`,
+          cotacaoId: c.id,
+        });
       }
+
     }
 
-    // Hospedagens só de cotações aprovadas
-    const aprovadosIds = new Set(
-      cotacoes.filter((c) => c.status === "aprovado").map((c) => c.id)
-    );
-
     for (const h of hospedagens) {
-      if (!aprovadosIds.has(h.cotacao_id)) continue;
       const nome = nomePorId.get(h.cotacao_id) || "Cliente";
+
 
       if (soDataISO(h.checkin) === hoje) {
         out.push({
