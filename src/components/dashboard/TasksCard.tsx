@@ -31,6 +31,8 @@ type ItemDia = {
   titulo: string;
   subtitulo: string;
   cotacaoId?: string;
+  horaIda?: string;
+  horaVolta?: string;
 };
 
 const ICONS: Record<TipoItemDia, typeof Plane> = {
