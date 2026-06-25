@@ -509,10 +509,8 @@ function NovaCotacao() {
                     <Label>Telefone / WhatsApp</Label>
                     <Input placeholder="(11) 99999-9999" value={telefone} onChange={(e) => setTelefone(e.target.value)} />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label>Tag / Identificador</Label>
-                    <Input placeholder="Ex.: Lua de Mel, Família..." value={tag} onChange={(e) => setTag(e.target.value)} />
-                  </div>
+
+
                 </div>
               </section>
 
