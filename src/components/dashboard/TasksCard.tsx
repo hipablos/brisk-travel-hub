@@ -196,6 +196,9 @@ export function TasksCard() {
           ? [c.vooVolta]
           : [];
 
+        const horaIdaCot = (idas[0] as any)?.horaSaida || "";
+        const horaVoltaCot = (voltas[0] as any)?.horaSaida || "";
+
         [...idas, ...voltas].forEach((v: any) => {
           if (!v) return;
 
@@ -212,6 +215,8 @@ export function TasksCard() {
               titulo: nome,
               subtitulo: `${v.origem || "—"} → ${v.destino || "—"}${escalasInfo}`,
               cotacaoId: c.id,
+              horaIda: horaIdaCot,
+              horaVolta: horaVoltaCot,
             });
           }
 
@@ -225,12 +230,15 @@ export function TasksCard() {
                   titulo: nome,
                   subtitulo: `Conexão: ${e.origem || "—"} → ${e.destino || "—"}`,
                   cotacaoId: c.id,
+                  horaIda: horaIdaCot,
+                  horaVolta: horaVoltaCot,
                 });
               }
             });
           }
         });
       }
+
 
       // Cobranças com vencimento hoje (qualquer status)
       for (const v of c.vendaVendas ?? []) {
