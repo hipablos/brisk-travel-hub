@@ -162,7 +162,7 @@ export function TasksCard() {
       const nome = c.cliente?.nome ?? "Cliente";
 
       // Cotações criadas hoje (qualquer status)
-      if (soDataISO(c.createdAt) === hoje) {
+      if (dataDoDia(c.createdAt) === hoje) {
         out.push({
           tipo: "cotacao_nova",
           hora: horaDeISO(c.createdAt),
@@ -175,7 +175,7 @@ export function TasksCard() {
       }
 
       // Vendas aprovadas hoje
-      if (c.status === "aprovado" && soDataISO(c.dataVenda) === hoje) {
+      if (c.status === "aprovado" && dataDoDia(c.dataVenda) === hoje) {
         out.push({
           tipo: "venda_aprovada",
           hora: "",
@@ -197,7 +197,7 @@ export function TasksCard() {
         [...idas, ...voltas].forEach((v: any) => {
           if (!v) return;
 
-          if (soDataISO(v.data) === hoje) {
+          if (dataDoDia(v.data) === hoje) {
             const escalasInfo =
               v.escalas?.length > 0
                 ? ` · ${v.escalas.length} escala${
@@ -215,7 +215,7 @@ export function TasksCard() {
 
           if (v.tipo === "com_escala" && Array.isArray(v.escalas)) {
             v.escalas.forEach((e: any) => {
-              const dataEscala = soDataISO(e.dataPartida ?? e.dataSaida ?? null);
+              const dataEscala = dataDoDia(e.dataPartida ?? e.dataSaida ?? null);
               if (dataEscala && dataEscala === hoje) {
                 out.push({
                   tipo: "voo",
@@ -232,7 +232,7 @@ export function TasksCard() {
 
       // Cobranças com vencimento hoje (qualquer status)
       for (const v of c.vendaVendas ?? []) {
-        if (soDataISO(v.vencimento) !== hoje) continue;
+        if (dataDoDia(v.vencimento) !== hoje) continue;
         out.push({
           tipo: "cobranca",
           hora: "",
@@ -250,7 +250,7 @@ export function TasksCard() {
       const nome = nomePorId.get(h.cotacao_id) || "Cliente";
 
 
-      if (soDataISO(h.checkin) === hoje) {
+      if (dataDoDia(h.checkin) === hoje) {
         out.push({
           tipo: "hospedagem_checkin",
           hora: horaDeISO(h.checkin),
@@ -259,7 +259,7 @@ export function TasksCard() {
           cotacaoId: h.cotacao_id,
         });
       }
-      if (soDataISO(h.checkout) === hoje) {
+      if (dataDoDia(h.checkout) === hoje) {
         out.push({
           tipo: "hospedagem_checkout",
           hora: horaDeISO(h.checkout),
@@ -270,8 +270,20 @@ export function TasksCard() {
       }
     }
 
+    for (const ex of experiencias) {
+      if (dataDoDia(ex.data) !== hoje) continue;
+      const nome = nomePorId.get(ex.cotacao_id) || "Cliente";
+      out.push({
+        tipo: "experiencia",
+        hora: ex.hora_inicio || "",
+        titulo: nome,
+        subtitulo: `${ex.nome || "Experiência"}${ex.cidade ? ` — ${ex.cidade}` : ""}`,
+        cotacaoId: ex.cotacao_id ?? undefined,
+      });
+    }
+
     for (const ev of eventos) {
-      if (ev.data !== hoje) continue;
+      if (dataDoDia(ev.data) !== hoje) continue;
       out.push({
         tipo: "observacao",
         hora: ev.hora || "",
@@ -300,7 +312,7 @@ export function TasksCard() {
       if (!b.hora) return -1;
       return a.hora.localeCompare(b.hora);
     });
-  }, [cotacoes, hospedagens, eventos, clientes, hoje, hojeMMDD]);
+  }, [cotacoes, hospedagens, experiencias, eventos, clientes, hoje, hojeMMDD]);
 
   return (
     <div className="bg-card border border-border rounded-xl p-5 shadow-[var(--shadow-card)]">
