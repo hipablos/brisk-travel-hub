@@ -112,6 +112,7 @@ function NovaCotacao() {
   const [experiencias, setExperiencias] = useState<ExperienciaDraft[]>([]);
   const [hospedagensRemovidas, setHospedagensRemovidas] = useState<string[]>([]);
   const [experienciasRemovidas, setExperienciasRemovidas] = useState<string[]>([]);
+  const [transfers, setTransfers] = useState<TransferDraft[]>([]);
 
   // Valores tab
   const [valoresCusto, setValoresCusto] = useState<ValorCusto[]>([]);
