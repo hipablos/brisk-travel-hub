@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { PromoBanner } from "@/components/dashboard/PromoBanner";
+
 import { UpcomingFlights } from "@/components/dashboard/UpcomingFlights";
 import { TasksCard } from "@/components/dashboard/TasksCard";
 import { BudgetsChart } from "@/components/dashboard/BudgetsChart";
@@ -26,7 +26,7 @@ function Dashboard() {
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar />
         <main className="p-6 space-y-6 max-w-[1600px] w-full mx-auto">
-          <PromoBanner />
+          
           <StatCards />
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <UpcomingFlights />
