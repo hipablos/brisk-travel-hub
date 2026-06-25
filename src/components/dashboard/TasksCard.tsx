@@ -1,5 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { ClipboardList, Plane, Hotel, StickyNote, Cake, DollarSign, FileText, CheckCircle2 } from "lucide-react";
+import {
+  ClipboardList,
+  Plane,
+  Hotel,
+  StickyNote,
+  Cake,
+  DollarSign,
+  FileText,
+  CheckCircle2,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCotacoes, useClientes, formatBRL } from "@/lib/cotacoes-store";
 
@@ -43,6 +52,27 @@ const LABELS: Record<TipoItemDia, string> = {
   venda_aprovada: "Venda aprovada",
 };
 
+const ICON_COLORS: Record<TipoItemDia, string> = {
+  voo: "bg-blue-500/15 text-blue-400",
+  hospedagem_checkin: "bg-emerald-500/15 text-emerald-400",
+  hospedagem_checkout: "bg-orange-500/15 text-orange-400",
+  observacao: "bg-purple-500/15 text-purple-400",
+  aniversario: "bg-pink-500/15 text-pink-400",
+  cobranca: "bg-yellow-500/15 text-yellow-400",
+  cotacao_nova: "bg-sky-500/15 text-sky-400",
+  venda_aprovada: "bg-green-500/15 text-green-400",
+};
+
+const LABEL_COLORS: Record<TipoItemDia, string> = {
+  voo: "text-blue-400",
+  hospedagem_checkin: "text-emerald-400",
+  hospedagem_checkout: "text-orange-400",
+  observacao: "text-purple-400",
+  aniversario: "text-pink-400",
+  cobranca: "text-yellow-400",
+  cotacao_nova: "text-sky-400",
+  venda_aprovada: "text-green-400",
+};
 
 function soDataISO(s?: string | null): string {
   if (!s) return "";
@@ -72,35 +102,45 @@ export function TasksCard() {
     let active = true;
     (async () => {
       const [{ data: h }, { data: e }] = await Promise.all([
-        (supabase.from as any)("hospedagens").select("id, cotacao_id, nome_hotel, checkin, checkout"),
-        (supabase.from as any)("calendario_eventos").select("id, data, hora, titulo, descricao, cotacao_id"),
+        (supabase.from as any)("hospedagens").select(
+          "id, cotacao_id, nome_hotel, checkin, checkout"
+        ),
+        (supabase.from as any)("calendario_eventos").select(
+          "id, data, hora, titulo, descricao, cotacao_id"
+        ),
       ]);
       if (!active) return;
       setHospedagens(h ?? []);
       setEventos(e ?? []);
     })();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, []);
 
   const itens = useMemo<ItemDia[]>(() => {
-    const nomePorId = new Map(cotacoes.map((c) => [c.id, c.cliente?.nome ?? "Cliente"]));
+    const nomePorId = new Map(
+      cotacoes.map((c) => [c.id, c.cliente?.nome ?? "Cliente"])
+    );
     const out: ItemDia[] = [];
 
     for (const c of cotacoes) {
       const nome = c.cliente?.nome ?? "Cliente";
 
-      // Cotações criadas hoje
+      // Cotações criadas hoje (qualquer status)
       if (soDataISO(c.createdAt) === hoje) {
         out.push({
           tipo: "cotacao_nova",
           hora: horaDeISO(c.createdAt),
           titulo: nome,
-          subtitulo: `Cotação ${c.code || ""} criada${c.destino ? ` — ${c.destino}` : ""}`.trim(),
+          subtitulo: `Cotação ${c.code || ""} criada${
+            c.destino ? ` — ${c.destino}` : ""
+          }`.trim(),
           cotacaoId: c.id,
         });
       }
 
-      // Vendas aprovadas hoje (dataVenda hoje + status aprovado)
+      // Vendas aprovadas hoje
       if (c.status === "aprovado" && soDataISO(c.dataVenda) === hoje) {
         out.push({
           tipo: "venda_aprovada",
@@ -111,40 +151,94 @@ export function TasksCard() {
         });
       }
 
-      // Voos (idas/voltas) com data hoje — independente do status
-      const idas = c.vooIdas?.length ? c.vooIdas : c.vooIda ? [c.vooIda] : [];
-      const voltas = c.vooVoltas?.length ? c.vooVoltas : c.vooVolta ? [c.vooVolta] : [];
-      [...idas, ...voltas].forEach((v: any) => {
-        if (!v || soDataISO(v.data) !== hoje) return;
-        out.push({
-          tipo: "voo",
-          hora: v.horaSaida || "",
-          titulo: nome,
-          subtitulo: `${v.origem || "—"} → ${v.destino || "—"}`,
-          cotacaoId: c.id,
-        });
-      });
+      // Voos só de cotações aprovadas
+      if (c.status === "aprovado") {
+        const idas = c.vooIdas?.length ? c.vooIdas : c.vooIda ? [c.vooIda] : [];
+        const voltas = c.vooVoltas?.length
+          ? c.vooVoltas
+          : c.vooVolta
+          ? [c.vooVolta]
+          : [];
 
-      // Cobranças (vendaVendas) com vencimento hoje
-      for (const v of c.vendaVendas ?? []) {
-        if (soDataISO(v.vencimento) !== hoje) continue;
-        out.push({
-          tipo: "cobranca",
-          hora: "",
-          titulo: nome,
-          subtitulo: `${v.descricao || v.categoria || "Pagamento"} — R$ ${formatBRL(v.valor || 0)}${v.pago ? " (recebido)" : ""}`,
-          cotacaoId: c.id,
+        [...idas, ...voltas].forEach((v: any) => {
+          if (!v) return;
+
+          if (soDataISO(v.data) === hoje) {
+            const escalasInfo =
+              v.escalas?.length > 0
+                ? ` · ${v.escalas.length} escala${
+                    v.escalas.length > 1 ? "s" : ""
+                  }`
+                : "";
+            out.push({
+              tipo: "voo",
+              hora: v.horaSaida || "",
+              titulo: nome,
+              subtitulo: `${v.origem || "—"} → ${v.destino || "—"}${escalasInfo}`,
+              cotacaoId: c.id,
+            });
+          }
+
+          if (v.tipo === "com_escala" && Array.isArray(v.escalas)) {
+            v.escalas.forEach((e: any) => {
+              const dataEscala = soDataISO(e.dataPartida ?? e.dataSaida ?? null);
+              if (dataEscala && dataEscala === hoje) {
+                out.push({
+                  tipo: "voo",
+                  hora: e.saida || "",
+                  titulo: nome,
+                  subtitulo: `Conexão: ${e.origem || "—"} → ${e.destino || "—"}`,
+                  cotacaoId: c.id,
+                });
+              }
+            });
+          }
         });
+      }
+
+      // Cobranças (vencimento hoje) — só aprovadas
+      if (c.status === "aprovado") {
+        for (const v of c.vendaVendas ?? []) {
+          if (soDataISO(v.vencimento) !== hoje) continue;
+          out.push({
+            tipo: "cobranca",
+            hora: "",
+            titulo: nome,
+            subtitulo: `${
+              v.descricao || v.categoria || "Pagamento"
+            } — R$ ${formatBRL(v.valor || 0)}${v.pago ? " ✓ recebido" : ""}`,
+            cotacaoId: c.id,
+          });
+        }
       }
     }
 
+    // Hospedagens só de cotações aprovadas
+    const aprovadosIds = new Set(
+      cotacoes.filter((c) => c.status === "aprovado").map((c) => c.id)
+    );
+
     for (const h of hospedagens) {
+      if (!aprovadosIds.has(h.cotacao_id)) continue;
       const nome = nomePorId.get(h.cotacao_id) || "Cliente";
+
       if (soDataISO(h.checkin) === hoje) {
-        out.push({ tipo: "hospedagem_checkin", hora: horaDeISO(h.checkin), titulo: nome, subtitulo: `Check-in — ${h.nome_hotel}`, cotacaoId: h.cotacao_id });
+        out.push({
+          tipo: "hospedagem_checkin",
+          hora: horaDeISO(h.checkin),
+          titulo: nome,
+          subtitulo: `Check-in — ${h.nome_hotel}`,
+          cotacaoId: h.cotacao_id,
+        });
       }
       if (soDataISO(h.checkout) === hoje) {
-        out.push({ tipo: "hospedagem_checkout", hora: horaDeISO(h.checkout), titulo: nome, subtitulo: `Check-out — ${h.nome_hotel}`, cotacaoId: h.cotacao_id });
+        out.push({
+          tipo: "hospedagem_checkout",
+          hora: horaDeISO(h.checkout),
+          titulo: nome,
+          subtitulo: `Check-out — ${h.nome_hotel}`,
+          cotacaoId: h.cotacao_id,
+        });
       }
     }
 
@@ -153,13 +247,14 @@ export function TasksCard() {
       out.push({
         tipo: "observacao",
         hora: ev.hora || "",
-        titulo: ev.cotacao_id ? (nomePorId.get(ev.cotacao_id) || ev.titulo) : ev.titulo,
+        titulo: ev.cotacao_id
+          ? nomePorId.get(ev.cotacao_id) || ev.titulo
+          : ev.titulo,
         subtitulo: ev.descricao || ev.titulo,
         cotacaoId: ev.cotacao_id ?? undefined,
       });
     }
 
-    // Aniversários de clientes (mesmo dia/mês)
     for (const cli of clientes) {
       if (!cli.dataNascimento) continue;
       if (mmdd(cli.dataNascimento) !== hojeMMDD) continue;
@@ -176,17 +271,28 @@ export function TasksCard() {
       if (!a.hora) return 1;
       if (!b.hora) return -1;
       return a.hora.localeCompare(b.hora);
-
     });
   }, [cotacoes, hospedagens, eventos, clientes, hoje, hojeMMDD]);
 
   return (
     <div className="bg-card border border-border rounded-xl p-5 shadow-[var(--shadow-card)]">
-      <h3 className="text-base font-semibold text-foreground mb-4">Tarefas para hoje, dia {diaLabel}</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold text-foreground">
+          Tarefas para hoje, dia {diaLabel}
+        </h3>
+        {itens.length > 0 && (
+          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+            {itens.length} {itens.length === 1 ? "item" : "itens"}
+          </span>
+        )}
+      </div>
+
       {itens.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <ClipboardList className="size-12 text-muted-foreground/40 mb-3" />
-          <p className="text-sm text-muted-foreground">Você não possui nenhuma tarefa para o dia de hoje.</p>
+          <p className="text-sm text-muted-foreground">
+            Você não possui nenhuma tarefa para o dia de hoje.
+          </p>
         </div>
       ) : (
         <ul className="space-y-3">
@@ -194,15 +300,29 @@ export function TasksCard() {
             const Icon = ICONS[item.tipo];
             return (
               <li key={i} className="flex items-center gap-3">
-                <div className="size-9 rounded-md bg-muted flex items-center justify-center shrink-0">
-                  <Icon className="size-4 text-muted-foreground" />
+                <div
+                  className={`size-9 rounded-md flex items-center justify-center shrink-0 ${ICON_COLORS[item.tipo]}`}
+                >
+                  <Icon className="size-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">{LABELS[item.tipo]}</div>
-                  <div className="text-sm font-medium text-foreground truncate">{item.titulo}</div>
-                  <div className="text-xs text-muted-foreground truncate">{item.subtitulo}</div>
+                  <div
+                    className={`text-[10px] uppercase tracking-wide font-semibold ${LABEL_COLORS[item.tipo]}`}
+                  >
+                    {LABELS[item.tipo]}
+                  </div>
+                  <div className="text-sm font-medium text-foreground truncate">
+                    {item.titulo}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {item.subtitulo}
+                  </div>
                 </div>
-                {item.hora && <span className="text-xs text-muted-foreground shrink-0">{item.hora}</span>}
+                {item.hora && (
+                  <span className="text-xs text-muted-foreground shrink-0">
+                    {item.hora}
+                  </span>
+                )}
               </li>
             );
           })}
@@ -211,4 +331,3 @@ export function TasksCard() {
     </div>
   );
 }
-
