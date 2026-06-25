@@ -271,18 +271,21 @@ function NovaCotacao() {
   );
 
   const buildCotacao = async (): Promise<Cotacao | null> => {
-    const cliente = clientes.find((c) => c.id === clienteId);
-    if (!cliente) {
-      toast.error("Selecione ou cadastre um cliente");
-      return null;
-    }
+    const cliente = clientes.find((c) => c.id === clienteId) ?? {
+      id: clienteId || crypto.randomUUID(),
+      nome: "Cliente",
+      email: email || undefined,
+      telefone: telefone || undefined,
+      tipo: "cliente" as const,
+      dataNascimento: undefined,
+      cpf: undefined,
+      passaporte: undefined,
+      endereco: undefined,
+      createdAt: new Date().toISOString(),
+    };
     const vooIda = vooIdas[0];
     const vooVolta = vooVoltas[0] ?? null;
     const destinoFinal = (destino || vooIda?.destino || "").trim();
-    if (!destinoFinal) {
-      toast.error("Informe o destino do voo de ida");
-      return null;
-    }
     const existing = editId ? await getCotacao(editId) : undefined;
     return {
       id: existing?.id ?? crypto.randomUUID(),
