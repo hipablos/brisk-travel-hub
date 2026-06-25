@@ -19,8 +19,8 @@ export function Topbar() {
   const { user } = useAuth();
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
-  const initial = (user?.user_metadata?.full_name || user?.email || "U").charAt(0).toUpperCase();
-  const displayName = (user?.user_metadata?.full_name as string) || user?.email?.split("@")[0] || "USUÁRIO";
+  const initial = "B";
+  const displayName = "BRISK VIAGENS";
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
