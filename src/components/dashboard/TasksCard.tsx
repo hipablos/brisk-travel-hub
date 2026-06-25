@@ -8,15 +8,18 @@ import {
   DollarSign,
   FileText,
   CheckCircle2,
+  MapPin,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCotacoes, useClientes, formatBRL } from "@/lib/cotacoes-store";
+import { normalizeDateOnly, todayDateOnly } from "@/lib/dates";
 
 type TipoItemDia =
   | "voo"
   | "hospedagem_checkin"
   | "hospedagem_checkout"
   | "observacao"
+  | "experiencia"
   | "aniversario"
   | "cobranca"
   | "cotacao_nova"
@@ -35,6 +38,7 @@ const ICONS: Record<TipoItemDia, typeof Plane> = {
   hospedagem_checkin: Hotel,
   hospedagem_checkout: Hotel,
   observacao: StickyNote,
+  experiencia: MapPin,
   aniversario: Cake,
   cobranca: DollarSign,
   cotacao_nova: FileText,
@@ -46,6 +50,7 @@ const LABELS: Record<TipoItemDia, string> = {
   hospedagem_checkin: "Check-in",
   hospedagem_checkout: "Check-out",
   observacao: "Calendário",
+  experiencia: "Experiência",
   aniversario: "Aniversário",
   cobranca: "Cobrança",
   cotacao_nova: "Cotação criada",
@@ -57,6 +62,7 @@ const ICON_COLORS: Record<TipoItemDia, string> = {
   hospedagem_checkin: "bg-emerald-500/15 text-emerald-400",
   hospedagem_checkout: "bg-orange-500/15 text-orange-400",
   observacao: "bg-purple-500/15 text-purple-400",
+  experiencia: "bg-violet-500/15 text-violet-400",
   aniversario: "bg-pink-500/15 text-pink-400",
   cobranca: "bg-yellow-500/15 text-yellow-400",
   cotacao_nova: "bg-sky-500/15 text-sky-400",
@@ -68,15 +74,37 @@ const LABEL_COLORS: Record<TipoItemDia, string> = {
   hospedagem_checkin: "text-emerald-400",
   hospedagem_checkout: "text-orange-400",
   observacao: "text-purple-400",
+  experiencia: "text-violet-400",
   aniversario: "text-pink-400",
   cobranca: "text-yellow-400",
   cotacao_nova: "text-sky-400",
   venda_aprovada: "text-green-400",
 };
 
-function soDataISO(s?: string | null): string {
+function dataDoDia(s?: string | null): string {
   if (!s) return "";
-  return s.slice(0, 10);
+  const raw = s.trim();
+  const normalized = normalizeDateOnly(raw);
+  if (normalized) return normalized;
+
+  const isoPrefix = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (isoPrefix) return normalizeDateOnly(isoPrefix[1]);
+
+  const parsed = new Date(raw);
+  if (!Number.isNaN(parsed.getTime())) {
+    const parts = new Intl.DateTimeFormat("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).formatToParts(parsed);
+    const day = parts.find((p) => p.type === "day")?.value ?? "";
+    const month = parts.find((p) => p.type === "month")?.value ?? "";
+    const year = parts.find((p) => p.type === "year")?.value ?? "";
+    return day && month && year ? `${day}-${month}-${year}` : "";
+  }
+
+  return "";
 }
 function horaDeISO(s?: string | null): string {
   if (!s) return "";
@@ -86,25 +114,29 @@ function horaDeISO(s?: string | null): string {
 }
 function mmdd(s?: string | null): string {
   if (!s) return "";
-  return s.slice(5, 10);
+  const d = dataDoDia(s);
+  return d ? `${d.slice(3, 5)}-${d.slice(0, 2)}` : "";
 }
 
 export function TasksCard() {
-  const agora = new Date();
-  const hoje = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, "0")}-${String(agora.getDate()).padStart(2, "0")}`;
-  const hojeMMDD = hoje.slice(5, 10);
-  const diaLabel = new Date().toLocaleDateString("pt-BR", { day: "2-digit" });
+  const hoje = todayDateOnly();
+  const hojeMMDD = `${hoje.slice(3, 5)}-${hoje.slice(0, 2)}`;
+  const diaLabel = hoje.slice(0, 2);
   const cotacoes = useCotacoes();
   const clientes = useClientes();
   const [hospedagens, setHospedagens] = useState<any[]>([]);
+  const [experiencias, setExperiencias] = useState<any[]>([]);
   const [eventos, setEventos] = useState<any[]>([]);
 
   useEffect(() => {
     let active = true;
     (async () => {
-      const [{ data: h }, { data: e }] = await Promise.all([
+      const [{ data: h }, { data: ex }, { data: e }] = await Promise.all([
         (supabase.from as any)("hospedagens").select(
           "id, cotacao_id, nome_hotel, checkin, checkout"
+        ),
+        (supabase.from as any)("experiencias").select(
+          "id, cotacao_id, nome, categoria, cidade, data, hora_inicio"
         ),
         (supabase.from as any)("calendario_eventos").select(
           "id, data, hora, titulo, descricao, cotacao_id"
@@ -112,6 +144,7 @@ export function TasksCard() {
       ]);
       if (!active) return;
       setHospedagens(h ?? []);
+      setExperiencias(ex ?? []);
       setEventos(e ?? []);
     })();
     return () => {
