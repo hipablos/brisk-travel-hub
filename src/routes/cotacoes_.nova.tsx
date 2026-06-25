@@ -489,7 +489,7 @@ function NovaCotacao() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label>Cliente *</Label>
+                    <Label>Cliente</Label>
                     <ClienteAutocomplete
                       clientes={clientes}
                       value={clientes.find((c) => c.id === clienteId)?.nome}
