@@ -35,6 +35,7 @@ import { VendaLinhaDialog } from "@/components/cotacoes/VendaLinhaDialog";
 import { TelegramAlertDiagnostic } from "@/components/cotacoes/TelegramAlertDiagnostic";
 import { HospedagemInlineForm, novaHospedagem, type HospedagemDraft } from "@/components/hospedagens/HospedagemInlineForm";
 import { ExperienciaInlineForm, novaExperiencia, type ExperienciaDraft } from "@/components/places/ExperienciaInlineForm";
+import { TransferInlineForm, novoTransfer, type TransferDraft } from "@/components/cotacoes/TransferInlineForm";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, Eye, Minus, Plus as PlusIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
