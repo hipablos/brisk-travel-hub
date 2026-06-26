@@ -462,7 +462,10 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
           duracaoTrecho: last?.duracaoTrecho || "—",
         });
         for (let i = 0; i < out.length - 1; i++) {
-          out[i].duracaoEscalaAteProximo = calcDuracaoEscala(out[i].arr, out[i + 1].dep);
+          const espera = escalas[i]?.tempoEspera;
+          out[i].duracaoEscalaAteProximo = (espera && String(espera).trim())
+            ? String(espera).trim()
+            : calcDuracaoEscala(out[i].arr, out[i + 1].dep);
         }
         return out;
       })();
