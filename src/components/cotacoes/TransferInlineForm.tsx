@@ -75,93 +75,87 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
   );
 
   return (
-    <div className="border border-border/60 rounded-xl p-6 space-y-6 bg-card">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-semibold">
-          <Car className="size-4 text-primary" /> Carro / Transfer #{index + 1}
+    <div className="rounded-xl overflow-visible bg-[#111827] border border-[#1f2a3c]">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1a2236]">
+        <div className="flex items-center gap-2 text-sm font-semibold text-slate-400">
+          <Car className="size-4" /> Carro / Transfer #{index + 1}
         </div>
-        <Button type="button" variant="ghost" size="icon" onClick={onRemove}
-          className="text-muted-foreground hover:text-destructive">
-          <Trash2 className="size-4" />
-        </Button>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="text-slate-600 hover:text-red-500 transition-colors p-1 rounded-md"
+          aria-label="Remover"
+        >
+          <Trash2 className="size-[18px]" />
+        </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label>Tipo</Label>
-          <Select value={f.tipo || "Transfer privativo"} onValueChange={(v) => onChange({ tipo: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {TIPOS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-6">
-        <PlaceAutocomplete
-          label="Origem"
-          value={f.origem || ""}
-          onChange={(v) => onChange({ origem: v })}
-          onPlaceSelected={(p) => onChange({ origem: p.nome || p.endereco || f.origem || "" })}
-        />
-        <PlaceAutocomplete
-          label="Destino"
-          value={f.destino || ""}
-          onChange={(v) => onChange({ destino: v })}
-          onPlaceSelected={(p) => onChange({ destino: p.nome || p.endereco || f.destino || "" })}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div className="space-y-2">
-          <Label>Data de ida</Label>
-          <DateInput
-            value={f.data_ida || ""}
-            onChange={(v) => onChange({ data_ida: v })}
-            placeholder=""
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>Hora de ida</Label>
-          <Input type="time" value={f.hora_ida || ""} onChange={(e) => onChange({ hora_ida: e.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <Label>Data de volta</Label>
-          <DateInput
-            value={f.data_volta || ""}
-            onChange={(v) => onChange({ data_volta: v })}
-            placeholder=""
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>Hora de volta</Label>
-          <Input type="time" value={f.hora_volta || ""} onChange={(e) => onChange({ hora_volta: e.target.value })} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div className="space-y-2">
-          <Label>Duração total</Label>
-          <div className="relative">
-            <Input
-              value={duracao}
-              readOnly
-              tabIndex={-1}
-              placeholder=""
-              className="pl-9 bg-muted text-muted-foreground cursor-not-allowed"
-            />
-            <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
+      {/* Body */}
+      <div className="px-5 py-5 space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-[13px] font-semibold text-slate-200">Tipo</Label>
+            <Select value={f.tipo || "Transfer privativo"} onValueChange={(v) => onChange({ tipo: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {TIPOS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
-          <p className="text-[11px] text-muted-foreground">Calculada a partir das datas e horários.</p>
         </div>
-        <div className="space-y-2">
-          <Label>Passageiros</Label>
-          <Input type="number" min={1} value={f.passageiros ?? ""}
-            onChange={(e) => onChange({ passageiros: e.target.value ? Number(e.target.value) : null })} />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <PlaceAutocomplete
+            label="Origem"
+            value={f.origem || ""}
+            onChange={(v) => onChange({ origem: v })}
+            onPlaceSelected={(p) => onChange({ origem: p.nome || p.endereco || f.origem || "" })}
+          />
+          <PlaceAutocomplete
+            label="Destino"
+            value={f.destino || ""}
+            onChange={(v) => onChange({ destino: v })}
+            onPlaceSelected={(p) => onChange({ destino: p.nome || p.endereco || f.destino || "" })}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+          <div className="space-y-1.5">
+            <Label className="text-[13px] font-semibold text-slate-200">Data de ida</Label>
+            <DateInput value={f.data_ida || ""} onChange={(v) => onChange({ data_ida: v })} placeholder="" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[13px] font-semibold text-slate-200">Hora de ida</Label>
+            <Input type="time" value={f.hora_ida || ""} onChange={(e) => onChange({ hora_ida: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[13px] font-semibold text-slate-200">Data de volta</Label>
+            <DateInput value={f.data_volta || ""} onChange={(v) => onChange({ data_volta: v })} placeholder="" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[13px] font-semibold text-slate-200">Hora de volta</Label>
+            <Input type="time" value={f.hora_volta || ""} onChange={(e) => onChange({ hora_volta: e.target.value })} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+          <div className="space-y-1.5">
+            <Label className="text-[13px] font-semibold text-slate-200">Duração total</Label>
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-[#0d1620] border border-[#1a2a40] text-sm text-[#60a5fa] min-h-[42px]">
+              <Clock className="size-4" />
+              <span>{duracao || "—"}</span>
+            </div>
+            <p className="text-[11px] text-[#4a6080]">Calculada a partir das datas e horários.</p>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[13px] font-semibold text-slate-200">Passageiros</Label>
+            <Input type="number" min={1} value={f.passageiros ?? ""}
+              onChange={(e) => onChange({ passageiros: e.target.value ? Number(e.target.value) : null })} />
+          </div>
         </div>
       </div>
-
     </div>
   );
 }
+
