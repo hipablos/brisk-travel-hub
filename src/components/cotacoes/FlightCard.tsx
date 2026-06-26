@@ -279,7 +279,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     <Label>Data do voo</Label>
                     <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Horário de saída</Label>
                       <Input type="time" value={voo.horaSaida ?? ""} onChange={(e) => onChange({ horaSaida: e.target.value })} />
