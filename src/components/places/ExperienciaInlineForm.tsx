@@ -29,6 +29,7 @@ export type ExperienciaDraft = {
   idioma: string | null;
   idade_minima: number | null;
   descricao: string | null;
+  fotos: string[] | null;
 };
 
 export const novaExperiencia = (): ExperienciaDraft => ({
@@ -50,6 +51,7 @@ export const novaExperiencia = (): ExperienciaDraft => ({
   idioma: "Português",
   idade_minima: null,
   descricao: "",
+  fotos: [],
 });
 
 const CATEGORIAS = [
@@ -84,6 +86,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
       google_maps_url: p.google_maps_url ?? null,
       lat: p.lat ?? null,
       lng: p.lng ?? null,
+      fotos: p.fotos && p.fotos.length > 0 ? p.fotos : f.fotos,
     });
   };
 

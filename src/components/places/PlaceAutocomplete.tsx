@@ -13,6 +13,7 @@ export type PlaceResult = {
   google_maps_url?: string;
   lat?: number;
   lng?: number;
+  fotos?: string[];
 };
 
 const BROWSER_KEY = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as
@@ -89,6 +90,7 @@ export function PlaceAutocomplete({
             "place_id",
             "url",
             "geometry",
+            "photos",
           ],
           ...(types ? { types } : {}),
         });
@@ -99,6 +101,18 @@ export function PlaceAutocomplete({
           const lat = place.geometry?.location?.lat?.();
           const lng = place.geometry?.location?.lng?.();
           const placeId = place.place_id;
+          const fotos: string[] = Array.isArray(place.photos)
+            ? place.photos
+                .slice(0, 6)
+                .map((ph: any) => {
+                  try {
+                    return ph.getUrl({ maxWidth: 1024, maxHeight: 768 }) as string;
+                  } catch {
+                    return undefined;
+                  }
+                })
+                .filter((u: string | undefined): u is string => !!u)
+            : [];
           const result: PlaceResult = {
             nome: place.name,
             endereco: place.formatted_address,
@@ -113,6 +127,7 @@ export function PlaceAutocomplete({
                 : undefined),
             lat,
             lng,
+            fotos,
           };
           if (result.nome) onChange(result.nome);
           onPlaceSelected(result);
