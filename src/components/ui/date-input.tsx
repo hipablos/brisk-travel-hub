@@ -27,6 +27,8 @@ type Props = Omit<
   onChange?: (value: string) => void;
   minISO?: string;
   maxISO?: string;
+  /** ISO (yyyy-mm-dd) usado como mês inicial do calendário quando não há valor. */
+  defaultMonthISO?: string;
   /** Mostra mensagem de erro embaixo do campo. */
   showError?: boolean;
 };
