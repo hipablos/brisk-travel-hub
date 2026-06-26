@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DateInput } from "@/components/ui/date-input";
 
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -14,6 +15,8 @@ export type TransferDraft = {
   origem: string | null;
   destino: string | null;
   data: string | null;
+  data_ida: string | null;
+  data_volta: string | null;
   hora: string | null;
   passageiros: number | null;
   bagagens: number | null;
@@ -30,6 +33,8 @@ export const novoTransfer = (): TransferDraft => ({
   origem: "",
   destino: "",
   data: "",
+  data_ida: "",
+  data_volta: "",
   hora: "",
   passageiros: 1,
   bagagens: 1,
@@ -94,10 +99,22 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="space-y-1.5">
-          <Label>Data</Label>
-          <Input type="date" value={f.data || ""} onChange={(e) => onChange({ data: e.target.value })} />
+          <Label>Data de ida</Label>
+          <DateInput
+            value={f.data_ida || ""}
+            onChange={(v) => onChange({ data_ida: v })}
+            placeholder="dd/mm/aaaa"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Data de volta</Label>
+          <DateInput
+            value={f.data_volta || ""}
+            onChange={(v) => onChange({ data_volta: v })}
+            placeholder="dd/mm/aaaa"
+          />
         </div>
         <div className="space-y-1.5">
           <Label>Hora</Label>
