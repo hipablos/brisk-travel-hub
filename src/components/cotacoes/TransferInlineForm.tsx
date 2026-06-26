@@ -33,6 +33,8 @@ export const novoTransfer = (): TransferDraft => ({
   origem: "",
   destino: "",
   data: "",
+  data_ida: "",
+  data_volta: "",
   hora: "",
   passageiros: 1,
   bagagens: 1,
