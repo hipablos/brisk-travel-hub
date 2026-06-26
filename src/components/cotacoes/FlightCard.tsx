@@ -286,11 +286,11 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   </div>
                   <div className="space-y-2">
                     <Label>Data de início do voo</Label>
-                    <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} />
+                    <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} minISO={minCotacaoISO} />
                   </div>
                   <div className="space-y-2">
                     <Label>Data de fim do voo</Label>
-                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} />
+                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} minISO={minChegadaISO} />
                   </div>
                   <div className="space-y-2">
                     <Label>Horário de saída</Label>
