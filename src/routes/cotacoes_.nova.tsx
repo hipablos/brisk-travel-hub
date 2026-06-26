@@ -312,6 +312,7 @@ function NovaCotacao() {
       instrucoesPagamento: instrucoesPagamento || undefined,
       linkPagamento: linkPagamento || undefined,
       passageirosNomes: existing?.passageirosNomes,
+      transfers,
     };
   };
 
