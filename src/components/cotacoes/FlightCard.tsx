@@ -151,8 +151,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const totalEscalas = voo.escalas.length;
   const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
   const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
-  const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
-  const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
 
   // Mantém voo.duracao sincronizado com a duração TOTAL (principal + escalas).
   useEffect(() => {
