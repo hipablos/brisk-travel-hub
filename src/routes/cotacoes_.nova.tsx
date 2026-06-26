@@ -1055,7 +1055,7 @@ function NovaCotacao() {
                   <section className="bg-card border border-border/50 rounded-xl p-8 space-y-6">
                     <div>
                       <Label>Valor de Comparação</Label>
-                      <div className="flex items-center gap-2 mt-1.5 max-w-xs">
+                      <div className="flex items-center gap-3 mt-2 max-w-xs">
                         <span className="px-3 h-9 flex items-center rounded-md border border-border/40 bg-muted text-sm text-muted-foreground">R$</span>
                         <Input
                           placeholder="0,00"
