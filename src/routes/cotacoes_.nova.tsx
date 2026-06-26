@@ -1179,7 +1179,7 @@ function NovaCotacao() {
 
             <aside className="space-y-8">
               <section className="bg-card border border-border/50 rounded-xl p-8 sticky top-8">
-                <h2 className="text-lg font-semibold text-foreground mb-4">Resumo</h2>
+                <h2 className="text-lg font-semibold text-foreground mb-6">Resumo</h2>
 
                 <div className="space-y-2 mb-5">
                   <Label>Status</Label>
