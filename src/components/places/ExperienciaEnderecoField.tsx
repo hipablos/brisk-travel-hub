@@ -10,7 +10,7 @@ export interface EnderecoSelecionado {
   pais: string;
   lat: number;
   lon: number;
-  imagemUrl: string | null;
+  imagens: string[];
   imagemCredito: string | null;
 }
 
@@ -34,14 +34,91 @@ interface NominatimResult {
   lon: string;
 }
 
-interface UnsplashPhoto {
-  urls: { regular: string; small: string };
-  user: { name: string };
-  alt_description: string | null;
+const BROWSER_KEY = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as
+  | string
+  | undefined;
+const TRACKING_ID = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID as
+  | string
+  | undefined;
+
+let mapsLoaderPromise: Promise<void> | null = null;
+function loadGoogleMaps(): Promise<void> {
+  if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
+  if (!BROWSER_KEY) return Promise.reject(new Error("no-key"));
+  // @ts-ignore
+  if ((window as any).google?.maps?.places) return Promise.resolve();
+  if (mapsLoaderPromise) return mapsLoaderPromise;
+  mapsLoaderPromise = new Promise((resolve, reject) => {
+    (window as any).__briskMapsInit = () => resolve();
+    const s = document.createElement("script");
+    const channel = TRACKING_ID ? `&channel=${TRACKING_ID}` : "";
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${BROWSER_KEY}&loading=async&libraries=places&callback=__briskMapsInit${channel}`;
+    s.async = true;
+    s.onerror = () => reject(new Error("maps-load-error"));
+    document.head.appendChild(s);
+  });
+  return mapsLoaderPromise;
 }
 
-const UNSPLASH_ACCESS_KEY =
-  (import.meta.env.VITE_UNSPLASH_ACCESS_KEY as string | undefined) || "";
+async function buscarFotosGoogle(
+  query: string,
+  lat: number,
+  lon: number
+): Promise<string[]> {
+  try {
+    await loadGoogleMaps();
+    const google = (window as any).google;
+    if (!google?.maps?.places) return [];
+    const div = document.createElement("div");
+    const service = new google.maps.places.PlacesService(div);
+
+    const place: any = await new Promise((resolve) => {
+      service.findPlaceFromQuery(
+        {
+          query,
+          fields: ["place_id", "name", "photos", "geometry"],
+          locationBias: new google.maps.Circle({
+            center: { lat, lng: lon },
+            radius: 5000,
+          }),
+        },
+        (results: any[], status: string) => {
+          if (status === "OK" && results && results[0]) resolve(results[0]);
+          else resolve(null);
+        }
+      );
+    });
+    if (!place) return [];
+
+    // If photos missing, fetch details
+    let photos = place.photos;
+    if (!photos && place.place_id) {
+      photos = await new Promise<any[]>((resolve) => {
+        service.getDetails(
+          { placeId: place.place_id, fields: ["photos"] },
+          (res: any, status: string) => {
+            if (status === "OK" && res?.photos) resolve(res.photos);
+            else resolve([]);
+          }
+        );
+      });
+    }
+
+    if (!Array.isArray(photos)) return [];
+    return photos
+      .slice(0, 6)
+      .map((ph: any) => {
+        try {
+          return ph.getUrl({ maxWidth: 1024, maxHeight: 768 }) as string;
+        } catch {
+          return null;
+        }
+      })
+      .filter((u: string | null): u is string => !!u);
+  } catch {
+    return [];
+  }
+}
 
 const TIPOS_TURISTICOS = new Set([
   "attraction", "theme_park", "zoo", "aquarium", "viewpoint",
@@ -125,27 +202,6 @@ async function buscarSugestoesEndereco(query: string): Promise<NominatimResult[]
   return (filtrados.length > 0 ? filtrados : listaGerais).slice(0, 6);
 }
 
-async function buscarImagemUnsplash(query: string): Promise<{ url: string; credito: string } | null> {
-  if (!UNSPLASH_ACCESS_KEY) {
-    return {
-      url: `https://source.unsplash.com/800x400/?${encodeURIComponent(query)},travel,tourism,nature`,
-      credito: "Unsplash",
-    };
-  }
-  const url = new URL("https://api.unsplash.com/search/photos");
-  url.searchParams.set("query", `${query} turismo paisagem`);
-  url.searchParams.set("per_page", "1");
-  url.searchParams.set("orientation", "landscape");
-  const res = await fetch(url.toString(), {
-    headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` },
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  const foto: UnsplashPhoto = data.results?.[0];
-  if (!foto) return null;
-  return { url: foto.urls.regular, credito: foto.user.name };
-}
-
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -168,7 +224,7 @@ export function ExperienciaEnderecoField({ value, onChange, onClear }: Props) {
   const [buscandoImagem, setBuscandoImagem] = useState(false);
   const [aberto, setAberto] = useState(false);
   const [selecionado, setSelecionado] = useState<EnderecoSelecionado | null>(null);
-  const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [imagens, setImagens] = useState<string[]>([]);
   const [erro, setErro] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -221,11 +277,13 @@ export function ExperienciaEnderecoField({ value, onChange, onClear }: Props) {
       const pais = addr.country || "";
       const nomeLocal = item.name || item.display_name.split(",")[0].trim();
       const categoria = labelCategoria(item);
-      const termoBusca = [nomeLocal, cidade].filter(Boolean).join(" ");
+      const lat = parseFloat(item.lat);
+      const lon = parseFloat(item.lon);
+      const termoBusca = [nomeLocal, cidade, pais].filter(Boolean).join(" ");
       setQuery(nomeLocal);
       setBuscandoImagem(true);
-      setImagemPreview(null);
-      const imagem = await buscarImagemUnsplash(termoBusca).catch(() => null);
+      setImagens([]);
+      const fotosGoogle = await buscarFotosGoogle(termoBusca, lat, lon);
       setBuscandoImagem(false);
       const enderecoCompleto: EnderecoSelecionado = {
         endereco: item.display_name,
@@ -234,13 +292,13 @@ export function ExperienciaEnderecoField({ value, onChange, onClear }: Props) {
         cidade,
         estado,
         pais,
-        lat: parseFloat(item.lat),
-        lon: parseFloat(item.lon),
-        imagemUrl: imagem?.url || null,
-        imagemCredito: imagem?.credito || null,
+        lat,
+        lon,
+        imagens: fotosGoogle,
+        imagemCredito: fotosGoogle.length > 0 ? "Google" : null,
       };
       setSelecionado(enderecoCompleto);
-      setImagemPreview(imagem?.url || null);
+      setImagens(fotosGoogle);
       onChange(enderecoCompleto);
     },
     [onChange]
@@ -249,7 +307,7 @@ export function ExperienciaEnderecoField({ value, onChange, onClear }: Props) {
   const handleLimpar = () => {
     setQuery("");
     setSelecionado(null);
-    setImagemPreview(null);
+    setImagens([]);
     setSugestoes([]);
     onClear?.();
     inputRef.current?.focus();
@@ -270,7 +328,7 @@ export function ExperienciaEnderecoField({ value, onChange, onClear }: Props) {
             onChange={(e) => {
               setQuery(e.target.value);
               setSelecionado(null);
-              setImagemPreview(null);
+              setImagens([]);
             }}
             onFocus={() => sugestoes.length > 0 && setAberto(true)}
             className="w-full bg-slate-800/60 border border-slate-600 rounded-lg pl-10 pr-10 py-2.5
@@ -342,34 +400,54 @@ export function ExperienciaEnderecoField({ value, onChange, onClear }: Props) {
       {buscandoImagem && (
         <div className="flex items-center gap-2 text-sm text-slate-400">
           <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
-          Buscando imagem do local...
+          Buscando imagens do local no Google...
         </div>
       )}
 
-      {imagemPreview && selecionado && !buscandoImagem && (
-        <div className="relative rounded-lg overflow-hidden border border-slate-600">
-          <img
-            src={imagemPreview}
-            alt={selecionado.nomeLocal}
-            className="w-full h-44 object-cover"
-          />
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent px-3 py-2.5">
+      {selecionado && !buscandoImagem && (
+        <div className="rounded-lg overflow-hidden border border-slate-600 bg-slate-800/40">
+          {imagens.length > 0 ? (
+            <div className="relative">
+              <img
+                src={imagens[0]}
+                alt={selecionado.nomeLocal}
+                className="w-full h-44 object-cover"
+              />
+              {imagens.length > 1 && (
+                <div className="flex gap-2 p-2 overflow-x-auto bg-slate-900/60">
+                  {imagens.slice(1).map((url, i) => (
+                    <img
+                      key={i}
+                      src={url}
+                      alt={`${selecionado.nomeLocal} ${i + 2}`}
+                      className="h-16 w-24 object-cover rounded shrink-0 border border-slate-700"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="h-32 flex items-center justify-center text-xs text-slate-400 px-4 text-center">
+              Não foi possível carregar imagens do Google para este local.
+            </div>
+          )}
+          <div className="px-3 py-2.5 bg-slate-900/80">
             <div className="flex items-center gap-2">
               <span className="text-sm">{iconePorCategoria(selecionado.categoria)}</span>
-              <div>
-                <p className="text-sm font-medium text-white">{selecionado.nomeLocal}</p>
-                <p className="text-xs text-slate-300">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-white truncate">{selecionado.nomeLocal}</p>
+                <p className="text-xs text-slate-300 truncate">
                   {[selecionado.cidade, selecionado.estado, selecionado.pais].filter(Boolean).join(", ")}
                 </p>
               </div>
               {selecionado.categoria && (
-                <span className="ml-auto text-xs bg-white/20 text-white px-2 py-0.5 rounded-full">
+                <span className="ml-auto text-xs bg-white/10 text-white px-2 py-0.5 rounded-full shrink-0">
                   {selecionado.categoria}
                 </span>
               )}
             </div>
-            {selecionado.imagemCredito && selecionado.imagemCredito !== "Unsplash" && (
-              <p className="text-xs text-slate-400 mt-1">📷 {selecionado.imagemCredito} · Unsplash</p>
+            {selecionado.imagemCredito && (
+              <p className="text-xs text-slate-400 mt-1">📷 Fotos do Google Places</p>
             )}
           </div>
         </div>
