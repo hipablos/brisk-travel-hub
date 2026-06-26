@@ -76,20 +76,6 @@ type Props = {
 };
 
 export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: Props) {
-  const handlePlace = (p: PlaceResult) => {
-    onChange({
-      endereco: p.endereco ?? f.endereco,
-      cidade: p.cidade ?? f.cidade,
-      estado: p.estado ?? f.estado,
-      pais: p.pais ?? f.pais,
-      google_place_id: p.google_place_id ?? null,
-      google_maps_url: p.google_maps_url ?? null,
-      lat: p.lat ?? null,
-      lng: p.lng ?? null,
-      fotos: p.fotos && p.fotos.length > 0 ? p.fotos : f.fotos,
-    });
-  };
-
   return (
     <div className="border border-border/60 rounded-xl p-6 space-y-6 bg-card">
       <div className="flex items-center justify-between">
@@ -119,14 +105,24 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         </div>
       </div>
 
-      <PlaceAutocomplete
-        label="Endereço / local"
-        placeholder=""
+      <ExperienciaEnderecoField
         value={f.endereco || ""}
-        onChange={(v) => onChange({ endereco: v })}
-        onPlaceSelected={handlePlace}
-        types={["establishment"]}
+        onChange={(e) => {
+          onChange({
+            endereco: e.endereco,
+            cidade: e.cidade,
+            estado: e.estado,
+            pais: e.pais,
+            lat: e.lat,
+            lng: e.lon,
+            google_place_id: null,
+            google_maps_url: `https://www.google.com/maps/search/?api=1&query=${e.lat},${e.lon}`,
+            fotos: e.imagemUrl ? [e.imagemUrl] : f.fotos,
+          });
+        }}
+        onClear={() => onChange({ endereco: "", fotos: [] })}
       />
+
 
       {f.fotos && f.fotos.length > 0 && (
         <div className="space-y-2">
