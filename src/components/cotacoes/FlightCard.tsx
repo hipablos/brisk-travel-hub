@@ -273,7 +273,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       value={voo.origem}
                       onChange={(v) => onChange({ origem: v, origemInfo: undefined })}
                       onSelect={(a, formatted) => onChange({ origem: formatted, origemInfo: a })}
-                      placeholder="Ex.: GRU, São Paulo, Guarulhos"
+                      placeholder=""
                     />
                   </div>
                   <div className="space-y-2">
