@@ -1125,7 +1125,7 @@ function NovaCotacao() {
                     <div>
                       <Label>Link para Pagamento</Label>
                       <Input
-                        className="mt-1.5"
+                        className="mt-2"
                         placeholder="Adicione o link de pagamento para exibição no orçamento"
                         value={linkPagamento}
                         onChange={(e) => setLinkPagamento(e.target.value)}
