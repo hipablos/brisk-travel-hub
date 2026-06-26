@@ -763,7 +763,7 @@ function NovaCotacao() {
 
               <section className="bg-card border border-border/50 rounded-xl p-8 space-y-6">
                 <div>
-                  <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
+                  <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
                     <h2 className="text-lg font-semibold text-foreground">Termos e Condições</h2>
                     <Button asChild type="button" variant="outline" size="sm" className="gap-2">
                       <Link to="/termos-condicoes"><FileSignature className="size-4" /> Gerenciar modelos</Link>
