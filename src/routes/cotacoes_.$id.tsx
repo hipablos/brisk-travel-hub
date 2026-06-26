@@ -626,14 +626,14 @@ function HospedagemBlock({ h }: { h: HospedagemRow }) {
   };
   return (
     <section className="space-y-1.5">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <Hotel className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
-        <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">Hospedagem</h3>
-        <span className="text-slate-300">·</span>
-        <span className="text-[12px] font-semibold text-slate-900">{h.nome_hotel}</span>
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-center size-6 rounded-md bg-gradient-to-br from-[oklch(0.55_0.18_255)] to-[oklch(0.65_0.20_290)] shadow-sm">
+          <Hotel className="size-3.5 text-white" />
+        </div>
+        <span className="text-[14px] font-bold text-slate-900 tracking-tight">{h.nome_hotel}</span>
         {h.estrelas ? (
           <span className="inline-flex items-center text-amber-500">
-            {Array.from({ length: h.estrelas }).map((_, i) => <Star key={i} className="size-3 fill-current" />)}
+            {Array.from({ length: h.estrelas }).map((_, i) => <Star key={i} className="size-3.5 fill-current" />)}
           </span>
         ) : null}
       </div>
