@@ -286,18 +286,20 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Data do voo</Label>
+                    <Label>Data de início do voo</Label>
                     <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Horário de saída</Label>
-                      <Input type="time" value={voo.horaSaida ?? ""} onChange={(e) => onChange({ horaSaida: e.target.value })} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Horário de chegada</Label>
-                      <Input type="time" value={voo.horaChegada ?? ""} onChange={(e) => onChange({ horaChegada: e.target.value })} />
-                    </div>
+                  <div className="space-y-2">
+                    <Label>Data de fim do voo</Label>
+                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Horário de saída</Label>
+                    <Input type="time" value={voo.horaSaida ?? ""} onChange={(e) => onChange({ horaSaida: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Horário de chegada</Label>
+                    <Input type="time" value={voo.horaChegada ?? ""} onChange={(e) => onChange({ horaChegada: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <Label>Duração total do voo</Label>
@@ -308,25 +310,29 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                         tabIndex={-1}
                         placeholder="—"
                         className="pl-9 bg-muted text-muted-foreground cursor-not-allowed"
-                        aria-label="Duração calculada automaticamente a partir dos horários"
+                        aria-label="Duração calculada automaticamente a partir das datas e horários"
                       />
                       <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      Calculada automaticamente a partir dos horários de saída e chegada.
+                      Calculada automaticamente a partir das datas e horários de início e fim.
                       {voo.tipo === "com_escala" && duracaoTotal && (
                         <> Tempo de voo (trechos + escalas): <span className="font-semibold text-foreground">{duracaoTotal}</span></>
                       )}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label>Duração do trecho {voo.tipo === "com_escala" ? "(origem → 1ª escala)" : ""}</Label>
+                    <Label>Duração do trecho</Label>
                     <Input
-                      placeholder="ex: 1h 30m"
-                      value={voo.duracaoTrecho ?? ""}
-                      onChange={(e) => onChange({ duracaoTrecho: e.target.value })}
+                      value={duracaoTrechoCalculada}
+                      readOnly
+                      tabIndex={-1}
+                      placeholder="—"
+                      className="bg-muted text-muted-foreground cursor-not-allowed"
                     />
-                    <p className="text-[11px] text-muted-foreground">Informe manualmente (ex: 21h, 1h 30m).</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Duração de voo {voo.escalas.some((e) => e.duracaoTrecho) ? "+ duração de voo da(s) escala(s)" : "(copiada automaticamente)"}.
+                    </p>
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <Label>Número do voo</Label>
