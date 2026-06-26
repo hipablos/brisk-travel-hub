@@ -248,7 +248,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
         <CollapsibleContent>
           <div className="px-6 pb-6 pt-2 space-y-6 border-t border-border/50">
             {voo.tipo === "localizador" ? (
-              <div className="grid grid-cols-1 gap-4 pt-4">
+              <div className="grid grid-cols-1 gap-6 pt-4">
                 <div className="space-y-2">
                   <Label>Localizador</Label>
                   <Input value={voo.localizador ?? ""} onChange={(e) => onChange({ localizador: e.target.value.toUpperCase() })} placeholder="Ex.: ABCDEF" />
