@@ -15,6 +15,8 @@ export type TransferDraft = {
   origem: string | null;
   destino: string | null;
   data: string | null;
+  data_ida: string | null;
+  data_volta: string | null;
   hora: string | null;
   passageiros: number | null;
   bagagens: number | null;
