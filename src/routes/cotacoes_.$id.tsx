@@ -216,6 +216,9 @@ function VisualizarCotacao() {
               </section>
 
               {/* Voos */}
+              {(vooIdas.length > 0 || vooVoltas.length > 0) && (
+                <SectionDivider title="Voos" icon={Plane} />
+              )}
               {vooIdas.map((v, idx) => (
                 <VooBlock key={v?.id ?? `ida-${idx}`} direction="ida" voo={v} index={idx} total={vooIdas.length} />
               ))}
@@ -224,10 +227,21 @@ function VisualizarCotacao() {
               ))}
 
               {/* Hospedagens */}
+              {hospedagens.length > 0 && <SectionDivider title="Hospedagens" icon={Hotel} />}
               {hospedagens.map((h) => <HospedagemBlock key={h.id} h={h} />)}
 
               {/* Experiências */}
+              {experiencias.length > 0 && <SectionDivider title="Experiências" icon={MapPin} />}
               {experiencias.map((e) => <ExperienciaBlock key={e.id} e={e} />)}
+
+              {/* Carros / Transfers */}
+              {((cotacao as any).transfers?.length ?? 0) > 0 && (
+                <SectionDivider title="Carros / Transfers" icon={Car} />
+              )}
+              {((cotacao as any).transfers ?? []).map((t: any, idx: number) => (
+                <TransferBlock key={t.id ?? `transfer-${idx}`} t={t} />
+              ))}
+
 
 
 
@@ -695,3 +709,57 @@ function ExperienciaBlock({ e }: { e: ExperienciaRow }) {
     </section>
   );
 }
+
+/* ---------- Section Divider ---------- */
+function SectionDivider({ title, icon: Icon }: { title: string; icon: React.ComponentType<{ className?: string }> }) {
+  return (
+    <section className="pt-3 mt-1 border-t-2 border-[oklch(0.22_0.08_255)]/20">
+      <div className="flex items-center gap-2 mb-1.5">
+        <div className="flex items-center justify-center size-7 rounded-md bg-[oklch(0.22_0.08_255)]/10">
+          <Icon className="size-4 text-[oklch(0.22_0.08_255)]" />
+        </div>
+        <h2 className="text-base font-bold text-[oklch(0.22_0.08_255)] tracking-tight">{title}</h2>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Transfer Block ---------- */
+function TransferBlock({ t }: { t: any }) {
+  const fmtD = (s?: string | null) => {
+    if (!s) return "—";
+    const br = dateOnlyToBR(normalizeDateOnly(s));
+    return br !== "—" ? br : s;
+  };
+  const fmtH = (s?: string | null) => (s ? s.slice(0, 5) : "—");
+  return (
+    <section className="space-y-1.5">
+      <div className="flex items-baseline gap-2 flex-wrap">
+        <Car className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
+        <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.tipo || "Transfer"}</h3>
+        {(t.origem || t.destino) && (
+          <>
+            <span className="text-slate-300">·</span>
+            <span className="text-[12px] font-semibold text-slate-900">
+              {t.origem || "—"} <ArrowRight className="inline size-3 mx-0.5" /> {t.destino || "—"}
+            </span>
+          </>
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
+        <div><span className="text-slate-500">Data de ida:</span> <span className="font-medium text-slate-900">{fmtD(t.data_ida)}</span></div>
+        <div><span className="text-slate-500">Hora de ida:</span> <span className="font-medium text-slate-900">{fmtH(t.hora_ida)}</span></div>
+        {(t.data_volta || t.hora_volta) && (
+          <>
+            <div><span className="text-slate-500">Data de volta:</span> <span className="font-medium text-slate-900">{fmtD(t.data_volta)}</span></div>
+            <div><span className="text-slate-500">Hora de volta:</span> <span className="font-medium text-slate-900">{fmtH(t.hora_volta)}</span></div>
+          </>
+        )}
+        {t.passageiros != null && (
+          <div><span className="text-slate-500">Passageiros:</span> <span className="font-medium text-slate-900">{t.passageiros}</span></div>
+        )}
+      </div>
+    </section>
+  );
+}
+

@@ -221,6 +221,7 @@ export type Cotacao = {
   termos?: string;
   outrasInformacoes?: string;
   passageirosNomes?: string[];
+  transfers?: any[];
 };
 
 export const DEFAULT_TERMOS = `• Esta proposta é válida apenas para a data e horário indicados, sujeita à confirmação de disponibilidade e preço no momento da emissão.
