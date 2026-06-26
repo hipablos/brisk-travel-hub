@@ -835,7 +835,7 @@ function NovaCotacao() {
                     </SelectContent>
                   </Select>
                   {outrasInformacoes && (
-                    <div className="mt-2 text-[11px] text-muted-foreground whitespace-pre-wrap border border-dashed border-border/60 rounded p-2 max-h-32 overflow-auto">
+                    <div className="mt-3 text-xs text-muted-foreground whitespace-pre-wrap border border-dashed border-border/60 rounded p-3 max-h-40 overflow-auto">
                       {outrasInformacoes}
                     </div>
                   )}
