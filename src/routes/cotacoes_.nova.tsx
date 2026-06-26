@@ -1241,6 +1241,7 @@ function NovaCotacao() {
               </section>
             </aside>
           </form>
+        </div>
         </main>
       </div>
     </div>
