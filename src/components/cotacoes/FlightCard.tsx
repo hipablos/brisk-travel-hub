@@ -316,30 +316,27 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     <Label>Duração total do voo</Label>
                     <div className="relative">
                       <Input
-                        value={duracaoTotal === "—" ? "" : duracaoTotal}
-                        readOnly
-                        tabIndex={-1}
-                        placeholder=""
-                        className="pl-9 bg-muted text-muted-foreground cursor-not-allowed"
+                        value={voo.duracao ?? ""}
+                        onChange={(e) => onChange({ duracao: e.target.value })}
+                        placeholder={duracaoTotal}
+                        className="pl-9"
                         aria-label="Duração total do voo"
                       />
                       <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      Soma de todos os trechos e escalas.
+                      Soma de todos os trechos e escalas. Editável.
                     </p>
                   </div>
                   <div className="space-y-2">
                     <Label>Duração do trecho</Label>
                     <Input
-                      value={duracaoTrechoCalculada}
-                      readOnly
-                      tabIndex={-1}
-                      placeholder=""
-                      className="bg-muted text-muted-foreground cursor-not-allowed"
+                      value={voo.duracaoTrecho ?? ""}
+                      onChange={(e) => onChange({ duracaoTrecho: e.target.value })}
+                      placeholder={duracaoTrechoCalculada}
                     />
                     <p className="text-[11px] text-muted-foreground">
-                      Calculada automaticamente pelos horários.
+                      Calculada automaticamente pelos horários. Editável.
                     </p>
                   </div>
 
