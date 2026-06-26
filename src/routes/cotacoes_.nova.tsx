@@ -865,7 +865,7 @@ function NovaCotacao() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex flex-wrap gap-3 mb-6">
                       {serviceOptions.map((opt) => (
                         <button
                           key={opt.id}
@@ -880,7 +880,7 @@ function NovaCotacao() {
                       ))}
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-5">
                       {services.length === 0 && (
                         <p className="text-sm text-muted-foreground text-center py-6">
                           Nenhum serviço adicionado. Clique acima para incluir.
@@ -889,7 +889,7 @@ function NovaCotacao() {
                       {services.map((s) => {
                         const opt = serviceOptions.find((o) => o.id === s.type)!;
                         return (
-                          <div key={s.id} className="border border-border/60 rounded-lg p-3 grid grid-cols-12 gap-3 items-end">
+                          <div key={s.id} className="border border-border/60 rounded-lg p-5 grid grid-cols-12 gap-4 items-end">
                             <div className="col-span-12 md:col-span-3 space-y-2">
                               <Label className="text-xs">Tipo</Label>
                               <div className="flex items-center gap-2 h-9 px-3 rounded-md bg-secondary/10 border border-border/40 text-sm">
