@@ -86,7 +86,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
   };
 
   return (
-    <div className="border border-border/60 rounded-xl p-4 space-y-4 bg-card">
+    <div className="border border-border/60 rounded-xl p-6 space-y-6 bg-card">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <MapPin className="size-4 text-primary" /> Experiência #{index + 1}
@@ -97,7 +97,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         <div className="space-y-1.5">
           <Label>Nome do passeio / experiência</Label>
           <Input value={f.nome || ""} placeholder="Ex: Cristo Redentor"
@@ -123,7 +123,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         types={["establishment"]}
       />
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-6">
         <div className="space-y-1.5">
           <Label>Cidade</Label>
           <Input value={f.cidade || ""} onChange={(e) => onChange({ cidade: e.target.value })} />
@@ -138,7 +138,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-6">
         <div className="space-y-1.5">
           <Label>Data</Label>
           <Input type="date" value={f.data || ""} onChange={(e) => onChange({ data: e.target.value })} />

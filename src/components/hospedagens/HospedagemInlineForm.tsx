@@ -100,7 +100,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
   };
 
   return (
-    <div className="border border-border/60 rounded-xl p-4 space-y-4 bg-card">
+    <div className="border border-border/60 rounded-xl p-6 space-y-6 bg-card">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Hotel className="size-4 text-primary" /> Hospedagem #{index + 1}
@@ -135,7 +135,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         <div className="space-y-1.5">
           <Label>Classificação (estrelas)</Label>
           <Select
@@ -171,7 +171,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         <Input value={f.endereco || ""} onChange={(e) => onChange({ endereco: e.target.value })} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-6">
         <div className="space-y-1.5">
           <Label>Cidade</Label>
           <Input value={f.cidade || ""} onChange={(e) => onChange({ cidade: e.target.value })} />
@@ -186,7 +186,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         <div className="space-y-1.5">
           <Label>Check-in</Label>
           <Input type="datetime-local" value={f.checkin || ""} onChange={(e) => onChange({ checkin: e.target.value })} />
@@ -197,7 +197,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-6">
         <div className="space-y-1.5">
           <Label>Noites</Label>
           <Input type="number" min={0}
@@ -223,7 +223,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         <div className="space-y-1.5">
           <Label>Nº da reserva</Label>
           <Input value={f.numero_reserva || ""} onChange={(e) => onChange({ numero_reserva: e.target.value })} />

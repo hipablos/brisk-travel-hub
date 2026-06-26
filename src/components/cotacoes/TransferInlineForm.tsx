@@ -63,7 +63,7 @@ type Props = {
 
 export function TransferInlineForm({ value: f, index, onChange, onRemove }: Props) {
   return (
-    <div className="border border-border/60 rounded-xl p-4 space-y-4 bg-card">
+    <div className="border border-border/60 rounded-xl p-6 space-y-6 bg-card">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Car className="size-4 text-primary" /> Carro / Transfer #{index + 1}
@@ -74,7 +74,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         <div className="space-y-1.5">
           <Label>Tipo</Label>
           <Select value={f.tipo || "Transfer privativo"} onValueChange={(v) => onChange({ tipo: v })}>
@@ -86,7 +86,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         <div className="space-y-1.5">
           <Label>Origem</Label>
           <Input value={f.origem || ""} placeholder="Aeroporto, hotel, endereço..."
@@ -99,7 +99,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <div className="space-y-1.5">
           <Label>Data de ida</Label>
           <DateInput
