@@ -435,10 +435,12 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                         <Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Duração do trecho</Label>
-                        <div className="h-9 px-3 flex items-center rounded-md border border-border/60 bg-muted text-sm text-muted-foreground">
-                          {calcDuracaoEscalaTrecho(e) || e.duracaoTrecho || "—"}
-                        </div>
+                        <Label className="text-xs">Duração do trecho</Label>
+                        <Input
+                          value={e.duracaoTrecho ?? ""}
+                          onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })}
+                          placeholder={calcDuracaoEscalaTrecho(e) || "—"}
+                        />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Número do voo</Label>
