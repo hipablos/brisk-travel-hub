@@ -8,6 +8,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { Hotel, Trash2, ExternalLink } from "lucide-react";
 import { HotelAutocomplete, type PlaceResult } from "@/components/hospedagens/HotelAutocomplete";
+import { DateInput } from "@/components/ui/date-input";
+import { dateOnlyToNativeISO } from "@/lib/dates";
+
+// checkin/checkout são armazenados como ISO "YYYY-MM-DDTHH:mm".
+// O DateInput trabalha com DD-MM-AAAA, então convertemos nas pontas.
+function splitDateTime(iso: string | null | undefined): { dateBR: string; time: string } {
+  if (!iso) return { dateBR: "", time: "" };
+  const [d, t] = iso.split("T");
+  if (!d) return { dateBR: "", time: "" };
+  const [y, m, day] = d.split("-");
+  const dateBR = y && m && day ? `${day}-${m}-${y}` : "";
+  return { dateBR, time: (t || "").slice(0, 5) };
+}
+function joinDateTime(dateBR: string, time: string): string {
+  const iso = dateOnlyToNativeISO(dateBR);
+  if (!iso) return "";
+  return `${iso}T${time || "00:00"}`;
+}
 
 export type HospedagemDraft = {
   id?: string;
