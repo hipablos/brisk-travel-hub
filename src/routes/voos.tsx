@@ -260,16 +260,12 @@ function FlightCard({ voo, cotacaoId }: { voo: VooItem; cotacaoId: string }) {
         <div className="lg:col-span-2">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">Embarque</div>
           <div className="text-base font-semibold text-foreground">{voo.data}</div>
-          {voo.horaIda && (
-            <div className="text-xs text-muted-foreground">
-              Ida: <span className="text-foreground/90 font-medium">{voo.horaIda}</span>
-            </div>
-          )}
-          {voo.horaVolta && (
-            <div className="text-xs text-muted-foreground">
-              Volta: <span className="text-foreground/90 font-medium">{voo.horaVolta}</span>
-            </div>
-          )}
+          <div className="text-xs text-muted-foreground">
+            Ida: <span className="text-foreground/90 font-medium">{voo.horaIda || "—"}</span>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Volta: <span className="text-foreground/90 font-medium">{voo.horaVolta || "—"}</span>
+          </div>
         </div>
         <div className="lg:col-span-3 min-w-0">
           <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300 text-xs font-semibold">
