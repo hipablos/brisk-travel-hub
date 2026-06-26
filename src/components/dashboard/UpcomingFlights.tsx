@@ -14,8 +14,7 @@ type Leg = {
   cotacaoId: string;
   dateKey: string;
   hora: string;
-  horaIda: string;
-  horaVolta: string;
+  trecho: "ida" | "volta";
   cliente: string;
   origem: string;
   destino: string;
@@ -31,8 +30,6 @@ export function UpcomingFlights() {
       const vIda: any = (c as any).vooIda ?? null;
       const vVolta: any = (c as any).vooVolta ?? null;
       const cliente = c.cliente?.nome ?? "—";
-      const horaIda = vIda?.horaSaida || "";
-      const horaVolta = vVolta?.horaSaida || "";
 
       const ida = normalizeDateOnly(vIda?.data ?? c.ida);
       if (ida) {
@@ -40,9 +37,8 @@ export function UpcomingFlights() {
           id: `${c.id}-ida`,
           cotacaoId: c.id,
           dateKey: ida,
-          hora: horaIda,
-          horaIda,
-          horaVolta,
+          hora: vIda?.horaSaida || "",
+          trecho: "ida",
           cliente,
           origem: vIda?.origem ?? c.origem ?? "—",
           destino: vIda?.destino ?? c.destino ?? "—",
@@ -54,9 +50,8 @@ export function UpcomingFlights() {
           id: `${c.id}-volta`,
           cotacaoId: c.id,
           dateKey: volta,
-          hora: horaVolta,
-          horaIda,
-          horaVolta,
+          hora: vVolta?.horaSaida || "",
+          trecho: "volta",
           cliente,
           origem: vVolta?.origem ?? c.destino ?? "—",
           destino: vVolta?.destino ?? c.origem ?? "—",
@@ -75,6 +70,7 @@ export function UpcomingFlights() {
       })
       .slice(0, 6);
   }, [cotacoes]);
+
 
   return (
     <div className="bg-card border border-border rounded-xl p-5 shadow-[var(--shadow-card)]">
@@ -103,12 +99,10 @@ export function UpcomingFlights() {
                 <div className="text-right whitespace-nowrap leading-tight">
                   <div className="text-xs text-foreground/80 font-medium">{fmtData(l.dateKey)}</div>
                   <div className="text-[11px] text-muted-foreground">
-                    Ida: <span className="text-foreground/80">{l.horaIda || "—"}</span>
-                  </div>
-                  <div className="text-[11px] text-muted-foreground">
-                    Volta: <span className="text-foreground/80">{l.horaVolta || "—"}</span>
+                    {l.trecho === "ida" ? "Ida" : "Volta"}: <span className="text-foreground/80">{l.hora || "—"}</span>
                   </div>
                 </div>
+
               </Link>
             </li>
           ))}
