@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Download, Printer, Plane, Hotel, Car, Ship, Shield, MapPin,
   Phone, Mail, Instagram, FileText, Clock, ArrowRight,
-  ShoppingBag, Briefcase, Luggage, UtensilsCrossed, Armchair, BellRing, PlaneTakeoff, PlaneLanding,
+  ShoppingBag, Briefcase, Luggage, PlaneTakeoff, PlaneLanding,
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 import { dateOnlyToBR, normalizeDateOnly, parseDateOnly } from "@/lib/dates";
@@ -570,12 +570,9 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
         )}
 
         {/* Extras */}
-        {(voo?.refeicao || voo?.assento || voo?.alertaCheckin || voo?.localizador) && (
+        {voo?.localizador && (
           <div className="border-t border-slate-200 px-3 py-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-slate-600">
             {voo?.localizador && <span><strong className="text-slate-800">Localizador:</strong> {voo.localizador}</span>}
-            {voo?.refeicao && <span className="inline-flex items-center gap-1"><UtensilsCrossed className="size-3 text-emerald-600" /> Refeição</span>}
-            {voo?.assento && <span className="inline-flex items-center gap-1"><Armchair className="size-3 text-emerald-600" /> Assento marcado</span>}
-            {voo?.alertaCheckin && <span className="inline-flex items-center gap-1"><BellRing className="size-3 text-emerald-600" /> Alerta check-in</span>}
           </div>
         )}
       </div>
