@@ -155,31 +155,42 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
   const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
 
-  // Mantém voo.duracao sincronizado com a duração TOTAL (principal + escalas).
+  // Refs guardam o último valor calculado para detectar override manual.
+  const lastCalcTotal = useRef<string | undefined>(undefined);
+  const lastCalcTrecho = useRef<string | undefined>(undefined);
+  const lastCalcEscala = useRef<Record<string, string>>({});
+
   useEffect(() => {
-    if (voo.duracao !== duracaoTotal) {
-      onChange({ duracao: duracaoTotal });
+    const current = voo.duracao;
+    const prevCalc = lastCalcTotal.current;
+    if (!current || current === "—" || current === prevCalc) {
+      if (current !== duracaoTotal) onChange({ duracao: duracaoTotal });
     }
+    lastCalcTotal.current = duracaoTotal;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoTotal]);
 
-  // Duração do trecho principal calculada automaticamente.
   useEffect(() => {
-    if (voo.duracaoTrecho !== duracaoTrechoCalculada) {
-      onChange({ duracaoTrecho: duracaoTrechoCalculada });
+    const current = voo.duracaoTrecho;
+    const prevCalc = lastCalcTrecho.current;
+    if (!current || current === "—" || current === prevCalc) {
+      if (current !== duracaoTrechoCalculada) onChange({ duracaoTrecho: duracaoTrechoCalculada });
     }
+    lastCalcTrecho.current = duracaoTrechoCalculada;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoTrechoCalculada]);
 
-  // Sincroniza a duração de cada escala (calculada das suas datas+horários).
   useEffect(() => {
     if (voo.tipo !== "com_escala") return;
     const patches: Array<{ id: string; patch: Partial<Escala> }> = [];
     voo.escalas.forEach((e) => {
       const dt = calcDuracaoEscalaTrecho(e);
-      if (e.duracaoTrecho !== dt) {
-        patches.push({ id: e.id, patch: { duracaoTrecho: dt } });
+      const prev = lastCalcEscala.current[e.id];
+      const cur = e.duracaoTrecho;
+      if (!cur || cur === "—" || cur === prev) {
+        if (cur !== dt) patches.push({ id: e.id, patch: { duracaoTrecho: dt } });
       }
+      lastCalcEscala.current[e.id] = dt;
     });
     if (patches.length === 0) return;
     onChange({
