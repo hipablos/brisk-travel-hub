@@ -122,12 +122,15 @@ function Counter({
   );
 }
 
-export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total }: Props) {
+export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total, minData }: Props) {
   const voo = {
     ...rawVoo,
     escalas: rawVoo.escalas ?? [],
     bagagens: rawVoo.bagagens ?? { pessoal: 0, maoCabine: 0, despachada23: 0, despachada32: 0 },
   };
+  const minCotacaoISO = dateOnlyToNativeISO(minData) || undefined;
+  const minVooISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
+  const minChegadaISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
   const [open, setOpen] = useState(false);
   const isIda = direction === "ida";
   const Icon = isIda ? PlaneTakeoff : PlaneLanding;
