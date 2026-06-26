@@ -52,6 +52,7 @@ export type Voo = {
   origemInfo?: Airport;
   destinoInfo?: Airport;
   data?: string;
+  dataChegada?: string;
   horaSaida?: string;
   horaChegada?: string;
   duracao?: string;
