@@ -1,13 +1,10 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { MapPin, Trash2 } from "lucide-react";
-import { ExperienciaEnderecoField } from "@/components/places/ExperienciaEnderecoField";
+import { ExperienciaEnderecoField, EnderecoSelecionado } from "@/components/places/ExperienciaEnderecoField";
 import { DateInput } from "@/components/ui/date-input";
-import { dateOnlyToBR, dateOnlyToNativeISO } from "@/lib/dates";
+import { dateOnlyToNativeISO } from "@/lib/dates";
 
 export type ExperienciaDraft = {
   id?: string;
@@ -26,15 +23,12 @@ export type ExperienciaDraft = {
   hora_termino: string | null;
   duracao_min: number | null;
   participantes: number | null;
-  idioma: string | null;
-  idade_minima: number | null;
-  descricao: string | null;
   fotos: string[] | null;
 };
 
 export const novaExperiencia = (): ExperienciaDraft => ({
   nome: "",
-  categoria: "Passeio",
+  categoria: "",
   endereco: "",
   cidade: "",
   estado: "",
@@ -48,16 +42,8 @@ export const novaExperiencia = (): ExperienciaDraft => ({
   hora_termino: "",
   duracao_min: null,
   participantes: 1,
-  idioma: "Português",
-  idade_minima: null,
-  descricao: "",
   fotos: [],
 });
-
-const CATEGORIAS = [
-  "Passeio", "City Tour", "Ingresso", "Aventura", "Gastronômico",
-  "Cultural", "Show / Evento", "Transfer", "Outro",
-];
 
 function minutesBetween(a: string, b: string): number | null {
   if (!a || !b) return null;
@@ -76,6 +62,22 @@ type Props = {
 };
 
 export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: Props) {
+  const handleEnderecoChange = (e: EnderecoSelecionado) => {
+    onChange({
+      nome: f.nome || e.nomeLocal,
+      categoria: f.categoria || e.categoria,
+      endereco: e.endereco,
+      cidade: e.cidade,
+      estado: e.estado,
+      pais: e.pais,
+      lat: e.lat,
+      lng: e.lon,
+      google_place_id: null,
+      google_maps_url: `https://www.google.com/maps/search/?api=1&query=${e.lat},${e.lon}`,
+      fotos: e.imagemUrl ? [e.imagemUrl] : f.fotos,
+    });
+  };
+
   return (
     <div className="border border-border/60 rounded-xl p-6 space-y-6 bg-card">
       <div className="flex items-center justify-between">
@@ -96,38 +98,21 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         </div>
         <div className="space-y-2">
           <Label>Categoria</Label>
-          <Select value={f.categoria || "Passeio"} onValueChange={(v) => onChange({ categoria: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {CATEGORIAS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <Input value={f.categoria || ""}
+            onChange={(e) => onChange({ categoria: e.target.value })} />
         </div>
       </div>
 
       <ExperienciaEnderecoField
         value={f.endereco || ""}
-        onChange={(e) => {
-          onChange({
-            endereco: e.endereco,
-            cidade: e.cidade,
-            estado: e.estado,
-            pais: e.pais,
-            lat: e.lat,
-            lng: e.lon,
-            google_place_id: null,
-            google_maps_url: `https://www.google.com/maps/search/?api=1&query=${e.lat},${e.lon}`,
-            fotos: e.imagemUrl ? [e.imagemUrl] : f.fotos,
-          });
-        }}
+        onChange={handleEnderecoChange}
         onClear={() => onChange({ endereco: "", fotos: [] })}
       />
-
 
       {f.fotos && f.fotos.length > 0 && (
         <div className="space-y-2">
           <Label className="text-xs text-muted-foreground">
-            Fotos do Google ({f.fotos.length}) — usadas no orçamento em PDF
+            Fotos do local ({f.fotos.length}) — usadas no orçamento em PDF
           </Label>
           <div className="flex gap-3 overflow-x-auto pb-2">
             {f.fotos.map((url, i) => (
