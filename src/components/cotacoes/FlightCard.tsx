@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR } from "@/lib/dates";
-import { calcDuracaoVoo, calcDuracaoEscala, calcTempoDeVooTotal } from "@/lib/voos";
+import { calcDuracaoVooComData, calcDuracaoEscala, calcTempoDeVooTotal, calcDuracaoTrecho } from "@/lib/voos";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
