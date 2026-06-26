@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DateInput } from "@/components/ui/date-input";
@@ -6,7 +7,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Car, Trash2 } from "lucide-react";
+import { Car, Trash2, Clock } from "lucide-react";
+import { calcDuracaoVooComData } from "@/lib/voos";
 
 export type TransferDraft = {
   id?: string;
@@ -18,6 +20,8 @@ export type TransferDraft = {
   data_ida: string | null;
   data_volta: string | null;
   hora: string | null;
+  hora_ida: string | null;
+  hora_volta: string | null;
   passageiros: number | null;
   bagagens: number | null;
   veiculo: string | null;
@@ -36,6 +40,8 @@ export const novoTransfer = (): TransferDraft => ({
   data_ida: "",
   data_volta: "",
   hora: "",
+  hora_ida: "",
+  hora_volta: "",
   passageiros: 1,
   bagagens: 1,
   veiculo: "",
@@ -62,6 +68,11 @@ type Props = {
 };
 
 export function TransferInlineForm({ value: f, index, onChange, onRemove }: Props) {
+  const duracao = useMemo(
+    () => calcDuracaoVooComData(f.data_ida, f.hora_ida, f.data_volta ?? f.data_ida, f.hora_volta),
+    [f.data_ida, f.data_volta, f.hora_ida, f.hora_volta],
+  );
+
   return (
     <div className="border border-border/60 rounded-xl p-6 space-y-6 bg-card">
       <div className="flex items-center justify-between">
@@ -109,6 +120,10 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
           />
         </div>
         <div className="space-y-2">
+          <Label>Hora de ida</Label>
+          <Input type="time" value={f.hora_ida || ""} onChange={(e) => onChange({ hora_ida: e.target.value })} />
+        </div>
+        <div className="space-y-2">
           <Label>Data de volta</Label>
           <DateInput
             value={f.data_volta || ""}
@@ -117,8 +132,25 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
           />
         </div>
         <div className="space-y-2">
-          <Label>Hora</Label>
-          <Input type="time" value={f.hora || ""} onChange={(e) => onChange({ hora: e.target.value })} />
+          <Label>Hora de volta</Label>
+          <Input type="time" value={f.hora_volta || ""} onChange={(e) => onChange({ hora_volta: e.target.value })} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="space-y-2">
+          <Label>Duração total</Label>
+          <div className="relative">
+            <Input
+              value={duracao}
+              readOnly
+              tabIndex={-1}
+              placeholder="—"
+              className="pl-9 bg-muted text-muted-foreground cursor-not-allowed"
+            />
+            <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
+          </div>
+          <p className="text-[11px] text-muted-foreground">Calculada a partir das datas e horários.</p>
         </div>
         <div className="space-y-2">
           <Label>Passageiros</Label>
