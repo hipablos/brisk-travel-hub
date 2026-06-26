@@ -49,7 +49,7 @@ export function Topbar() {
             activeOptions={{ exact: true }}
             activeProps={{ className: "px-3 py-2 text-sm rounded-md text-secondary font-semibold" }}
           >
-            Início
+            Painel
           </Link>
         </nav>
         <div className="flex-1 md:flex-none" />

@@ -20,7 +20,7 @@ const baseGroups: Group[] = [
   {
     title: "Principal",
     items: [
-      { icon: LayoutDashboard, label: "Início", href: "/" },
+      { icon: LayoutDashboard, label: "Painel", href: "/" },
       { icon: FileText, label: "Cotações", href: "/cotacoes" },
       { icon: Calendar, label: "Calendário", href: "/calendario" },
     ],
