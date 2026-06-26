@@ -18,7 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
-import { dateOnlyToBR } from "@/lib/dates";
+import { dateOnlyToBR, dateOnlyToNativeISO } from "@/lib/dates";
 import { calcTempoDeVooTotal, calcDuracaoTrecho, calcDuracaoEscalaTrecho } from "@/lib/voos";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
@@ -91,6 +91,8 @@ interface Props {
   onDuplicate?: () => void;
   index?: number;
   total?: number;
+  /** Data mínima (DD-MM-AAAA) — normalmente a data da cotação. */
+  minData?: string;
 }
 
 function Counter({
@@ -120,12 +122,15 @@ function Counter({
   );
 }
 
-export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total }: Props) {
+export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total, minData }: Props) {
   const voo = {
     ...rawVoo,
     escalas: rawVoo.escalas ?? [],
     bagagens: rawVoo.bagagens ?? { pessoal: 0, maoCabine: 0, despachada23: 0, despachada32: 0 },
   };
+  const minCotacaoISO = dateOnlyToNativeISO(minData) || undefined;
+  const minVooISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
+  const minChegadaISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
   const [open, setOpen] = useState(false);
   const isIda = direction === "ida";
   const Icon = isIda ? PlaneTakeoff : PlaneLanding;
@@ -281,11 +286,11 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   </div>
                   <div className="space-y-2">
                     <Label>Data de início do voo</Label>
-                    <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} />
+                    <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} minISO={minCotacaoISO} />
                   </div>
                   <div className="space-y-2">
                     <Label>Data de fim do voo</Label>
-                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} />
+                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} minISO={minChegadaISO} />
                   </div>
                   <div className="space-y-2">
                     <Label>Horário de saída</Label>
@@ -406,11 +411,11 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Data de início</Label>
-                        <DateInput value={e.dataInicio ?? ""} onChange={(iso) => updEscala(e.id, { dataInicio: iso })} />
+                        <DateInput value={e.dataInicio ?? ""} onChange={(iso) => updEscala(e.id, { dataInicio: iso })} minISO={minVooISO} />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Data de fim</Label>
-                        <DateInput value={e.dataFim ?? ""} onChange={(iso) => updEscala(e.id, { dataFim: iso })} />
+                        <DateInput value={e.dataFim ?? ""} onChange={(iso) => updEscala(e.id, { dataFim: iso })} minISO={dateOnlyToNativeISO(e.dataInicio) || minVooISO} />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Horário de saída</Label>
