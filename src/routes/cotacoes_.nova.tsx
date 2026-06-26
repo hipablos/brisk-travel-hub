@@ -842,7 +842,7 @@ function NovaCotacao() {
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground mb-2">Observações internas</h2>
+                  <h2 className="text-lg font-semibold text-foreground mb-3">Observações internas</h2>
                   <p className="text-xs text-muted-foreground mb-2">Não aparece no PDF — uso interno.</p>
                   <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Notas internas sobre a cotação..." rows={3} />
                 </div>
