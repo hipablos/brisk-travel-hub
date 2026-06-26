@@ -60,7 +60,7 @@ export function HotelAutocomplete({
   onChange,
   onPlaceSelected,
   label = "Nome do hotel",
-  placeholder = "Digite o nome do hotel...",
+  placeholder,
 }: {
   value: string;
   onChange: (v: string) => void;

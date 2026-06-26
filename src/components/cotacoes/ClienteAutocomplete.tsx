@@ -56,7 +56,7 @@ export function ClienteAutocomplete({ clientes, value, onSelect, placeholder }: 
           else if (e.key === "Enter" && results[highlight]) { e.preventDefault(); pick(results[highlight]); }
           else if (e.key === "Escape") setOpen(false);
         }}
-        placeholder={placeholder ?? "Digite o nome do cliente..."}
+        placeholder={placeholder}
       />
       {open && results.length > 0 && (
         <div className="absolute z-50 mt-1 w-full max-h-72 overflow-y-auto rounded-md border border-border bg-popover shadow-lg">
