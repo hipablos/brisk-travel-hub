@@ -99,10 +99,22 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="space-y-1.5">
-          <Label>Data</Label>
-          <Input type="date" value={f.data || ""} onChange={(e) => onChange({ data: e.target.value })} />
+          <Label>Data de ida</Label>
+          <DateInput
+            value={f.data_ida || ""}
+            onChange={(v) => onChange({ data_ida: v })}
+            placeholder="dd/mm/aaaa"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Data de volta</Label>
+          <DateInput
+            value={f.data_volta || ""}
+            onChange={(v) => onChange({ data_volta: v })}
+            placeholder="dd/mm/aaaa"
+          />
         </div>
         <div className="space-y-1.5">
           <Label>Hora</Label>
