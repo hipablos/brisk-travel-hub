@@ -159,7 +159,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 max-w-[200px]">
+      <div className="grid grid-cols-1 gap-6 max-w-[200px]">
         <div className="space-y-1.5">
           <Label>Participantes</Label>
           <Input type="number" min={1} value={f.participantes ?? ""}
