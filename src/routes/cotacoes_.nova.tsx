@@ -84,7 +84,7 @@ function NovaCotacao() {
   const [destino, setDestino] = useState("");
   const [ida, setIda] = useState("");
   const [volta, setVolta] = useState("");
-  const [adultos, setAdultos] = useState(2);
+  const [adultos, setAdultos] = useState(0);
   const [criancas, setCriancas] = useState(0);
   const [termos, setTermos] = useState("");
   const [outrasInformacoes, setOutrasInformacoes] = useState("");
@@ -100,11 +100,9 @@ function NovaCotacao() {
   const [formasPagamentoIds, setFormasPagamentoIds] = useState<string[]>([]);
   const formasPagamento = useFormasPagamento();
 
-  const [services, setServices] = useState<ServiceItem[]>([
-    { id: "1", type: "voo", description: "", value: "" },
-  ]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
 
-  const [vooIdas, setVooIdas] = useState<Voo[]>(() => [novoVoo()]);
+  const [vooIdas, setVooIdas] = useState<Voo[]>([]);
   const [vooVoltas, setVooVoltas] = useState<Voo[]>([]);
 
   // Hospedagens e Experiências vinculadas a esta cotação
@@ -207,20 +205,6 @@ function NovaCotacao() {
       });
   }, [editId]);
 
-  // Aplica modelo padrão em novas cotações quando os modelos carregam
-  useEffect(() => {
-    if (editing) return;
-    const padraoT = termosModelos.find((m) => m.categoria === "termos" && m.padrao && m.ativo);
-    const padraoO = termosModelos.find((m) => m.categoria === "outras" && m.padrao && m.ativo);
-    if (padraoT && !termosModeloId) {
-      setTermosModeloId(padraoT.id);
-      setTermos(padraoT.conteudo);
-    }
-    if (padraoO && !outrasModeloId) {
-      setOutrasModeloId(padraoO.id);
-      setOutrasInformacoes(padraoO.conteudo);
-    }
-  }, [termosModelos, editing, termosModeloId, outrasModeloId]);
 
 
 
@@ -523,16 +507,16 @@ function NovaCotacao() {
                         if (c.email) setEmail(c.email);
                         if (c.telefone) setTelefone(c.telefone);
                       }}
-                      placeholder={clientes.length ? "Digite o nome do cliente..." : "Nenhum cliente — cadastre acima"}
+                      placeholder=""
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>E-mail</Label>
-                    <Input type="email" placeholder="cliente@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>
                   <div className="space-y-2">
                     <Label>Telefone / WhatsApp</Label>
-                    <Input placeholder="(11) 99999-9999" value={telefone} onChange={(e) => setTelefone(e.target.value)} />
+                    <Input value={telefone} onChange={(e) => setTelefone(e.target.value)} />
                   </div>
 
 
@@ -785,7 +769,7 @@ function NovaCotacao() {
                       }
                     }}
                   >
-                    <SelectTrigger><SelectValue placeholder="Selecione um modelo" /></SelectTrigger>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__none">Sem termos</SelectItem>
                       {termosModelos.filter((m) => m.categoria === "termos" && m.ativo).map((m) => (
@@ -824,7 +808,7 @@ function NovaCotacao() {
                       }
                     }}
                   >
-                    <SelectTrigger><SelectValue placeholder="Selecione um modelo" /></SelectTrigger>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__none">Sem outras informações</SelectItem>
                       {termosModelos.filter((m) => m.categoria === "outras" && m.ativo).map((m) => (
@@ -844,7 +828,7 @@ function NovaCotacao() {
                 <div>
                   <h2 className="text-lg font-semibold text-foreground mb-3">Observações internas</h2>
                   <p className="text-xs text-muted-foreground mb-3">Não aparece no PDF — uso interno.</p>
-                  <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Notas internas sobre a cotação..." rows={3} />
+                  <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={3} />
                 </div>
               </section>
 
@@ -899,16 +883,14 @@ function NovaCotacao() {
                             </div>
                             <div className="col-span-12 md:col-span-6 space-y-2">
                               <Label className="text-xs">Descrição</Label>
-                              <Input
-                                placeholder="Descrição do serviço"
-                                value={s.description}
-                                onChange={(e) => updateService(s.id, { description: e.target.value })}
-                              />
+                                <Input
+                                  value={s.description}
+                                  onChange={(e) => updateService(s.id, { description: e.target.value })}
+                                />
                             </div>
                             <div className="col-span-9 md:col-span-2 space-y-2">
                               <Label className="text-xs">Valor (R$)</Label>
                               <Input
-                                placeholder="0,00"
                                 value={s.value}
                                 onChange={(e) => updateService(s.id, { value: e.target.value })}
                               />
@@ -968,7 +950,7 @@ function NovaCotacao() {
                       <div className="md:w-72">
                         <Input
                           id="localizador"
-                          placeholder="Ex.: ABC123"
+                          placeholder=""
                           value={localizador}
                           onChange={(e) => setLocalizador(e.target.value.toUpperCase())}
                           className="font-mono tracking-wider uppercase bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700 focus-visible:ring-yellow-500"
@@ -1019,7 +1001,7 @@ function NovaCotacao() {
                             className="flex items-center gap-4 rounded-lg border border-border/50 bg-background/40 px-4 py-3"
                           >
                             <Input
-                              placeholder="Observação"
+                              value={v.descricao ?? ""}
                               value={v.descricao ?? ""}
                               onChange={(e) => updVendaCusto(v.id, { descricao: e.target.value })}
                               className="flex-1"
@@ -1029,7 +1011,7 @@ function NovaCotacao() {
                               <Input
                                 type="number"
                                 step="0.01"
-                                placeholder="0,00"
+                                value={v.valor || ""}
                                 value={v.valor || ""}
                                 onChange={(e) => updVendaCusto(v.id, { valor: parseFloat(e.target.value) || 0 })}
                               />
@@ -1058,7 +1040,7 @@ function NovaCotacao() {
                       <div className="flex items-center gap-3 mt-2 max-w-xs">
                         <span className="px-3 h-9 flex items-center rounded-md border border-border/40 bg-muted text-sm text-muted-foreground">R$</span>
                         <Input
-                          placeholder="0,00"
+                          value={valorComparacao}
                           value={valorComparacao}
                           onChange={(e) => setValorComparacao(e.target.value)}
                         />
@@ -1126,7 +1108,7 @@ function NovaCotacao() {
                       <Label>Link para Pagamento</Label>
                       <Input
                         className="mt-2"
-                        placeholder="Adicione o link de pagamento para exibição no orçamento"
+                        placeholder=""
                         value={linkPagamento}
                         onChange={(e) => setLinkPagamento(e.target.value)}
                       />
