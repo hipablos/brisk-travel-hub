@@ -148,9 +148,10 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
 
   const totalEscalas = voo.escalas.length;
   const duracaoCalculada = useMemo(
-    () => calcDuracaoVoo(voo.horaSaida, voo.horaChegada),
-    [voo.horaSaida, voo.horaChegada],
+    () => calcDuracaoVooComData(voo.data, voo.horaSaida, voo.dataChegada ?? voo.data, voo.horaChegada),
+    [voo.data, voo.dataChegada, voo.horaSaida, voo.horaChegada],
   );
+  const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
   const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
 
   // Mantém voo.duracao sincronizado com o cálculo automático (porta-a-porta).
@@ -160,6 +161,14 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoCalculada]);
+
+  // Duração do trecho principal também é calculada automaticamente.
+  useEffect(() => {
+    if (voo.duracaoTrecho !== duracaoTrechoCalculada) {
+      onChange({ duracaoTrecho: duracaoTrechoCalculada });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duracaoTrechoCalculada]);
 
   // Apenas a duração de ESCALA (espera no aeroporto) é calculada automaticamente.
   // duracaoTrecho passa a ser editado manualmente pelo usuário.
