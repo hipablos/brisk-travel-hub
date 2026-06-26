@@ -121,14 +121,22 @@ export function parseDuracaoParaMinutos(texto?: string | null): number {
  * datas+horários da própria escala. Cai em manual (esc.duracaoTrecho) se
  * não houver horários preenchidos.
  */
+/**
+ * Duração de um trecho de ESCALA (perna adicional de voo), calculada
+ * exclusivamente pelos horários de saída/chegada (e datas, se houver).
+ * Se os horários não estiverem preenchidos, usa o valor manual; caso
+ * contrário sempre o cálculo manda — diff negativo vira 0.
+ */
 export function calcDuracaoEscalaTrechoMin(esc: any): number {
-  const calc = calcDuracaoMinutosComData(
-    esc?.dataInicio,
-    esc?.saida,
-    esc?.dataFim ?? esc?.dataInicio,
-    esc?.chegada,
-  );
-  if (calc != null) return calc;
+  if (esc?.saida && esc?.chegada) {
+    const calc = calcDuracaoMinutosComData(
+      esc?.dataInicio,
+      esc?.saida,
+      esc?.dataFim ?? esc?.dataInicio,
+      esc?.chegada,
+    );
+    return calc != null && calc > 0 ? calc : 0;
+  }
   return parseDuracaoParaMinutos(esc?.duracaoTrecho);
 }
 
