@@ -122,7 +122,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
           <Label className="text-xs text-muted-foreground">
             Fotos do Google ({f.fotos.length}) — usadas no orçamento em PDF
           </Label>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-3 overflow-x-auto pb-2">
             {f.fotos.map((url, i) => (
               <img
                 key={i}
