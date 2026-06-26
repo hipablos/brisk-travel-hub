@@ -156,15 +156,15 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
   const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
 
-  // Mantém voo.duracao sincronizado com o cálculo automático (porta-a-porta).
+  // Mantém voo.duracao sincronizado com a duração TOTAL (principal + escalas).
   useEffect(() => {
-    if (voo.duracao !== duracaoCalculada) {
-      onChange({ duracao: duracaoCalculada });
+    if (voo.duracao !== duracaoTotal) {
+      onChange({ duracao: duracaoTotal });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [duracaoCalculada]);
+  }, [duracaoTotal]);
 
-  // Duração do trecho principal também é calculada automaticamente.
+  // Duração do trecho principal calculada automaticamente.
   useEffect(() => {
     if (voo.duracaoTrecho !== duracaoTrechoCalculada) {
       onChange({ duracaoTrecho: duracaoTrechoCalculada });
@@ -172,15 +172,14 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoTrechoCalculada]);
 
-  // Apenas a duração de ESCALA (espera no aeroporto) é calculada automaticamente.
-  // duracaoTrecho passa a ser editado manualmente pelo usuário.
+  // Sincroniza a duração de cada escala (calculada das suas datas+horários).
   useEffect(() => {
     if (voo.tipo !== "com_escala") return;
     const patches: Array<{ id: string; patch: Partial<Escala> }> = [];
     voo.escalas.forEach((e) => {
-      const duracaoEscala = calcDuracaoEscala(e.chegada, e.saida);
-      if (e.duracaoEscala !== duracaoEscala) {
-        patches.push({ id: e.id, patch: { duracaoEscala } });
+      const dt = calcDuracaoEscalaTrecho(e);
+      if (dt && e.duracaoTrecho !== dt) {
+        patches.push({ id: e.id, patch: { duracaoTrecho: dt } });
       }
     });
     if (patches.length === 0) return;
