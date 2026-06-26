@@ -16,13 +16,39 @@ export function calcDuracaoMinutos(
   return fim - inicio;
 }
 
+/**
+ * Duração levando em conta data de início e data de fim (em ISO yyyy-mm-dd).
+ * Quando ambas as datas existem, suporta voos que cruzam vários dias.
+ */
+export function calcDuracaoMinutosComData(
+  dataInicio?: string | null,
+  horaSaida?: string | null,
+  dataFim?: string | null,
+  horaChegada?: string | null,
+): number | null {
+  if (!horaSaida || !horaChegada) return null;
+  if (dataInicio && dataFim) {
+    const ini = new Date(`${dataInicio}T${horaSaida}:00`);
+    const fim = new Date(`${dataFim}T${horaChegada}:00`);
+    const diff = fim.getTime() - ini.getTime();
+    if (Number.isNaN(diff) || diff < 0) return null;
+    return Math.round(diff / 60000);
+  }
+  return calcDuracaoMinutos(horaSaida, horaChegada);
+}
+
 export function formatDuracao(minutos: number | null): string {
   if (minutos == null || minutos < 0) return "—";
-  const h = Math.floor(minutos / 60);
-  const m = minutos % 60;
-  if (h === 0) return `${m}m`;
-  if (m === 0) return `${h}h`;
-  return `${h}h ${String(m).padStart(2, "0")}m`;
+  const d = Math.floor(minutos / (60 * 24));
+  const rest = minutos - d * 60 * 24;
+  const h = Math.floor(rest / 60);
+  const m = rest % 60;
+  const partes: string[] = [];
+  if (d > 0) partes.push(`${d}d`);
+  if (h > 0) partes.push(`${h}h`);
+  if (m > 0) partes.push(`${String(m).padStart(2, "0")}m`);
+  if (partes.length === 0) return "0m";
+  return partes.join(" ");
 }
 
 export function calcDuracaoVoo(
@@ -30,6 +56,15 @@ export function calcDuracaoVoo(
   horaChegada?: string | null,
 ): string {
   return formatDuracao(calcDuracaoMinutos(horaSaida, horaChegada));
+}
+
+export function calcDuracaoVooComData(
+  dataInicio?: string | null,
+  horaSaida?: string | null,
+  dataFim?: string | null,
+  horaChegada?: string | null,
+): string {
+  return formatDuracao(calcDuracaoMinutosComData(dataInicio, horaSaida, dataFim, horaChegada));
 }
 
 /**
@@ -45,26 +80,50 @@ export function calcDuracaoEscala(
 
 /** Duração porta-a-porta usando saída do primeiro trecho e chegada do último. */
 export function calcDuracaoTotalVoo(voo: any): string {
-  return calcDuracaoVoo(voo?.horaSaida, voo?.horaChegada);
+  return calcDuracaoVooComData(voo?.data, voo?.horaSaida, voo?.dataChegada ?? voo?.data, voo?.horaChegada);
 }
 
 /**
- * Converte uma duração em texto livre ("21h", "1h 30m", "45m", "1h30") em minutos.
+ * Converte uma duração em texto livre ("1d 2h 30m", "21h", "1h 30m", "45m", "1h30") em minutos.
  */
 export function parseDuracaoParaMinutos(texto?: string | null): number {
   if (!texto) return 0;
   const t = String(texto).trim().toLowerCase();
   if (!t) return 0;
+  const diasMatch = t.match(/(\d+)\s*d/);
   const horasMatch = t.match(/(\d+)\s*h/);
   const minMatch = t.match(/(\d+)\s*m(?!ês)/);
+  const dias = diasMatch ? Number(diasMatch[1]) : 0;
   const horas = horasMatch ? Number(horasMatch[1]) : 0;
   const minutos = minMatch ? Number(minMatch[1]) : 0;
-  if (!horasMatch && !minMatch) {
+  if (!diasMatch && !horasMatch && !minMatch) {
     const soNumero = Number(t.replace(",", "."));
     if (!Number.isNaN(soNumero)) return Math.round(soNumero * 60);
     return 0;
   }
-  return horas * 60 + minutos;
+  return dias * 24 * 60 + horas * 60 + minutos;
+}
+
+/**
+ * Duração do trecho principal:
+ * = duração de voo (porta-a-porta com datas) + duração de voo de cada escala (se preenchida).
+ * Se nenhuma escala possuir duração, retorna apenas a duração de voo.
+ */
+export function calcDuracaoTrecho(voo: any): string {
+  const base = calcDuracaoMinutosComData(
+    voo?.data,
+    voo?.horaSaida,
+    voo?.dataChegada ?? voo?.data,
+    voo?.horaChegada,
+  ) ?? 0;
+  const escalas: any[] = Array.isArray(voo?.escalas) ? voo.escalas : [];
+  let extra = 0;
+  escalas.forEach((esc: any) => {
+    extra += parseDuracaoParaMinutos(esc?.duracaoTrecho);
+  });
+  const total = base + extra;
+  if (total <= 0) return "";
+  return formatDuracao(total);
 }
 
 /**
@@ -73,13 +132,17 @@ export function parseDuracaoParaMinutos(texto?: string | null): number {
  */
 export function calcTempoDeVooTotal(voo: any): string {
   const escalas: any[] = Array.isArray(voo?.escalas) ? voo.escalas : [];
+  const base = calcDuracaoMinutosComData(
+    voo?.data,
+    voo?.horaSaida,
+    voo?.dataChegada ?? voo?.data,
+    voo?.horaChegada,
+  ) ?? 0;
   if (escalas.length === 0) {
-    const mins = parseDuracaoParaMinutos(voo?.duracaoTrecho);
-    if (mins > 0) return formatDuracao(mins);
-    // fallback: porta-a-porta calculado
-    return calcDuracaoVoo(voo?.horaSaida, voo?.horaChegada);
+    if (base > 0) return formatDuracao(base);
+    return "—";
   }
-  let total = parseDuracaoParaMinutos(voo?.duracaoTrecho);
+  let total = base;
   escalas.forEach((esc: any) => {
     total += calcDuracaoMinutos(esc?.chegada, esc?.saida) ?? 0;
     total += parseDuracaoParaMinutos(esc?.duracaoTrecho);
