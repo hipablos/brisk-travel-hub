@@ -75,7 +75,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Tipo</Label>
           <Select value={f.tipo || "Transfer privativo"} onValueChange={(v) => onChange({ tipo: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
@@ -87,12 +87,12 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Origem</Label>
           <Input value={f.origem || ""} placeholder="Aeroporto, hotel, endereço..."
             onChange={(e) => onChange({ origem: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Destino</Label>
           <Input value={f.destino || ""} placeholder="Hotel, aeroporto, endereço..."
             onChange={(e) => onChange({ destino: e.target.value })} />
@@ -100,7 +100,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Data de ida</Label>
           <DateInput
             value={f.data_ida || ""}
@@ -108,7 +108,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
             placeholder="dd/mm/aaaa"
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Data de volta</Label>
           <DateInput
             value={f.data_volta || ""}
@@ -116,11 +116,11 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
             placeholder="dd/mm/aaaa"
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Hora</Label>
           <Input type="time" value={f.hora || ""} onChange={(e) => onChange({ hora: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Passageiros</Label>
           <Input type="number" min={1} value={f.passageiros ?? ""}
             onChange={(e) => onChange({ passageiros: e.target.value ? Number(e.target.value) : null })} />
