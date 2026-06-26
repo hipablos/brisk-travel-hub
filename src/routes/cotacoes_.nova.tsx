@@ -182,6 +182,8 @@ function NovaCotacao() {
       const voltasArr = ((c as any).vooVoltas as Voo[] | undefined) ?? (c.vooVolta ? [c.vooVolta as Voo] : []);
       setVooIdas(idasArr.length ? idasArr : [novoVoo()]);
       setVooVoltas(voltasArr);
+      const transfersArr = ((c as any).transfers as TransferDraft[] | undefined) ?? [];
+      setTransfers(transfersArr);
     });
 
     // Carrega hospedagens e experiências já vinculadas
