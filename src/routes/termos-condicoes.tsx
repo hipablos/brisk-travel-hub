@@ -263,7 +263,6 @@ function TermosCondicoesPage() {
               <div className="space-y-1.5">
                 <Label>Nome *</Label>
                 <Input
-                  placeholder="Ex.: Modelo padrão internacional"
                   value={draft.nome}
                   onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
                 />
@@ -273,7 +272,6 @@ function TermosCondicoesPage() {
               <Label>Conteúdo</Label>
               <Textarea
                 rows={12}
-                placeholder="Texto que aparecerá no PDF da cotação..."
                 value={draft.conteudo}
                 onChange={(e) => setDraft({ ...draft, conteudo: e.target.value })}
                 className="font-mono text-xs"

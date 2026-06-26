@@ -366,7 +366,6 @@ function TelegramPage() {
                     <Input
                       value={cfg.chat_id}
                       onChange={(e) => setField("chat_id", e.target.value)}
-                      placeholder="-1001234567890"
                     />
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
@@ -375,7 +374,6 @@ function TelegramPage() {
                       type="password"
                       value={cfg.token_bot}
                       onChange={(e) => setField("token_bot", e.target.value)}
-                      placeholder="123456789:AAH..."
                     />
                   </div>
                 </div>

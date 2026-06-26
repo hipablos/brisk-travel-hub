@@ -179,7 +179,6 @@ function PerfilPage() {
                   <Input
                     value={profile.cargo ?? ""}
                     onChange={(e) => setProfile({ ...profile, cargo: e.target.value })}
-                    placeholder="Ex: Consultor de viagens"
                   />
                 </div>
                 <div>

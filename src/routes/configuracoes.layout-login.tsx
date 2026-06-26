@@ -247,11 +247,11 @@ function LayoutLoginPage() {
                       <div className="text-sm font-semibold" style={{ color: "#0f172a" }}>Entrar</div>
                       <div className="relative">
                         <Mail className="absolute left-2 top-1/2 -translate-y-1/2 size-4" style={{ color: form.cor_icones }} />
-                        <input disabled className="w-full h-9 pl-7 pr-2 rounded border text-xs" style={{ background: form.cor_campos, color: "#0f172a" }} placeholder="email@exemplo.com" />
+                        <input disabled className="w-full h-9 pl-7 pr-2 rounded border text-xs" style={{ background: form.cor_campos, color: "#0f172a" }} />
                       </div>
                       <div className="relative">
                         <Lock className="absolute left-2 top-1/2 -translate-y-1/2 size-4" style={{ color: form.cor_icones }} />
-                        <input disabled type="password" className="w-full h-9 pl-7 pr-2 rounded border text-xs" style={{ background: form.cor_campos, color: "#0f172a" }} placeholder="••••••" />
+                        <input disabled type="password" className="w-full h-9 pl-7 pr-2 rounded border text-xs" style={{ background: form.cor_campos, color: "#0f172a" }} />
                       </div>
                       <button className="h-9 rounded text-xs font-semibold" style={{ background: form.cor_botao, color: form.cor_botao_texto }}>Entrar</button>
                       <a className="text-xs underline text-center" style={{ color: form.cor_links }}>Esqueci minha senha</a>

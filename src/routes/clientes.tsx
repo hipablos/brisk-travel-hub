@@ -111,7 +111,6 @@ function ClientesList() {
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar por nome, CPF/CNPJ, e-mail, telefone..."
                   className="pl-9"
                 />
               </div>
@@ -119,7 +118,7 @@ function ClientesList() {
                 value={tipoFilter || "all"}
                 onValueChange={(v) => setTipoFilter(v === "all" ? "" : (v as TipoCliente))}
               >
-                <SelectTrigger className="md:w-56"><SelectValue placeholder="Tipo de cliente" /></SelectTrigger>
+                <SelectTrigger className="md:w-56"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os tipos</SelectItem>
                   <SelectItem value="passageiro">Passageiro</SelectItem>

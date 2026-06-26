@@ -231,7 +231,6 @@ function ExperienciasPage() {
                       <Input
                         value={form.nome || ""}
                         onChange={(e) => setForm((f) => ({ ...f, nome: e.target.value }))}
-                        placeholder="Ex: Cristo Redentor"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -254,7 +253,6 @@ function ExperienciasPage() {
 
                   <PlaceAutocomplete
                     label="Endereço / local"
-                    placeholder="Buscar no Google Maps..."
                     value={form.endereco || ""}
                     onChange={(v) => setForm((f) => ({ ...f, endereco: v }))}
                     onPlaceSelected={handlePlace}
@@ -374,7 +372,7 @@ function ExperienciasPage() {
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecionar..." />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {clientes.map((c) => (
@@ -392,7 +390,7 @@ function ExperienciasPage() {
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecionar..." />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {cotacoes.map((c) => (

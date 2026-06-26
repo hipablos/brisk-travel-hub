@@ -158,7 +158,7 @@ function NovoCliente() {
                   <div className="space-y-1.5">
                     <Label>Sexo</Label>
                     <Select value={form.sexo} onValueChange={(v) => set("sexo", v as typeof form.sexo)}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="masculino">Masculino</SelectItem>
                         <SelectItem value="feminino">Feminino</SelectItem>

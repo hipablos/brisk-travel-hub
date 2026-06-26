@@ -180,18 +180,18 @@ function VoosPage() {
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
                     <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
-                    <Input placeholder="Inicial" className="pl-9" />
+                    <Input className="pl-9" />
                   </div>
                   <span className="text-xs text-muted-foreground">até</span>
                   <div className="relative flex-1">
                     <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
-                    <Input placeholder="Final" className="pl-9" />
+                    <Input className="pl-9" />
                   </div>
                 </div>
               </div>
               <div className="space-y-1.5 lg:col-span-2">
                 <label className="text-xs font-medium text-muted-foreground">Localizador</label>
-                <Input placeholder="Ex.: BRK-29X4" />
+                <Input />
               </div>
               <div className="space-y-1.5 lg:col-span-2">
                 <label className="text-xs font-medium text-muted-foreground">Situação</label>

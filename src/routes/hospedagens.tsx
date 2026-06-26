@@ -250,7 +250,7 @@ function HospedagensPage() {
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecionar..." />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {[1, 2, 3, 4, 5].map((n) => (
@@ -381,7 +381,6 @@ function HospedagensPage() {
                     <div className="space-y-1.5">
                       <Label>Tipo de acomodação</Label>
                       <Input
-                        placeholder="Ex: Suíte Luxo"
                         value={form.tipo_acomodacao || ""}
                         onChange={(e) =>
                           setForm((f) => ({ ...f, tipo_acomodacao: e.target.value }))
@@ -421,7 +420,7 @@ function HospedagensPage() {
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecionar..." />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {clientes.map((c) => (
@@ -441,7 +440,7 @@ function HospedagensPage() {
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecionar..." />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {cotacoes.map((c) => (

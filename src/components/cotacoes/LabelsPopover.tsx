@@ -75,7 +75,6 @@ export function LabelsPopover({ cotacaoId, selected, trigger }: Props) {
           {adding ? (
             <div className="space-y-2">
               <Input
-                placeholder="Nome da etiqueta"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="h-8"
