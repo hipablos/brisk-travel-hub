@@ -808,7 +808,7 @@ function NovaCotacao() {
                       <Link to="/termos-condicoes"><FileSignature className="size-4" /> Gerenciar modelos</Link>
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-2">Selecione um modelo cadastrado. O conteúdo será salvo junto à cotação.</p>
+                  <p className="text-xs text-muted-foreground mb-3">Selecione um modelo cadastrado. O conteúdo será salvo junto à cotação.</p>
                   <Select
                     value={outrasModeloId || "__none"}
                     onValueChange={(v) => {
