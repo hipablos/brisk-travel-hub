@@ -1024,7 +1024,7 @@ function NovaCotacao() {
                               onChange={(e) => updVendaCusto(v.id, { descricao: e.target.value })}
                               className="flex-1"
                             />
-                            <div className="flex items-center gap-1 w-44">
+                            <div className="flex items-center gap-2 w-44">
                               <span className="px-2 h-9 flex items-center rounded-md border border-border/40 bg-muted text-xs text-muted-foreground">R$</span>
                               <Input
                                 type="number"
