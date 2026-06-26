@@ -105,9 +105,28 @@ export function parseDuracaoParaMinutos(texto?: string | null): number {
 }
 
 /**
- * Duração do trecho principal:
- * = duração de voo (porta-a-porta com datas) + duração de voo de cada escala (se preenchida).
- * Se nenhuma escala possuir duração, retorna apenas a duração de voo.
+ * Duração de um trecho de ESCALA (perna adicional de voo), calculada pelas
+ * datas+horários da própria escala. Cai em manual (esc.duracaoTrecho) se
+ * não houver horários preenchidos.
+ */
+export function calcDuracaoEscalaTrechoMin(esc: any): number {
+  const calc = calcDuracaoMinutosComData(
+    esc?.dataInicio,
+    esc?.saida,
+    esc?.dataFim ?? esc?.dataInicio,
+    esc?.chegada,
+  );
+  if (calc != null) return calc;
+  return parseDuracaoParaMinutos(esc?.duracaoTrecho);
+}
+
+export function calcDuracaoEscalaTrecho(esc: any): string {
+  const m = calcDuracaoEscalaTrechoMin(esc);
+  return m > 0 ? formatDuracao(m) : "";
+}
+
+/**
+ * Duração do trecho principal (somente o voo principal, sem escalas).
  */
 export function calcDuracaoTrecho(voo: any): string {
   const base = calcDuracaoMinutosComData(
@@ -116,36 +135,25 @@ export function calcDuracaoTrecho(voo: any): string {
     voo?.dataChegada ?? voo?.data,
     voo?.horaChegada,
   ) ?? 0;
-  const escalas: any[] = Array.isArray(voo?.escalas) ? voo.escalas : [];
-  let extra = 0;
-  escalas.forEach((esc: any) => {
-    extra += parseDuracaoParaMinutos(esc?.duracaoTrecho);
-  });
-  const total = base + extra;
-  if (total <= 0) return "";
-  return formatDuracao(total);
+  if (base <= 0) return "";
+  return formatDuracao(base);
 }
 
 /**
- * "Tempo de voo" total para exibir no PDF: soma de todas as durações de trecho
- * (editadas manualmente) + todas as durações de escala (calculadas chegada→saída).
+ * Duração total = trecho principal + soma dos trechos de cada escala.
  */
 export function calcTempoDeVooTotal(voo: any): string {
-  const escalas: any[] = Array.isArray(voo?.escalas) ? voo.escalas : [];
   const base = calcDuracaoMinutosComData(
     voo?.data,
     voo?.horaSaida,
     voo?.dataChegada ?? voo?.data,
     voo?.horaChegada,
   ) ?? 0;
-  if (escalas.length === 0) {
-    if (base > 0) return formatDuracao(base);
-    return "—";
-  }
+  const escalas: any[] = Array.isArray(voo?.escalas) ? voo.escalas : [];
   let total = base;
-  escalas.forEach((esc: any) => {
-    total += calcDuracaoMinutos(esc?.chegada, esc?.saida) ?? 0;
-    total += parseDuracaoParaMinutos(esc?.duracaoTrecho);
+  escalas.forEach((esc) => {
+    total += calcDuracaoEscalaTrechoMin(esc);
   });
+  if (total <= 0) return "—";
   return formatDuracao(total);
 }
