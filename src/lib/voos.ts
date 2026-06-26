@@ -195,6 +195,7 @@ export function calcTempoDeVooTotal(voo: any): string {
   let total = base;
   escalas.forEach((esc) => {
     total += calcDuracaoEscalaTrechoMin(esc);
+    total += parseDuracaoParaMinutos(esc?.tempoEspera);
   });
   if (total <= 0) return "";
   return formatDuracao(total);
