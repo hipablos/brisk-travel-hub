@@ -1076,14 +1076,14 @@ function NovaCotacao() {
                           <Link to="/formas-pagamento" className="text-primary underline">Cadastrar</Link>
                         </div>
                       ) : (
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                           {formasPagamento.filter((f) => f.ativo).map((f) => {
                             const checked = formasPagamentoIds.includes(f.id);
                             const calc = computeFormaTotal(totalVendas || total, f);
                             return (
                               <label
                                 key={f.id}
-                                className="flex items-start gap-2 py-1 cursor-pointer text-sm"
+                                className="flex items-start gap-3 py-2 cursor-pointer text-sm"
                               >
                                 <input
                                   type="checkbox"
