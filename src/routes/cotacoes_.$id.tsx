@@ -688,12 +688,12 @@ function ExperienciaBlock({ e }: { e: ExperienciaRow }) {
     : "—";
   return (
     <section className="space-y-1.5">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <MapPin className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
-        <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">Experiência</h3>
-        <span className="text-slate-300">·</span>
-        <span className="text-[12px] font-semibold text-slate-900">{e.nome}</span>
-        {e.categoria && <span className="text-[10px] text-slate-500">({e.categoria})</span>}
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-center size-6 rounded-md bg-gradient-to-br from-[oklch(0.65_0.18_30)] to-[oklch(0.70_0.20_60)] shadow-sm">
+          <MapPin className="size-3.5 text-white" />
+        </div>
+        <span className="text-[14px] font-bold text-slate-900 tracking-tight">{e.nome}</span>
+        {e.categoria && <span className="text-[11px] font-medium text-[oklch(0.55_0.15_30)] bg-[oklch(0.95_0.05_30)] px-1.5 py-0.5 rounded">{e.categoria}</span>}
       </div>
       {e.fotos && e.fotos.length > 0 && (
         <div className="grid grid-cols-4 gap-1.5">
