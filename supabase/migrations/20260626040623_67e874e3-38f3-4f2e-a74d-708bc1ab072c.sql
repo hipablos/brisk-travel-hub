@@ -1,0 +1,1 @@
+ALTER TABLE public.experiencias ADD COLUMN IF NOT EXISTS fotos text[] DEFAULT '{}'::text[];

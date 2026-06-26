@@ -246,6 +246,7 @@ export type Database = {
           duracao_min: number | null
           endereco: string | null
           estado: string | null
+          fotos: string[] | null
           google_maps_url: string | null
           google_place_id: string | null
           hora_inicio: string | null
@@ -272,6 +273,7 @@ export type Database = {
           duracao_min?: number | null
           endereco?: string | null
           estado?: string | null
+          fotos?: string[] | null
           google_maps_url?: string | null
           google_place_id?: string | null
           hora_inicio?: string | null
@@ -298,6 +300,7 @@ export type Database = {
           duracao_min?: number | null
           endereco?: string | null
           estado?: string | null
+          fotos?: string[] | null
           google_maps_url?: string | null
           google_place_id?: string | null
           hora_inicio?: string | null
