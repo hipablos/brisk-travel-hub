@@ -412,62 +412,87 @@ function NovaCotacao() {
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar />
-        <main className="p-6 max-w-[1400px] w-full mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Button asChild variant="outline" size="icon">
-                <Link to="/cotacoes"><ArrowLeft className="size-4" /></Link>
-              </Button>
-              <div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Link to="/cotacoes" className="hover:text-foreground">Cotações</Link>
-                  <span>/</span>
-                  <span className="text-foreground">{editing ? "Editar" : "Nova"}</span>
-                </div>
-                <h1 className="text-2xl font-bold text-foreground">{editing ? "Editar Cotação" : "Nova Cotação"}</h1>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <Button asChild variant="outline"><Link to="/cotacoes">Cancelar</Link></Button>
-              {editing && editId && (
-                <TelegramAlertDiagnostic
-                  cotacaoId={editId}
-                  code={undefined}
-                  status={status}
-                  cliente={clientes.find((c) => c.id === clienteId) ?? null}
-                  vooIdas={vooIdas}
-                  vooVoltas={vooVoltas}
-                />
-              )}
-              {editing && editId && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  className="gap-2"
-                  onClick={async () => {
-                    if (!confirm("Excluir esta cotação? Esta ação não pode ser desfeita.")) return;
-                    await deleteCotacao(editId);
-                    toast.success("Cotação excluída");
-                    navigate({ to: "/cotacoes" });
-                  }}
-                >
-                  <Trash2 className="size-4" /> Excluir
+        <main className="flex-1 p-0">
+          <div className="bg-card border-b border-border px-6 py-4">
+            <div className="max-w-[960px] mx-auto flex items-center justify-between">
+              <div className="flex items-center gap-3.5">
+                <Button asChild variant="outline" size="icon" className="h-9 w-9 rounded-lg border-border bg-muted/50 hover:bg-muted">
+                  <Link to="/cotacoes"><ArrowLeft className="size-4" /></Link>
                 </Button>
-              )}
-              <Button onClick={handleSave} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
-                <Save className="size-4" /> Salvar Cotação
-              </Button>
+                <div>
+                  <div className="text-xs text-muted-foreground">
+                    <Link to="/cotacoes" className="hover:text-foreground">Cotações</Link>
+                    <span className="mx-1.5">/</span>
+                    <span className="text-foreground">{editing ? "Editar" : "Nova"}</span>
+                  </div>
+                  <h1 className="text-lg font-semibold text-foreground">{editing ? "Editar Cotação" : "Nova Cotação"}</h1>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button asChild variant="outline" className="border-border hover:bg-muted"><Link to="/cotacoes">Cancelar</Link></Button>
+                {editing && editId && (
+                  <TelegramAlertDiagnostic
+                    cotacaoId={editId}
+                    code={undefined}
+                    status={status}
+                    cliente={clientes.find((c) => c.id === clienteId) ?? null}
+                    vooIdas={vooIdas}
+                    vooVoltas={vooVoltas}
+                  />
+                )}
+                {editing && editId && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    className="gap-2"
+                    onClick={async () => {
+                      if (!confirm("Excluir esta cotação? Esta ação não pode ser desfeita.")) return;
+                      await deleteCotacao(editId);
+                      toast.success("Cotação excluída");
+                      navigate({ to: "/cotacoes" });
+                    }}
+                  >
+                    <Trash2 className="size-4" /> Excluir
+                  </Button>
+                )}
+                <Button onClick={handleSave} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
+                  <Save className="size-4" /> Salvar
+                </Button>
+              </div>
             </div>
           </div>
 
+          <div className="max-w-[960px] mx-auto p-6">
           <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
 
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="w-full">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="orcamento" className="gap-2"><FileText className="size-4" />Orçamento</TabsTrigger>
-                  <TabsTrigger value="venda" className="gap-2"><ShoppingCart className="size-4" />Venda</TabsTrigger>
-                </TabsList>
+                <div className="flex gap-1.5 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("orcamento")}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors",
+                      activeTab === "orcamento"
+                        ? "bg-primary/10 border-primary text-foreground"
+                        : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-border/80"
+                    )}
+                  >
+                    <FileText className="size-4" /> Orçamento
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("venda")}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors",
+                      activeTab === "venda"
+                        ? "bg-primary/10 border-primary text-foreground"
+                        : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-border/80"
+                    )}
+                  >
+                    <ShoppingCart className="size-4" /> Venda
+                  </button>
+                </div>
 
 
 
@@ -1216,6 +1241,7 @@ function NovaCotacao() {
               </section>
             </aside>
           </form>
+        </div>
         </main>
       </div>
     </div>
