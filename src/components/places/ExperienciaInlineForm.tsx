@@ -143,7 +143,13 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
       <div className="grid grid-cols-4 gap-6">
         <div className="space-y-2">
           <Label>Data</Label>
-          <Input type="date" value={f.data || ""} onChange={(e) => onChange({ data: e.target.value })} />
+          <DateInput
+            value={f.data ? (f.data.includes("-") && f.data.length === 10 && f.data[4] === "-"
+              ? (() => { const [y,m,d]=f.data!.split("-"); return `${d}-${m}-${y}`; })()
+              : f.data)
+              : ""}
+            onChange={(br) => onChange({ data: dateOnlyToNativeISO(br) })}
+          />
         </div>
         <div className="space-y-2">
           <Label>Início</Label>
