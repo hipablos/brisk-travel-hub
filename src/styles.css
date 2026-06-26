@@ -153,3 +153,14 @@
     color: var(--color-foreground);
   }
 }
+
+/* Google Places Autocomplete dropdown — keep above dialogs/sheets */
+.pac-container {
+  z-index: 99999 !important;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  background: #ffffff;
+  color: #111827;
+}
+.pac-item { padding: 0.5rem 0.75rem; cursor: pointer; }
+.pac-item:hover { background: #f3f4f6; }
