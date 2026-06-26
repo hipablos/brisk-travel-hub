@@ -204,22 +204,6 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label>Nº da reserva</Label>
-          <Input value={f.numero_reserva || ""} onChange={(e) => onChange({ numero_reserva: e.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <Label>Código de confirmação</Label>
-          <Input value={f.codigo_confirmacao || ""} onChange={(e) => onChange({ codigo_confirmacao: e.target.value })} />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Observações ao cliente</Label>
-        <Textarea rows={2} value={f.observacoes_cliente || ""}
-          onChange={(e) => onChange({ observacoes_cliente: e.target.value })} />
-      </div>
 
       {f.google_maps_url && (
         <a href={f.google_maps_url} target="_blank" rel="noreferrer"
