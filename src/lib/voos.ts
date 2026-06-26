@@ -26,6 +26,34 @@ function toISODate(s?: string | null): string | null {
   return null;
 }
 
+function parseDateParts(date?: string | null): { year: number; month: number; day: number } | null {
+  const iso = toISODate(date);
+  if (!iso) return null;
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  const year = Number(m[1]);
+  const month = Number(m[2]);
+  const day = Number(m[3]);
+  if ([year, month, day].some((n) => Number.isNaN(n))) return null;
+  const check = new Date(Date.UTC(year, month - 1, day));
+  if (check.getUTCFullYear() !== year || check.getUTCMonth() !== month - 1 || check.getUTCDate() !== day) return null;
+  return { year, month, day };
+}
+
+function parseTimeToMinutes(time?: string | null): number | null {
+  if (!time) return null;
+  const m = String(time).match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  const hour = Number(m[1]);
+  const minute = Number(m[2]);
+  if (Number.isNaN(hour) || Number.isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+  return hour * 60 + minute;
+}
+
+function dateSerial(date: { year: number; month: number; day: number }): number {
+  return Math.floor(Date.UTC(date.year, date.month - 1, date.day) / 86400000);
+}
+
 /**
  * Duração levando em conta data de início e data de fim.
  * Aceita DD-MM-AAAA, DD/MM/AAAA ou YYYY-MM-DD. Suporta voos que cruzam dias.
@@ -36,17 +64,19 @@ export function calcDuracaoMinutosComData(
   dataFim?: string | null,
   horaChegada?: string | null,
 ): number | null {
-  if (!horaSaida || !horaChegada) return null;
-  const di = toISODate(dataInicio);
-  const df = toISODate(dataFim) ?? di;
+  const saidaMin = parseTimeToMinutes(horaSaida);
+  const chegadaMin = parseTimeToMinutes(horaChegada);
+  if (saidaMin == null || chegadaMin == null) return null;
+
+  const di = parseDateParts(dataInicio);
+  const df = parseDateParts(dataFim) ?? di;
   if (di && df) {
-    const ini = new Date(`${di}T${horaSaida}:00`);
-    const fim = new Date(`${df}T${horaChegada}:00`);
-    const diff = fim.getTime() - ini.getTime();
-    if (Number.isNaN(diff) || diff < 0) return null;
-    return Math.round(diff / 60000);
+    const diff = (dateSerial(df) - dateSerial(di)) * 24 * 60 + chegadaMin - saidaMin;
+    return diff >= 0 ? diff : null;
   }
-  return calcDuracaoMinutos(horaSaida, horaChegada);
+
+  const diffSemData = chegadaMin - saidaMin;
+  return diffSemData >= 0 ? diffSemData : null;
 }
 
 export function formatDuracao(minutos: number | null): string {
@@ -117,27 +147,19 @@ export function parseDuracaoParaMinutos(texto?: string | null): number {
 }
 
 /**
- * Duração de um trecho de ESCALA (perna adicional de voo), calculada pelas
- * datas+horários da própria escala. Cai em manual (esc.duracaoTrecho) se
- * não houver horários preenchidos.
- */
-/**
  * Duração de um trecho de ESCALA (perna adicional de voo), calculada
  * exclusivamente pelos horários de saída/chegada (e datas, se houver).
- * Se os horários não estiverem preenchidos, usa o valor manual; caso
- * contrário sempre o cálculo manda — diff negativo vira 0.
+ * Se os horários/datas não estiverem preenchidos ou a chegada vier antes
+ * da saída na mesma data, permanece zerado.
  */
 export function calcDuracaoEscalaTrechoMin(esc: any): number {
-  if (esc?.saida && esc?.chegada) {
-    const calc = calcDuracaoMinutosComData(
-      esc?.dataInicio,
-      esc?.saida,
-      esc?.dataFim ?? esc?.dataInicio,
-      esc?.chegada,
-    );
-    return calc != null && calc > 0 ? calc : 0;
-  }
-  return parseDuracaoParaMinutos(esc?.duracaoTrecho);
+  const calc = calcDuracaoMinutosComData(
+    esc?.dataInicio,
+    esc?.saida,
+    esc?.dataFim ?? esc?.dataInicio,
+    esc?.chegada,
+  );
+  return calc != null && calc > 0 ? calc : 0;
 }
 
 export function calcDuracaoEscalaTrecho(esc: any): string {
