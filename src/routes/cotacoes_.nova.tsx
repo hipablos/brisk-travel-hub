@@ -462,7 +462,7 @@ function NovaCotacao() {
             </div>
           </div>
 
-          <div className="max-w-[1200px] mx-auto p-6">
+          <div className="max-w-[1200px] mx-auto p-8">
           <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
 
