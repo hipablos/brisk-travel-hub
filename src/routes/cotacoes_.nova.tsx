@@ -1115,7 +1115,7 @@ function NovaCotacao() {
                     <div>
                       <Label>Instruções para Pagamento</Label>
                       <Textarea
-                        className="mt-1.5"
+                        className="mt-2"
                         rows={3}
                         value={instrucoesPagamento}
                         onChange={(e) => setInstrucoesPagamento(e.target.value)}
