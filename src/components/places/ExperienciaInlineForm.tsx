@@ -6,6 +6,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { MapPin, Trash2 } from "lucide-react";
 import { PlaceAutocomplete, type PlaceResult } from "@/components/places/PlaceAutocomplete";
+import { DateInput } from "@/components/ui/date-input";
+import { dateOnlyToBR, dateOnlyToNativeISO } from "@/lib/dates";
 
 export type ExperienciaDraft = {
   id?: string;
