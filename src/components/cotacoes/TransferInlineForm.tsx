@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DateInput } from "@/components/ui/date-input";
+import { PlaceAutocomplete } from "@/components/places/PlaceAutocomplete";
 
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -98,16 +99,18 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label>Origem</Label>
-          <Input value={f.origem || ""}
-            onChange={(e) => onChange({ origem: e.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <Label>Destino</Label>
-          <Input value={f.destino || ""}
-            onChange={(e) => onChange({ destino: e.target.value })} />
-        </div>
+        <PlaceAutocomplete
+          label="Origem"
+          value={f.origem || ""}
+          onChange={(v) => onChange({ origem: v })}
+          onPlaceSelected={(p) => onChange({ origem: p.nome || p.endereco || f.origem || "" })}
+        />
+        <PlaceAutocomplete
+          label="Destino"
+          value={f.destino || ""}
+          onChange={(v) => onChange({ destino: v })}
+          onPlaceSelected={(p) => onChange({ destino: p.nome || p.endereco || f.destino || "" })}
+        />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
