@@ -319,10 +319,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     <p className="text-[11px] text-muted-foreground">Informe manualmente (ex: 21h, 1h 30m).</p>
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Companhia aérea</Label>
-                    <Input value={voo.companhia ?? ""} onChange={(e) => onChange({ companhia: e.target.value })} placeholder="LATAM, GOL, Azul..." />
-                  </div>
-                  <div className="space-y-1.5">
                     <Label>Número do voo</Label>
                     <Input value={voo.numeroVoo ?? ""} onChange={(e) => onChange({ numeroVoo: e.target.value })} placeholder="LA 8084" />
                   </div>
