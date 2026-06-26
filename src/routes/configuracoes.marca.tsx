@@ -267,7 +267,6 @@ function MarcaPage() {
                         rows={2}
                         value={form.fundo_login_valor}
                         onChange={(e) => update("fundo_login_valor", e.target.value)}
-                        placeholder={form.fundo_login_tipo === "gradiente" ? "linear-gradient(135deg, #1e3a8a, #0f2557)" : "URL da imagem ou data URL"}
                         className="font-mono text-xs"
                       />
                     )}

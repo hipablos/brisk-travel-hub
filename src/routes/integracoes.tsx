@@ -303,12 +303,12 @@ function IntegracoesPage() {
               </div>
               <div className="space-y-2">
                 <Label>Nome *</Label>
-                <Input value={draft.nome} onChange={(e) => setDraft({ ...draft, nome: e.target.value })} placeholder="Ex: WhatsApp Vendas" />
+                <Input value={draft.nome} onChange={(e) => setDraft({ ...draft, nome: e.target.value })} />
               </div>
               <div className="space-y-2">
                 <Label>Provedor</Label>
                 <Select value={draft.provedor} onValueChange={(v) => setDraft({ ...draft, provedor: v })}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {CAT_BY_VALUE[draft.categoria].provedores.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                   </SelectContent>
@@ -316,7 +316,7 @@ function IntegracoesPage() {
               </div>
               <div className="space-y-2 md:col-span-2">
                 <Label>URL da API</Label>
-                <Input value={draft.api_url} onChange={(e) => setDraft({ ...draft, api_url: e.target.value })} placeholder="https://api.exemplo.com" />
+                <Input value={draft.api_url} onChange={(e) => setDraft({ ...draft, api_url: e.target.value })} />
               </div>
               <div className="space-y-2">
                 <Label>API Key</Label>

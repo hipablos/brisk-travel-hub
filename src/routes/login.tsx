@@ -194,7 +194,7 @@ function LoginPage() {
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input id="forgot-email" type="email" value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
-                    className="pl-9" placeholder="seu@email.com" required />
+                    className="pl-9" required />
                 </div>
               </div>
               <Button type="submit" className="w-full hover:opacity-90" style={btnStyle} disabled={loading}>
@@ -231,7 +231,7 @@ function LoginPage() {
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input id="l-email" type="email" value={lEmail}
                         onChange={(e) => setLEmail(e.target.value)}
-                        className="pl-9" placeholder="seu@email.com" autoComplete="email" />
+                        className="pl-9" autoComplete="email" />
                     </div>
                     {lErrors.email && <p className="text-xs text-destructive">{lErrors.email}</p>}
                   </div>
@@ -247,7 +247,7 @@ function LoginPage() {
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input id="l-password" type="password" value={lPassword}
                         onChange={(e) => setLPassword(e.target.value)}
-                        className="pl-9" placeholder="••••••••" autoComplete="current-password" />
+                        className="pl-9" autoComplete="current-password" />
                     </div>
                     {lErrors.password && <p className="text-xs text-destructive">{lErrors.password}</p>}
                   </div>
@@ -271,7 +271,7 @@ function LoginPage() {
                     <div className="relative">
                       <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input id="s-name" value={sName} onChange={(e) => setSName(e.target.value)}
-                        className="pl-9" placeholder="Seu nome" autoComplete="name" />
+                        className="pl-9" autoComplete="name" />
                     </div>
                     {sErrors.fullName && <p className="text-xs text-destructive">{sErrors.fullName}</p>}
                   </div>
@@ -281,7 +281,7 @@ function LoginPage() {
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input id="s-email" type="email" value={sEmail}
                         onChange={(e) => setSEmail(e.target.value)}
-                        className="pl-9" placeholder="seu@email.com" autoComplete="email" />
+                        className="pl-9" autoComplete="email" />
                     </div>
                     {sErrors.email && <p className="text-xs text-destructive">{sErrors.email}</p>}
                   </div>
@@ -291,7 +291,7 @@ function LoginPage() {
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input id="s-password" type="password" value={sPassword}
                         onChange={(e) => setSPassword(e.target.value)}
-                        className="pl-9" placeholder="Mínimo 4 caracteres" autoComplete="new-password" />
+                        className="pl-9" autoComplete="new-password" />
                     </div>
                     {sErrors.password && <p className="text-xs text-destructive">{sErrors.password}</p>}
                   </div>
@@ -301,7 +301,7 @@ function LoginPage() {
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                       <Input id="s-confirm" type="password" value={sConfirm}
                         onChange={(e) => setSConfirm(e.target.value)}
-                        className="pl-9" placeholder="Repita a senha" autoComplete="new-password" />
+                        className="pl-9" autoComplete="new-password" />
                     </div>
                     {sErrors.confirm && <p className="text-xs text-destructive">{sErrors.confirm}</p>}
                   </div>

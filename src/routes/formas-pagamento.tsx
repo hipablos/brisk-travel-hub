@@ -155,7 +155,6 @@ function FormasPagamentoPage() {
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar forma de pagamento"
                   className="pl-9"
                 />
               </div>
@@ -278,7 +277,6 @@ function FormasPagamentoPage() {
             <div className="space-y-1.5">
               <Label>Nome *</Label>
               <Input
-                placeholder="Ex.: Pix, Cartão de Crédito, Transferência Bancária"
                 value={draft.nome}
                 onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
               />
@@ -335,7 +333,6 @@ function FormasPagamentoPage() {
               <Label>Observação</Label>
               <Textarea
                 rows={4}
-                placeholder="Observações internas sobre esta forma de pagamento..."
                 value={draft.observacao}
                 onChange={(e) => setDraft({ ...draft, observacao: e.target.value })}
               />

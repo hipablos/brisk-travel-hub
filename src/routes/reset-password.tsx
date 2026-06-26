@@ -43,7 +43,7 @@ function ResetPasswordPage() {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input type="password" className="pl-9" value={password}
-                onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 4 caracteres" />
+                onChange={(e) => setPassword(e.target.value)} />
             </div>
           </div>
           <div className="space-y-2">
@@ -51,7 +51,7 @@ function ResetPasswordPage() {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input type="password" className="pl-9" value={confirm}
-                onChange={(e) => setConfirm(e.target.value)} placeholder="Repita a nova senha" />
+                onChange={(e) => setConfirm(e.target.value)} />
             </div>
           </div>
           <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" disabled={loading}>

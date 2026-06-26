@@ -161,7 +161,6 @@ function VendasPage() {
                   clientes={clientes}
                   value={clienteId === "__all" ? "" : (clientes.find((c) => c.id === clienteId)?.nome ?? "")}
                   onSelect={(c) => setClienteId(c.id)}
-                  placeholder="Buscar cliente por nome..."
                 />
               </div>
             </div>

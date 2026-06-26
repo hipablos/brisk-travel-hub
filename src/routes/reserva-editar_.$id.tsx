@@ -182,7 +182,6 @@ function ReservaEditarPage() {
                       onChange={(e) => {
                         const arr = [...passageiros]; arr[i] = e.target.value; setPassageiros(arr);
                       }}
-                      placeholder="Nome completo"
                     />
                   </div>
                 ))}
@@ -255,7 +254,7 @@ function VooForm({
         <div>
           <Label className="text-xs">Companhia</Label>
           <Select value={voo.companhia ?? ""} onValueChange={(v) => set({ companhia: v })}>
-            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               {COMPANHIAS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
             </SelectContent>
@@ -263,11 +262,11 @@ function VooForm({
         </div>
         <div>
           <Label className="text-xs">Localizador</Label>
-          <Input value={voo.localizador ?? ""} onChange={(e) => set({ localizador: e.target.value })} placeholder="ABC123" />
+          <Input value={voo.localizador ?? ""} onChange={(e) => set({ localizador: e.target.value })} />
         </div>
         <div className="md:col-span-2">
           <Label className="text-xs">Assentos</Label>
-          <Input value={voo.assento ?? ""} onChange={(e) => set({ assento: e.target.value })} placeholder="12A, 12B" />
+          <Input value={voo.assento ?? ""} onChange={(e) => set({ assento: e.target.value })} />
         </div>
         <div>
           <Label className="text-xs">Item pessoal / mochila</Label>
@@ -310,7 +309,7 @@ function VooForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div>
                 <Label className="text-xs">Número do voo</Label>
-                <Input value={t.numeroVoo ?? ""} onChange={(e) => updateTrecho(i, { numeroVoo: e.target.value })} placeholder="G3 1234" />
+                <Input value={t.numeroVoo ?? ""} onChange={(e) => updateTrecho(i, { numeroVoo: e.target.value })} />
               </div>
               <div>
                 <Label className="text-xs">Data</Label>
@@ -330,7 +329,6 @@ function VooForm({
                   value={t.origem}
                   onChange={(v) => updateTrecho(i, { origem: v })}
                   onSelect={(_a, formatted) => updateTrecho(i, { origem: formatted })}
-                  placeholder="Ex.: FOR, Fortaleza, Pinto Martins"
                 />
               </div>
               <div className="md:col-span-2">
@@ -339,7 +337,6 @@ function VooForm({
                   value={t.destino}
                   onChange={(v) => updateTrecho(i, { destino: v })}
                   onSelect={(_a, formatted) => updateTrecho(i, { destino: formatted })}
-                  placeholder="Ex.: SSA, Salvador, Luís Eduardo Magalhães"
                 />
               </div>
             </div>

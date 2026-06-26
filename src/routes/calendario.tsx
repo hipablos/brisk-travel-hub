@@ -415,7 +415,7 @@ function CalendarioPage() {
             </Tabs>
             <div className="flex flex-wrap items-center gap-2">
               <Select value={filterCat} onValueChange={setFilterCat}>
-                <SelectTrigger className="w-[170px]"><SelectValue placeholder="Categoria" /></SelectTrigger>
+                <SelectTrigger className="w-[170px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todas">Todas categorias</SelectItem>
                   {(Object.keys(CATEGORIA_INFO) as Categoria[]).map((k) => (
@@ -424,7 +424,7 @@ function CalendarioPage() {
                 </SelectContent>
               </Select>
               <Select value={filterCliente} onValueChange={setFilterCliente}>
-                <SelectTrigger className="w-[170px]"><SelectValue placeholder="Cliente" /></SelectTrigger>
+                <SelectTrigger className="w-[170px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos clientes</SelectItem>
                   {Array.from(new Set(eventos.map((e) => e.cliente).filter(Boolean))).map((c) => (
@@ -542,7 +542,7 @@ function CalendarioPage() {
             <div>
               <Label>Cliente</Label>
               <Select value={form.cliente_id ?? "none"} onValueChange={(v) => setForm({ ...form, cliente_id: v === "none" ? null : v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">—</SelectItem>
                   {clientes.map((c) => (
@@ -554,7 +554,7 @@ function CalendarioPage() {
             <div>
               <Label>Cotação</Label>
               <Select value={form.cotacao_id ?? "none"} onValueChange={(v) => setForm({ ...form, cotacao_id: v === "none" ? null : v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">—</SelectItem>
                   {cotacoes.map((c) => (

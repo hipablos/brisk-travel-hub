@@ -83,7 +83,6 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
             <Input
               value={linha.descricao ?? ""}
               onChange={(e) => upd({ descricao: e.target.value })}
-              placeholder={isCusto ? "Ex.: Emissão de bilhete LATAM" : "Ex.: Pacote de viagem"}
             />
           </div>
 
@@ -93,7 +92,6 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
               list={`parte-${kind}`}
               value={linha.parte ?? ""}
               onChange={(e) => upd({ parte: e.target.value })}
-              placeholder={isCusto ? "Nome do fornecedor" : "Nome do cliente"}
             />
             <datalist id={`parte-${kind}`}>
               {parteList.map((p) => <option key={p} value={p} />)}
@@ -106,7 +104,6 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
               list={`cat-${kind}`}
               value={linha.categoria ?? ""}
               onChange={(e) => upd({ categoria: e.target.value })}
-              placeholder="Ex.: Aéreo, Hospedagem..."
             />
             <datalist id={`cat-${kind}`}>
               {catList.map((p) => <option key={p} value={p} />)}
@@ -119,7 +116,6 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
               list={`conta-${kind}`}
               value={linha.conta ?? ""}
               onChange={(e) => upd({ conta: e.target.value })}
-              placeholder="Ex.: Itaú, Nubank, Caixa..."
             />
             <datalist id={`conta-${kind}`}>
               {contaList.map((p) => <option key={p} value={p} />)}
@@ -129,7 +125,7 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
           <div className="space-y-1.5">
             <Label>Forma de Pagamento</Label>
             <Select value={linha.forma ?? ""} onValueChange={(v) => upd({ forma: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {formas.length === 0 && (
                   <SelectItem value="__none" disabled>Nenhuma forma cadastrada</SelectItem>
@@ -146,7 +142,6 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
             <Input
               value={linha.parcela ?? ""}
               onChange={(e) => upd({ parcela: e.target.value })}
-              placeholder="Ex.: 1/3"
             />
           </div>
 
@@ -183,7 +178,6 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
                 className="pl-9 text-right"
                 value={linha.valor || ""}
                 onChange={(e) => upd({ valor: parseFloat(e.target.value) || 0 })}
-                placeholder="0,00"
               />
               <DollarSign className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
             </div>

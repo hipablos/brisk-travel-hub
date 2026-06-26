@@ -83,7 +83,6 @@ export function CotacoesFilters({ value, onChange, onPesquisar }: Props) {
             clientes={clientes}
             value={value.clienteNomeBusca}
             onSelect={(c) => onChange({ ...value, clienteId: c.id, clienteNomeBusca: c.nome })}
-            placeholder="Buscar cliente por nome..."
           />
         </div>
 
