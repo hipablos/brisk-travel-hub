@@ -326,14 +326,14 @@ function VisualizarCotacao() {
               {cotacao.termos && (
                 <section className="border-t border-slate-200 pt-3">
                   <h3 className="text-xs font-bold text-slate-900 mb-1">Termos e Condições</h3>
-                  <p className="text-[11px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.termos}</p>
+                  <p className="text-[12px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.termos}</p>
                 </section>
               )}
 
               {cotacao.outrasInformacoes && (
                 <section className="border-t border-slate-200 pt-3">
                   <h3 className="text-xs font-bold text-slate-900 mb-1">Outras Informações</h3>
-                  <p className="text-[11px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.outrasInformacoes}</p>
+                  <p className="text-[12px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.outrasInformacoes}</p>
                 </section>
               )}
 
@@ -626,14 +626,14 @@ function HospedagemBlock({ h }: { h: HospedagemRow }) {
   };
   return (
     <section className="space-y-1.5">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <Hotel className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
-        <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">Hospedagem</h3>
-        <span className="text-slate-300">·</span>
-        <span className="text-[12px] font-semibold text-slate-900">{h.nome_hotel}</span>
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-center size-6 rounded-md bg-gradient-to-br from-[oklch(0.55_0.18_255)] to-[oklch(0.65_0.20_290)] shadow-sm">
+          <Hotel className="size-3.5 text-white" />
+        </div>
+        <span className="text-[14px] font-bold text-slate-900 tracking-tight">{h.nome_hotel}</span>
         {h.estrelas ? (
           <span className="inline-flex items-center text-amber-500">
-            {Array.from({ length: h.estrelas }).map((_, i) => <Star key={i} className="size-3 fill-current" />)}
+            {Array.from({ length: h.estrelas }).map((_, i) => <Star key={i} className="size-3.5 fill-current" />)}
           </span>
         ) : null}
       </div>
@@ -651,7 +651,7 @@ function HospedagemBlock({ h }: { h: HospedagemRow }) {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px] text-slate-700">
         <div><span className="text-slate-500">Check-in:</span> <span className="font-medium text-slate-900">{formatDT(h.checkin)}</span></div>
         <div><span className="text-slate-500">Check-out:</span> <span className="font-medium text-slate-900">{formatDT(h.checkout)}</span></div>
         {h.noites != null && <div><span className="text-slate-500">Noites:</span> <span className="font-medium text-slate-900">{h.noites}</span></div>}
@@ -667,13 +667,13 @@ function HospedagemBlock({ h }: { h: HospedagemRow }) {
         {h.codigo_confirmacao && <div><span className="text-slate-500">Confirmação:</span> <span className="font-medium text-slate-900">{h.codigo_confirmacao}</span></div>}
       </div>
       {(h.endereco || local) && (
-        <div className="text-[11px] text-slate-600">
+        <div className="text-[12px] text-slate-600">
           <MapPin className="inline size-3 mr-0.5" />
           {[h.endereco, local].filter(Boolean).join(" — ")}
         </div>
       )}
       {h.observacoes_cliente && (
-        <div className="text-[11px] text-slate-700 italic">{h.observacoes_cliente}</div>
+        <div className="text-[12px] text-slate-700 italic">{h.observacoes_cliente}</div>
       )}
     </section>
   );
@@ -688,12 +688,12 @@ function ExperienciaBlock({ e }: { e: ExperienciaRow }) {
     : "—";
   return (
     <section className="space-y-1.5">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <MapPin className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
-        <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">Experiência</h3>
-        <span className="text-slate-300">·</span>
-        <span className="text-[12px] font-semibold text-slate-900">{e.nome}</span>
-        {e.categoria && <span className="text-[10px] text-slate-500">({e.categoria})</span>}
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-center size-6 rounded-md bg-gradient-to-br from-[oklch(0.65_0.18_30)] to-[oklch(0.70_0.20_60)] shadow-sm">
+          <MapPin className="size-3.5 text-white" />
+        </div>
+        <span className="text-[14px] font-bold text-slate-900 tracking-tight">{e.nome}</span>
+        {e.categoria && <span className="text-[11px] font-medium text-[oklch(0.55_0.15_30)] bg-[oklch(0.95_0.05_30)] px-1.5 py-0.5 rounded">{e.categoria}</span>}
       </div>
       {e.fotos && e.fotos.length > 0 && (
         <div className="grid grid-cols-4 gap-1.5">
@@ -707,7 +707,7 @@ function ExperienciaBlock({ e }: { e: ExperienciaRow }) {
           ))}
         </div>
       )}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px] text-slate-700">
         <div><span className="text-slate-500">Data:</span> <span className="font-medium text-slate-900">{data}</span></div>
         <div><span className="text-slate-500">Horário:</span> <span className="font-medium text-slate-900">{horario}</span></div>
         {e.duracao_min != null && <div><span className="text-slate-500">Duração:</span> <span className="font-medium text-slate-900">{e.duracao_min} min</span></div>}
@@ -716,12 +716,12 @@ function ExperienciaBlock({ e }: { e: ExperienciaRow }) {
         {e.idade_minima != null && <div><span className="text-slate-500">Idade mínima:</span> <span className="font-medium text-slate-900">{e.idade_minima}+</span></div>}
       </div>
       {(e.endereco || local) && (
-        <div className="text-[11px] text-slate-600">
+        <div className="text-[12px] text-slate-600">
           <MapPin className="inline size-3 mr-0.5" />
           {[e.endereco, local].filter(Boolean).join(" — ")}
         </div>
       )}
-      {e.descricao && <div className="text-[11px] text-slate-700 italic">{e.descricao}</div>}
+      {e.descricao && <div className="text-[12px] text-slate-700 italic">{e.descricao}</div>}
     </section>
   );
 }
@@ -750,19 +750,19 @@ function TransferBlock({ t }: { t: any }) {
   const fmtH = (s?: string | null) => (s ? s.slice(0, 5) : "—");
   return (
     <section className="space-y-1.5">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <Car className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
-        <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.tipo || "Transfer"}</h3>
-        {(t.origem || t.destino) && (
-          <>
-            <span className="text-slate-300">·</span>
-            <span className="text-[12px] font-semibold text-slate-900">
-              {t.origem || "—"} <ArrowRight className="inline size-3 mx-0.5" /> {t.destino || "—"}
-            </span>
-          </>
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-center size-6 rounded-md bg-gradient-to-br from-[oklch(0.60_0.18_160)] to-[oklch(0.65_0.18_200)] shadow-sm">
+          <Car className="size-3.5 text-white" />
+        </div>
+        {(t.origem || t.destino) ? (
+          <span className="text-[14px] font-bold text-slate-900 tracking-tight">
+            {t.origem || "—"} <ArrowRight className="inline size-3.5 mx-0.5 text-[oklch(0.60_0.18_180)]" /> {t.destino || "—"}
+          </span>
+        ) : (
+          <span className="text-[14px] font-bold text-slate-900 tracking-tight">{t.tipo || "Transfer"}</span>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px] text-slate-700">
         <div><span className="text-slate-500">Data de ida:</span> <span className="font-medium text-slate-900">{fmtD(t.data_ida)}</span></div>
         <div><span className="text-slate-500">Hora de ida:</span> <span className="font-medium text-slate-900">{fmtH(t.hora_ida)}</span></div>
         {(t.data_volta || t.hora_volta) && (
