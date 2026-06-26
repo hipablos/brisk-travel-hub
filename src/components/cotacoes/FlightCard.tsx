@@ -149,10 +149,8 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   };
 
   const totalEscalas = voo.escalas.length;
-  const duracaoCalculada = useMemo(
-    () => calcDuracaoVooComData(voo.data, voo.horaSaida, voo.dataChegada ?? voo.data, voo.horaChegada),
-    [voo.data, voo.dataChegada, voo.horaSaida, voo.horaChegada],
-  );
+  const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
+  const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
   const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
   const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
 
