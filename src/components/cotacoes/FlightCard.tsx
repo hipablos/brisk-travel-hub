@@ -282,7 +282,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       value={voo.destino}
                       onChange={(v) => onChange({ destino: v, destinoInfo: undefined })}
                       onSelect={(a, formatted) => onChange({ destino: formatted, destinoInfo: a })}
-                      placeholder="Ex.: MIA, Miami, JFK"
+                      placeholder=""
                     />
                   </div>
                   <div className="space-y-2">
@@ -308,7 +308,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                         value={duracaoCalculada}
                         readOnly
                         tabIndex={-1}
-                        placeholder="—"
+                        placeholder=""
                         className="pl-9 bg-muted text-muted-foreground cursor-not-allowed"
                         aria-label="Duração calculada automaticamente a partir das datas e horários"
                       />
@@ -327,7 +327,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       value={duracaoTrechoCalculada}
                       readOnly
                       tabIndex={-1}
-                      placeholder="—"
+                      placeholder=""
                       className="bg-muted text-muted-foreground cursor-not-allowed"
                     />
                     <p className="text-[11px] text-muted-foreground">
@@ -336,12 +336,12 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <Label>Número do voo</Label>
-                    <Input value={voo.numeroVoo ?? ""} onChange={(e) => onChange({ numeroVoo: e.target.value })} placeholder="LA 8084" />
+                    <Input value={voo.numeroVoo ?? ""} onChange={(e) => onChange({ numeroVoo: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <Label>Classe do voo</Label>
                     <Select value={voo.classe ?? ""} onValueChange={(v) => onChange({ classe: v })}>
-                      <SelectTrigger><SelectValue placeholder="Selecione a classe" /></SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="economica">Econômica</SelectItem>
                         <SelectItem value="premium">Premium Economy</SelectItem>
@@ -400,7 +400,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                           value={e.destino}
                           onChange={(v) => updEscala(e.id, { destino: v, origem: v })}
                           onSelect={(_a, formatted) => updEscala(e.id, { destino: formatted, origem: formatted })}
-                          placeholder="Ex.: SSA, Salvador"
+                          placeholder=""
                         />
                       </div>
                       <div className="space-y-1">
@@ -409,7 +409,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                           value={e.origem}
                           onChange={(v) => updEscala(e.id, { origem: v })}
                           onSelect={(_a, formatted) => updEscala(e.id, { origem: formatted })}
-                          placeholder="Preenchido automaticamente"
+                          placeholder=""
                         />
                       </div>
                       <div className="space-y-1"><Label className="text-xs">Nº do voo</Label><Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} /></div>
@@ -424,7 +424,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       <div className="space-y-1">
                         <Label className="text-xs text-muted-foreground">Duração trecho</Label>
                         <Input
-                          placeholder="ex: 1h 30m"
+                          placeholder=""
                           value={e.duracaoTrecho ?? ""}
                           onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })}
                         />
