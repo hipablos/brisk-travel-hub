@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR } from "@/lib/dates";
-import { calcDuracaoVooComData, calcDuracaoEscala, calcTempoDeVooTotal, calcDuracaoTrecho } from "@/lib/voos";
+import { calcDuracaoVooComData, calcTempoDeVooTotal, calcDuracaoTrecho, calcDuracaoEscalaTrecho } from "@/lib/voos";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -32,9 +32,11 @@ export type Escala = {
   destino?: string;
   companhia?: string;
   numeroVoo?: string;
-  chegada?: string;
+  dataInicio?: string;
+  dataFim?: string;
   saida?: string;
-  duracaoEscala?: string;
+  chegada?: string;
+  duracaoEscala?: string; // mantido p/ compat (não usado na UI nova)
   duracaoTrecho?: string;
 };
 
