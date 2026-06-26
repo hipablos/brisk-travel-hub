@@ -932,7 +932,7 @@ function NovaCotacao() {
 
 
                   {(status === "aprovado" || status === "aguardando_cliente") && vendaCustos.length === 0 && vendaVendas.length === 0 && (
-                    <section className="rounded-xl border border-secondary/40 bg-gradient-to-br from-secondary/10 to-secondary/5 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <section className="rounded-xl border border-secondary/40 bg-gradient-to-br from-secondary/10 to-secondary/5 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                       <div>
                         <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
                           <DollarSign className="size-4 text-secondary" />
