@@ -35,6 +35,7 @@ export type Escala = {
   chegada?: string;
   duracaoEscala?: string; // mantido p/ compat (não usado na UI nova)
   duracaoTrecho?: string;
+  tempoEspera?: string; // ex.: "2h 30m" — somado ao total
 };
 
 export type Bagagens = {
