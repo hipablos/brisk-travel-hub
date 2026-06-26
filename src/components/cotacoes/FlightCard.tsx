@@ -388,18 +388,9 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                         <Trash2 className="size-3.5" />
                       </Button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <Label className="text-xs">Destino (fim do trecho anterior)</Label>
-                        <AirportAutocomplete
-                          value={e.destino}
-                          onChange={(v) => updEscala(e.id, { destino: v, origem: v })}
-                          onSelect={(_a, formatted) => updEscala(e.id, { destino: formatted, origem: formatted })}
-                          placeholder=""
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Origem (início do próximo trecho)</Label>
+                        <Label className="text-xs">Aeroporto de origem</Label>
                         <AirportAutocomplete
                           value={e.origem}
                           onChange={(v) => updEscala(e.id, { origem: v })}
@@ -407,22 +398,40 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                           placeholder=""
                         />
                       </div>
-                      <div className="space-y-1"><Label className="text-xs">Nº do voo</Label><Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} /></div>
-                      <div className="space-y-1"><Label className="text-xs">Chegada</Label><Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} /></div>
-                      <div className="space-y-1"><Label className="text-xs">Saída</Label><Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} /></div>
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Duração escala</Label>
+                        <Label className="text-xs">Aeroporto de destino</Label>
+                        <AirportAutocomplete
+                          value={e.destino}
+                          onChange={(v) => updEscala(e.id, { destino: v })}
+                          onSelect={(_a, formatted) => updEscala(e.id, { destino: formatted })}
+                          placeholder=""
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Data de início</Label>
+                        <DateInput value={e.dataInicio ?? ""} onChange={(iso) => updEscala(e.id, { dataInicio: iso })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Data de fim</Label>
+                        <DateInput value={e.dataFim ?? ""} onChange={(iso) => updEscala(e.id, { dataFim: iso })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Horário de saída</Label>
+                        <Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Horário de chegada</Label>
+                        <Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Duração do trecho</Label>
                         <div className="h-9 px-3 flex items-center rounded-md border border-border/60 bg-muted text-sm text-muted-foreground">
-                          {e.duracaoEscala || "—"}
+                          {calcDuracaoEscalaTrecho(e) || e.duracaoTrecho || "—"}
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Duração trecho</Label>
-                        <Input
-                          placeholder=""
-                          value={e.duracaoTrecho ?? ""}
-                          onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })}
-                        />
+                        <Label className="text-xs">Número do voo</Label>
+                        <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
                       </div>
                     </div>
                   </div>
