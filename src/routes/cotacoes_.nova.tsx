@@ -1069,7 +1069,7 @@ function NovaCotacao() {
                     </div>
 
                     <div>
-                      <h3 className="font-semibold text-foreground mb-2">Forma(s) de Pagamento</h3>
+                      <h3 className="font-semibold text-foreground mb-3">Forma(s) de Pagamento</h3>
                       {formasPagamento.length === 0 ? (
                         <div className="text-xs text-muted-foreground border border-dashed border-border rounded-md p-3">
                           Nenhuma forma cadastrada.{" "}
