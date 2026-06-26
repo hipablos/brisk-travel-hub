@@ -290,7 +290,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   </div>
                   <div className="space-y-2">
                     <Label>Data de fim do voo</Label>
-                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} minISO={minChegadaISO} />
+                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} defaultMonthISO={sugChegadaISO} />
                   </div>
                   <div className="space-y-2">
                     <Label>Horário de saída</Label>
