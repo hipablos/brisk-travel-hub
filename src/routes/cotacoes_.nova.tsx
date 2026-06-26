@@ -498,7 +498,7 @@ function NovaCotacao() {
 
                 <TabsContent value="orcamento" className="space-y-8 mt-0">
               <section className="bg-card border border-border/50 rounded-xl p-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
                     <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
                       <User className="size-4" />
@@ -658,7 +658,7 @@ function NovaCotacao() {
 
 
               <section className="bg-card border border-border/50 rounded-xl p-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
                     <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
                       <Hotel className="size-4" />
@@ -671,11 +671,11 @@ function NovaCotacao() {
                   </Button>
                 </div>
                 {hospedagens.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
+                  <p className="text-sm text-muted-foreground text-center py-6">
                     Nenhuma hospedagem. Clique acima para adicionar — será salva e aparecerá no PDF.
                   </p>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {hospedagens.map((h, idx) => (
                       <HospedagemInlineForm
                         key={h.id ?? `new-${idx}`}
@@ -693,7 +693,7 @@ function NovaCotacao() {
               </section>
 
               <section className="bg-card border border-border/50 rounded-xl p-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
                     <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
                       <MapPin className="size-4" />
@@ -706,11 +706,11 @@ function NovaCotacao() {
                   </Button>
                 </div>
                 {experiencias.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
+                  <p className="text-sm text-muted-foreground text-center py-6">
                     Nenhuma experiência. Clique acima para adicionar — será salva e aparecerá no PDF.
                   </p>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {experiencias.map((ex, idx) => (
                       <ExperienciaInlineForm
                         key={ex.id ?? `new-${idx}`}
@@ -728,7 +728,7 @@ function NovaCotacao() {
               </section>
 
               <section className="bg-card border border-border/50 rounded-xl p-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
                     <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
                       <Car className="size-4" />
@@ -741,11 +741,11 @@ function NovaCotacao() {
                   </Button>
                 </div>
                 {transfers.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
+                  <p className="text-sm text-muted-foreground text-center py-6">
                     Nenhum transfer. Clique acima para adicionar — aparecerá no PDF.
                   </p>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {transfers.map((t, idx) => (
                       <TransferInlineForm
                         key={t.id ?? `transfer-${idx}`}
@@ -856,7 +856,7 @@ function NovaCotacao() {
 
 
                   <section className="bg-card border border-border/50 rounded-xl p-8">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-2">
                         <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
                           <FileText className="size-4" />
@@ -979,7 +979,7 @@ function NovaCotacao() {
 
                   {/* CUSTOS */}
                   <section className="bg-card border border-border/50 rounded-xl p-8">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-6">
                       <div>
                         <h2 className="text-lg font-semibold text-foreground">Custos</h2>
                         <p className="text-xs text-muted-foreground">
