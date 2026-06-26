@@ -396,7 +396,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                           placeholder="Preenchido automaticamente"
                         />
                       </div>
-                      <div className="space-y-1"><Label className="text-xs">Companhia</Label><Input value={e.companhia ?? ""} onChange={(ev) => updEscala(e.id, { companhia: ev.target.value })} /></div>
                       <div className="space-y-1"><Label className="text-xs">Nº do voo</Label><Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} /></div>
                       <div className="space-y-1"><Label className="text-xs">Chegada</Label><Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} /></div>
                       <div className="space-y-1"><Label className="text-xs">Saída</Label><Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} /></div>
