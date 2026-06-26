@@ -79,11 +79,6 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-1.5">
-          <Label>Fornecedor / Empresa</Label>
-          <Input value={f.fornecedor || ""} placeholder="Ex: Localiza, Uber, hotel..."
-            onChange={(e) => onChange({ fornecedor: e.target.value })} />
-        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -99,7 +94,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div className="space-y-1.5">
           <Label>Data</Label>
           <Input type="date" value={f.data || ""} onChange={(e) => onChange({ data: e.target.value })} />
@@ -113,42 +108,8 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
           <Input type="number" min={1} value={f.passageiros ?? ""}
             onChange={(e) => onChange({ passageiros: e.target.value ? Number(e.target.value) : null })} />
         </div>
-        <div className="space-y-1.5">
-          <Label>Bagagens</Label>
-          <Input type="number" min={0} value={f.bagagens ?? ""}
-            onChange={(e) => onChange({ bagagens: e.target.value ? Number(e.target.value) : null })} />
-        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="space-y-1.5">
-          <Label>Veículo</Label>
-          <Input value={f.veiculo || ""} placeholder="Sedan, Van, SUV..."
-            onChange={(e) => onChange({ veiculo: e.target.value })} />
-        </div>
-        <div className="space-y-1.5">
-          <Label>Motorista</Label>
-          <Input value={f.motorista || ""} onChange={(e) => onChange({ motorista: e.target.value })} />
-        </div>
-        <div className="space-y-1.5">
-          <Label>Telefone do motorista</Label>
-          <Input value={f.telefone_motorista || ""}
-            onChange={(e) => onChange({ telefone_motorista: e.target.value })} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label>Nº da reserva</Label>
-          <Input value={f.numero_reserva || ""} onChange={(e) => onChange({ numero_reserva: e.target.value })} />
-        </div>
-      </div>
-
-      <div className="space-y-1.5">
-        <Label>Observações</Label>
-        <Textarea rows={2} value={f.observacoes || ""}
-          onChange={(e) => onChange({ observacoes: e.target.value })} />
-      </div>
     </div>
   );
 }
