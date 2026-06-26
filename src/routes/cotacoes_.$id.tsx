@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Download, Printer, Plane, Hotel, Car, Ship, Shield, MapPin,
   Phone, Mail, Instagram, FileText, Clock, ArrowRight,
-  ShoppingBag, Briefcase, Luggage, UtensilsCrossed, Armchair, BellRing, PlaneTakeoff, PlaneLanding,
+  ShoppingBag, Briefcase, Luggage, PlaneTakeoff, PlaneLanding,
 } from "lucide-react";
 import { getCotacao, formatBRL, STATUS_LABELS, useFormasPagamento, computeFormaTotal, type Cotacao } from "@/lib/cotacoes-store";
 import { dateOnlyToBR, normalizeDateOnly, parseDateOnly } from "@/lib/dates";
