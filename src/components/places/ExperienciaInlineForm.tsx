@@ -86,7 +86,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
   };
 
   return (
-    <div className="border border-border/60 rounded-xl p-4 space-y-4 bg-card">
+    <div className="border border-border/60 rounded-xl p-6 space-y-6 bg-card">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <MapPin className="size-4 text-primary" /> Experiência #{index + 1}
@@ -97,13 +97,13 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-2">
           <Label>Nome do passeio / experiência</Label>
           <Input value={f.nome || ""} placeholder="Ex: Cristo Redentor"
             onChange={(e) => onChange({ nome: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Categoria</Label>
           <Select value={f.categoria || "Passeio"} onValueChange={(v) => onChange({ categoria: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
@@ -123,35 +123,35 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         types={["establishment"]}
       />
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-3 gap-6">
+        <div className="space-y-2">
           <Label>Cidade</Label>
           <Input value={f.cidade || ""} onChange={(e) => onChange({ cidade: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Estado</Label>
           <Input value={f.estado || ""} onChange={(e) => onChange({ estado: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>País</Label>
           <Input value={f.pais || ""} onChange={(e) => onChange({ pais: e.target.value })} />
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-4 gap-6">
+        <div className="space-y-2">
           <Label>Data</Label>
           <Input type="date" value={f.data || ""} onChange={(e) => onChange({ data: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Início</Label>
           <Input type="time" value={f.hora_inicio || ""} onChange={(e) => onChange({ hora_inicio: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Término</Label>
           <Input type="time" value={f.hora_termino || ""} onChange={(e) => onChange({ hora_termino: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Duração (min)</Label>
           <Input type="number" min={0}
             value={f.duracao_min ?? minutesBetween(f.hora_inicio || "", f.hora_termino || "") ?? ""}
@@ -159,8 +159,8 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 max-w-[200px]">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-1 gap-6 max-w-[200px]">
+        <div className="space-y-2">
           <Label>Participantes</Label>
           <Input type="number" min={1} value={f.participantes ?? ""}
             onChange={(e) => onChange({ participantes: e.target.value ? Number(e.target.value) : null })} />

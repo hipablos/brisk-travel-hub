@@ -100,7 +100,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
   };
 
   return (
-    <div className="border border-border/60 rounded-xl p-4 space-y-4 bg-card">
+    <div className="border border-border/60 rounded-xl p-6 space-y-6 bg-card">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Hotel className="size-4 text-primary" /> Hospedagem #{index + 1}
@@ -118,11 +118,11 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
       />
 
       {f.fotos && f.fotos.length > 0 && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label className="text-xs text-muted-foreground">
             Fotos do Google ({f.fotos.length}) — usadas no orçamento em PDF
           </Label>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-3 overflow-x-auto pb-2">
             {f.fotos.map((url, i) => (
               <img
                 key={i}
@@ -135,8 +135,8 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-2">
           <Label>Classificação (estrelas)</Label>
           <Select
             value={f.estrelas?.toString() ?? ""}
@@ -150,7 +150,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Regime alimentar</Label>
           <Select
             value={f.regime_alimentar || "sem_alimentacao"}
@@ -166,39 +166,39 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <Label>Endereço completo</Label>
         <Input value={f.endereco || ""} onChange={(e) => onChange({ endereco: e.target.value })} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-3 gap-6">
+        <div className="space-y-2">
           <Label>Cidade</Label>
           <Input value={f.cidade || ""} onChange={(e) => onChange({ cidade: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Estado</Label>
           <Input value={f.estado || ""} onChange={(e) => onChange({ estado: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>País</Label>
           <Input value={f.pais || ""} onChange={(e) => onChange({ pais: e.target.value })} />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-2">
           <Label>Check-in</Label>
           <Input type="datetime-local" value={f.checkin || ""} onChange={(e) => onChange({ checkin: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Check-out</Label>
           <Input type="datetime-local" value={f.checkout || ""} onChange={(e) => onChange({ checkout: e.target.value })} />
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-4 gap-6">
+        <div className="space-y-2">
           <Label>Noites</Label>
           <Input type="number" min={0}
             value={computedNoites ?? ""}
@@ -206,35 +206,35 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
             onChange={(e) => onChange({ noites: e.target.value ? Number(e.target.value) : null })}
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Hóspedes</Label>
           <Input type="number" min={1} value={f.hospedes ?? ""}
             onChange={(e) => onChange({ hospedes: e.target.value ? Number(e.target.value) : null })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Quartos</Label>
           <Input type="number" min={1} value={f.quartos ?? ""}
             onChange={(e) => onChange({ quartos: e.target.value ? Number(e.target.value) : null })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Tipo acomodação</Label>
           <Input placeholder="Ex: Suíte Luxo" value={f.tipo_acomodacao || ""}
             onChange={(e) => onChange({ tipo_acomodacao: e.target.value })} />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-2">
           <Label>Nº da reserva</Label>
           <Input value={f.numero_reserva || ""} onChange={(e) => onChange({ numero_reserva: e.target.value })} />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label>Código de confirmação</Label>
           <Input value={f.codigo_confirmacao || ""} onChange={(e) => onChange({ codigo_confirmacao: e.target.value })} />
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <Label>Observações ao cliente</Label>
         <Textarea rows={2} value={f.observacoes_cliente || ""}
           onChange={(e) => onChange({ observacoes_cliente: e.target.value })} />

@@ -187,7 +187,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <section className="bg-card border border-border/50 rounded-xl overflow-hidden transition-all hover:border-primary/30 hover:shadow-sm">
-        <div className="flex items-center justify-between p-4 gap-3 flex-wrap">
+        <div className="flex items-center justify-between p-6 gap-3 flex-wrap">
           <CollapsibleTrigger className="flex items-center gap-3 flex-1 min-w-0 text-left group">
             <div className={cn(
               "size-10 rounded-xl grid place-items-center text-primary-foreground shrink-0",
@@ -246,18 +246,18 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
 
 
         <CollapsibleContent>
-          <div className="px-5 pb-5 pt-1 space-y-5 border-t border-border/50">
+          <div className="px-6 pb-6 pt-2 space-y-6 border-t border-border/50">
             {voo.tipo === "localizador" ? (
-              <div className="grid grid-cols-1 gap-4 pt-4">
-                <div className="space-y-1.5">
+              <div className="grid grid-cols-1 gap-6 pt-4">
+                <div className="space-y-2">
                   <Label>Localizador</Label>
                   <Input value={voo.localizador ?? ""} onChange={(e) => onChange({ localizador: e.target.value.toUpperCase() })} placeholder="Ex.: ABCDEF" />
                 </div>
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                  <div className="space-y-1.5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                  <div className="space-y-2">
                     <Label>Aeroporto / Cidade de origem</Label>
                     <AirportAutocomplete
                       value={voo.origem}
@@ -266,7 +266,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       placeholder="Ex.: GRU, São Paulo, Guarulhos"
                     />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>Aeroporto / Cidade de destino</Label>
                     <AirportAutocomplete
                       value={voo.destino}
@@ -275,21 +275,21 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       placeholder="Ex.: MIA, Miami, JFK"
                     />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>Data do voo</Label>
                     <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
                       <Label>Horário de saída</Label>
                       <Input type="time" value={voo.horaSaida ?? ""} onChange={(e) => onChange({ horaSaida: e.target.value })} />
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       <Label>Horário de chegada</Label>
                       <Input type="time" value={voo.horaChegada ?? ""} onChange={(e) => onChange({ horaChegada: e.target.value })} />
                     </div>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>Duração total do voo</Label>
                     <div className="relative">
                       <Input
@@ -309,7 +309,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       )}
                     </p>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>Duração do trecho {voo.tipo === "com_escala" ? "(origem → 1ª escala)" : ""}</Label>
                     <Input
                       placeholder="ex: 1h 30m"
@@ -318,11 +318,11 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     />
                     <p className="text-[11px] text-muted-foreground">Informe manualmente (ex: 21h, 1h 30m).</p>
                   </div>
-                  <div className="space-y-1.5 md:col-span-2">
+                  <div className="space-y-2 md:col-span-2">
                     <Label>Número do voo</Label>
                     <Input value={voo.numeroVoo ?? ""} onChange={(e) => onChange({ numeroVoo: e.target.value })} placeholder="LA 8084" />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>Classe do voo</Label>
                     <Select value={voo.classe ?? ""} onValueChange={(v) => onChange({ classe: v })}>
                       <SelectTrigger><SelectValue placeholder="Selecione a classe" /></SelectTrigger>
@@ -334,7 +334,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>Tipo do voo</Label>
                     <Select value={voo.tipo} onValueChange={(v: TipoVoo) => onChange({ tipo: v })}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
@@ -351,7 +351,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
             )}
 
             {voo.tipo === "com_escala" && (
-              <div className="rounded-xl border border-dashed border-border bg-muted/30 p-4 space-y-3">
+              <div className="rounded-xl border border-dashed border-border bg-muted/30 p-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Plane className="size-4 text-secondary" />
@@ -370,14 +370,14 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                 )}
 
                 {voo.escalas.map((e, idx) => (
-                  <div key={e.id} className="rounded-lg border border-border/60 bg-card p-3 space-y-3">
+                  <div key={e.id} className="rounded-lg border border-border/60 bg-card p-4 space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-foreground">Escala {idx + 1}</span>
                       <Button type="button" variant="ghost" size="icon" className="size-7 text-muted-foreground hover:text-destructive" onClick={() => delEscala(e.id)}>
                         <Trash2 className="size-3.5" />
                       </Button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div className="space-y-1">
                         <Label className="text-xs">Destino (fim do trecho anterior)</Label>
                         <AirportAutocomplete
@@ -420,7 +420,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
             )}
 
             {/* Bagagens */}
-            <div className="rounded-xl border border-border/50 p-4 space-y-3">
+            <div className="rounded-xl border border-border/50 p-6 space-y-4">
               <div className="flex items-center gap-2">
                 <Luggage className="size-4 text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">Bagagens</h3>
