@@ -436,6 +436,15 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                         <Label className="text-xs">Número do voo</Label>
                         <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
                       </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Tempo em espera</Label>
+                        <Input
+                          value={e.tempoEspera ?? ""}
+                          onChange={(ev) => updEscala(e.id, { tempoEspera: ev.target.value })}
+                          placeholder="Ex.: 2h 30m"
+                        />
+                        <p className="text-[10px] text-muted-foreground">Somado à duração total do voo.</p>
+                      </div>
                     </div>
                   </div>
                 ))}
