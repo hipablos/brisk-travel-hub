@@ -27,6 +27,8 @@ type Props = Omit<
   onChange?: (value: string) => void;
   minISO?: string;
   maxISO?: string;
+  /** ISO (yyyy-mm-dd) usado como mês inicial do calendário quando não há valor. */
+  defaultMonthISO?: string;
   /** Mostra mensagem de erro embaixo do campo. */
   showError?: boolean;
 };
@@ -39,7 +41,7 @@ type Props = Omit<
  *  - nunca emite data inválida para o pai
  */
 export const DateInput = React.forwardRef<HTMLInputElement, Props>(function DateInput(
-  { value, onChange, className, minISO = MIN_ISO, maxISO = MAX_ISO, showError = true, onBlur, ...rest },
+  { value, onChange, className, minISO = MIN_ISO, maxISO = MAX_ISO, defaultMonthISO, showError = true, onBlur, ...rest },
   ref,
 ) {
   const [text, setText] = React.useState<string>(dateOnlyToBR(value) === "—" ? "" : dateOnlyToBR(value));
@@ -48,6 +50,7 @@ export const DateInput = React.forwardRef<HTMLInputElement, Props>(function Date
   const minDate = React.useMemo(() => isoToLocalDate(minISO), [minISO]);
   const maxDate = React.useMemo(() => isoToLocalDate(maxISO), [maxISO]);
   const selectedDate = React.useMemo(() => isoToLocalDate(dateOnlyToNativeISO(value)), [value]);
+  const defaultMonthDate = React.useMemo(() => isoToLocalDate(defaultMonthISO), [defaultMonthISO]);
 
   // Mantém sincronizado quando o valor externo muda.
   React.useEffect(() => {
@@ -98,7 +101,7 @@ export const DateInput = React.forwardRef<HTMLInputElement, Props>(function Date
             <Calendar
               mode="single"
               selected={selectedDate}
-              defaultMonth={selectedDate ?? new Date()}
+              defaultMonth={selectedDate ?? defaultMonthDate ?? new Date()}
               fromDate={minDate ?? undefined}
               toDate={maxDate ?? undefined}
               onSelect={(date) => {

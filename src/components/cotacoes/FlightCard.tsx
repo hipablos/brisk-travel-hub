@@ -129,8 +129,8 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     bagagens: rawVoo.bagagens ?? { pessoal: 0, maoCabine: 0, despachada23: 0, despachada32: 0 },
   };
   const minCotacaoISO = dateOnlyToNativeISO(minData) || undefined;
-  const minVooISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
-  const minChegadaISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
+  const sugVooISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
+  const sugChegadaISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
   const [open, setOpen] = useState(false);
   const isIda = direction === "ida";
   const Icon = isIda ? PlaneTakeoff : PlaneLanding;
@@ -286,11 +286,11 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   </div>
                   <div className="space-y-2">
                     <Label>Data de início do voo</Label>
-                    <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} minISO={minCotacaoISO} />
+                    <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} defaultMonthISO={minCotacaoISO} />
                   </div>
                   <div className="space-y-2">
                     <Label>Data de fim do voo</Label>
-                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} minISO={minChegadaISO} />
+                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} defaultMonthISO={sugChegadaISO} />
                   </div>
                   <div className="space-y-2">
                     <Label>Horário de saída</Label>
@@ -411,11 +411,11 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Data de início</Label>
-                        <DateInput value={e.dataInicio ?? ""} onChange={(iso) => updEscala(e.id, { dataInicio: iso })} minISO={minVooISO} />
+                        <DateInput value={e.dataInicio ?? ""} onChange={(iso) => updEscala(e.id, { dataInicio: iso })} defaultMonthISO={sugVooISO} />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Data de fim</Label>
-                        <DateInput value={e.dataFim ?? ""} onChange={(iso) => updEscala(e.id, { dataFim: iso })} minISO={dateOnlyToNativeISO(e.dataInicio) || minVooISO} />
+                        <DateInput value={e.dataFim ?? ""} onChange={(iso) => updEscala(e.id, { dataFim: iso })} defaultMonthISO={dateOnlyToNativeISO(e.dataInicio) || sugVooISO} />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Horário de saída</Label>
