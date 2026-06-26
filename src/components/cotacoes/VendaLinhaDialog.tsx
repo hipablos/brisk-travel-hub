@@ -83,7 +83,6 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
             <Input
               value={linha.descricao ?? ""}
               onChange={(e) => upd({ descricao: e.target.value })}
-              placeholder={isCusto ? "Ex.: Emissão de bilhete LATAM" : "Ex.: Pacote de viagem"}
             />
           </div>
 
@@ -93,7 +92,6 @@ export function VendaLinhaDialog({ open, onOpenChange, kind, initial, onSave, su
               list={`parte-${kind}`}
               value={linha.parte ?? ""}
               onChange={(e) => upd({ parte: e.target.value })}
-              placeholder={isCusto ? "Nome do fornecedor" : "Nome do cliente"}
             />
             <datalist id={`parte-${kind}`}>
               {parteList.map((p) => <option key={p} value={p} />)}

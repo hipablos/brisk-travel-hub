@@ -62,7 +62,6 @@ export const DateInput = React.forwardRef<HTMLInputElement, Props>(function Date
         <Input
           ref={ref}
           inputMode="numeric"
-          placeholder="DD/MM/AAAA"
           value={text}
           onChange={(e) => {
             const masked = maskBR(e.target.value);
