@@ -129,8 +129,8 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     bagagens: rawVoo.bagagens ?? { pessoal: 0, maoCabine: 0, despachada23: 0, despachada32: 0 },
   };
   const minCotacaoISO = dateOnlyToNativeISO(minData) || undefined;
-  const minVooISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
-  const minChegadaISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
+  const sugVooISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
+  const sugChegadaISO = dateOnlyToNativeISO(voo.data) || minCotacaoISO;
   const [open, setOpen] = useState(false);
   const isIda = direction === "ida";
   const Icon = isIda ? PlaneTakeoff : PlaneLanding;
