@@ -91,6 +91,8 @@ interface Props {
   onDuplicate?: () => void;
   index?: number;
   total?: number;
+  /** Data mínima (DD-MM-AAAA) — normalmente a data da cotação. */
+  minData?: string;
 }
 
 function Counter({
