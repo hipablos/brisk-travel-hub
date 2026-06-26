@@ -530,6 +530,7 @@ function NovaCotacao() {
                   voo={v}
                   index={idx}
                   total={vooIdas.length}
+                  minData={dataVenda}
                   onChange={(patch) =>
                     setVooIdas((list) => list.map((x, i) => (i === idx ? { ...x, ...patch } : x)))
                   }
