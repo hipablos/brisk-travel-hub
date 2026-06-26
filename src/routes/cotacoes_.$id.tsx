@@ -216,6 +216,9 @@ function VisualizarCotacao() {
               </section>
 
               {/* Voos */}
+              {(vooIdas.length > 0 || vooVoltas.length > 0) && (
+                <SectionDivider title="Voos" icon={Plane} />
+              )}
               {vooIdas.map((v, idx) => (
                 <VooBlock key={v?.id ?? `ida-${idx}`} direction="ida" voo={v} index={idx} total={vooIdas.length} />
               ))}
@@ -224,10 +227,21 @@ function VisualizarCotacao() {
               ))}
 
               {/* Hospedagens */}
+              {hospedagens.length > 0 && <SectionDivider title="Hospedagens" icon={Hotel} />}
               {hospedagens.map((h) => <HospedagemBlock key={h.id} h={h} />)}
 
               {/* Experiências */}
+              {experiencias.length > 0 && <SectionDivider title="Experiências" icon={MapPin} />}
               {experiencias.map((e) => <ExperienciaBlock key={e.id} e={e} />)}
+
+              {/* Carros / Transfers */}
+              {((cotacao as any).transfers?.length ?? 0) > 0 && (
+                <SectionDivider title="Carros / Transfers" icon={Car} />
+              )}
+              {((cotacao as any).transfers ?? []).map((t: any, idx: number) => (
+                <TransferBlock key={t.id ?? `transfer-${idx}`} t={t} />
+              ))}
+
 
 
 
