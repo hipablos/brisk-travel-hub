@@ -187,7 +187,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <section className="bg-card border border-border/50 rounded-xl overflow-hidden transition-all hover:border-primary/30 hover:shadow-sm">
-        <div className="flex items-center justify-between p-4 gap-3 flex-wrap">
+        <div className="flex items-center justify-between p-6 gap-3 flex-wrap">
           <CollapsibleTrigger className="flex items-center gap-3 flex-1 min-w-0 text-left group">
             <div className={cn(
               "size-10 rounded-xl grid place-items-center text-primary-foreground shrink-0",
@@ -246,7 +246,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
 
 
         <CollapsibleContent>
-          <div className="px-5 pb-5 pt-1 space-y-5 border-t border-border/50">
+          <div className="px-6 pb-6 pt-2 space-y-6 border-t border-border/50">
             {voo.tipo === "localizador" ? (
               <div className="grid grid-cols-1 gap-4 pt-4">
                 <div className="space-y-1.5">
