@@ -16,9 +16,19 @@ export function calcDuracaoMinutos(
   return fim - inicio;
 }
 
+/** Normaliza uma data em DD-MM-AAAA, DD/MM/AAAA ou YYYY-MM-DD para YYYY-MM-DD. */
+function toISODate(s?: string | null): string | null {
+  if (!s) return null;
+  const t = String(s).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+  const m = t.match(/^(\d{2})[-/](\d{2})[-/](\d{4})$/);
+  if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+  return null;
+}
+
 /**
- * Duração levando em conta data de início e data de fim (em ISO yyyy-mm-dd).
- * Quando ambas as datas existem, suporta voos que cruzam vários dias.
+ * Duração levando em conta data de início e data de fim.
+ * Aceita DD-MM-AAAA, DD/MM/AAAA ou YYYY-MM-DD. Suporta voos que cruzam dias.
  */
 export function calcDuracaoMinutosComData(
   dataInicio?: string | null,
@@ -27,9 +37,11 @@ export function calcDuracaoMinutosComData(
   horaChegada?: string | null,
 ): number | null {
   if (!horaSaida || !horaChegada) return null;
-  if (dataInicio && dataFim) {
-    const ini = new Date(`${dataInicio}T${horaSaida}:00`);
-    const fim = new Date(`${dataFim}T${horaChegada}:00`);
+  const di = toISODate(dataInicio);
+  const df = toISODate(dataFim) ?? di;
+  if (di && df) {
+    const ini = new Date(`${di}T${horaSaida}:00`);
+    const fim = new Date(`${df}T${horaChegada}:00`);
     const diff = fim.getTime() - ini.getTime();
     if (Number.isNaN(diff) || diff < 0) return null;
     return Math.round(diff / 60000);
