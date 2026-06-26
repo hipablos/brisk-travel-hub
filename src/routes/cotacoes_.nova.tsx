@@ -414,7 +414,7 @@ function NovaCotacao() {
         <Topbar />
         <main className="flex-1 p-0">
           <div className="bg-card border-b border-border px-6 py-4">
-            <div className="max-w-[960px] mx-auto flex items-center justify-between">
+            <div className="max-w-[1200px] mx-auto flex items-center justify-between">
               <div className="flex items-center gap-3.5">
                 <Button asChild variant="outline" size="icon" className="h-9 w-9 rounded-lg border-border bg-muted/50 hover:bg-muted">
                   <Link to="/cotacoes"><ArrowLeft className="size-4" /></Link>
@@ -462,12 +462,12 @@ function NovaCotacao() {
             </div>
           </div>
 
-          <div className="max-w-[960px] mx-auto p-6">
-          <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="max-w-[1200px] mx-auto p-6">
+          <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
 
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="w-full">
-                <div className="flex gap-1.5 mb-6">
+                <div className="flex gap-2 mb-8">
                   <button
                     type="button"
                     onClick={() => setActiveTab("orcamento")}
@@ -496,8 +496,8 @@ function NovaCotacao() {
 
 
 
-                <TabsContent value="orcamento" className="space-y-6 mt-0">
-              <section className="bg-card border border-border/50 rounded-xl p-6">
+                <TabsContent value="orcamento" className="space-y-8 mt-0">
+              <section className="bg-card border border-border/50 rounded-xl p-8">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
@@ -512,8 +512,8 @@ function NovaCotacao() {
                     </Link>
                   </Button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
                     <Label>Cliente</Label>
                     <ClienteAutocomplete
                       clientes={clientes}
@@ -526,11 +526,11 @@ function NovaCotacao() {
                       placeholder={clientes.length ? "Digite o nome do cliente..." : "Nenhum cliente — cadastre acima"}
                     />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>E-mail</Label>
                     <Input type="email" placeholder="cliente@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <Label>Telefone / WhatsApp</Label>
                     <Input placeholder="(11) 99999-9999" value={telefone} onChange={(e) => setTelefone(e.target.value)} />
                   </div>
@@ -657,7 +657,7 @@ function NovaCotacao() {
 
 
 
-              <section className="bg-card border border-border/50 rounded-xl p-6">
+              <section className="bg-card border border-border/50 rounded-xl p-8">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
@@ -692,7 +692,7 @@ function NovaCotacao() {
                 )}
               </section>
 
-              <section className="bg-card border border-border/50 rounded-xl p-6">
+              <section className="bg-card border border-border/50 rounded-xl p-8">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
@@ -727,7 +727,7 @@ function NovaCotacao() {
                 )}
               </section>
 
-              <section className="bg-card border border-border/50 rounded-xl p-6">
+              <section className="bg-card border border-border/50 rounded-xl p-8">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
@@ -761,7 +761,7 @@ function NovaCotacao() {
 
 
 
-              <section className="bg-card border border-border/50 rounded-xl p-6 space-y-5">
+              <section className="bg-card border border-border/50 rounded-xl p-8 space-y-5">
                 <div>
                   <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
                     <h2 className="text-lg font-semibold text-foreground">Termos e Condições</h2>
@@ -852,10 +852,10 @@ function NovaCotacao() {
                 </TabsContent>
 
 
-                <TabsContent value="venda" className="space-y-6 mt-0">
+                <TabsContent value="venda" className="space-y-8 mt-0">
 
 
-                  <section className="bg-card border border-border/50 rounded-xl p-6">
+                  <section className="bg-card border border-border/50 rounded-xl p-8">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
                         <div className="size-8 rounded-lg bg-primary/10 grid place-items-center text-primary">
@@ -890,14 +890,14 @@ function NovaCotacao() {
                         const opt = serviceOptions.find((o) => o.id === s.type)!;
                         return (
                           <div key={s.id} className="border border-border/60 rounded-lg p-3 grid grid-cols-12 gap-3 items-end">
-                            <div className="col-span-12 md:col-span-3 space-y-1.5">
+                            <div className="col-span-12 md:col-span-3 space-y-2">
                               <Label className="text-xs">Tipo</Label>
                               <div className="flex items-center gap-2 h-9 px-3 rounded-md bg-secondary/10 border border-border/40 text-sm">
                                 <opt.icon className="size-4 text-secondary" />
                                 <span className="font-medium">{opt.label}</span>
                               </div>
                             </div>
-                            <div className="col-span-12 md:col-span-6 space-y-1.5">
+                            <div className="col-span-12 md:col-span-6 space-y-2">
                               <Label className="text-xs">Descrição</Label>
                               <Input
                                 placeholder="Descrição do serviço"
@@ -905,7 +905,7 @@ function NovaCotacao() {
                                 onChange={(e) => updateService(s.id, { description: e.target.value })}
                               />
                             </div>
-                            <div className="col-span-9 md:col-span-2 space-y-1.5">
+                            <div className="col-span-9 md:col-span-2 space-y-2">
                               <Label className="text-xs">Valor (R$)</Label>
                               <Input
                                 placeholder="0,00"
@@ -932,7 +932,7 @@ function NovaCotacao() {
 
 
                   {(status === "aprovado" || status === "aguardando_cliente") && vendaCustos.length === 0 && vendaVendas.length === 0 && (
-                    <section className="rounded-xl border border-secondary/40 bg-gradient-to-br from-secondary/10 to-secondary/5 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <section className="rounded-xl border border-secondary/40 bg-gradient-to-br from-secondary/10 to-secondary/5 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                       <div>
                         <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
                           <DollarSign className="size-4 text-secondary" />
@@ -955,8 +955,8 @@ function NovaCotacao() {
 
 
                   {/* LOCALIZADOR DO VOO */}
-                  <section className="bg-card border border-border/50 rounded-xl p-6">
-                    <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                  <section className="bg-card border border-border/50 rounded-xl p-8">
+                    <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
                       <div className="flex-1">
                         <Label htmlFor="localizador" className="text-sm font-semibold text-foreground">
                           Localizador do Voo
@@ -978,7 +978,7 @@ function NovaCotacao() {
                   </section>
 
                   {/* CUSTOS */}
-                  <section className="bg-card border border-border/50 rounded-xl p-6">
+                  <section className="bg-card border border-border/50 rounded-xl p-8">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h2 className="text-lg font-semibold text-foreground">Custos</h2>
@@ -1052,7 +1052,7 @@ function NovaCotacao() {
 
 
 
-                  <section className="bg-card border border-border/50 rounded-xl p-6 space-y-6">
+                  <section className="bg-card border border-border/50 rounded-xl p-8 space-y-6">
                     <div>
                       <Label>Valor de Comparação</Label>
                       <div className="flex items-center gap-2 mt-1.5 max-w-xs">
@@ -1177,11 +1177,11 @@ function NovaCotacao() {
               </Tabs>
             </div>
 
-            <aside className="space-y-6">
-              <section className="bg-card border border-border/50 rounded-xl p-6 sticky top-6">
+            <aside className="space-y-8">
+              <section className="bg-card border border-border/50 rounded-xl p-8 sticky top-8">
                 <h2 className="text-lg font-semibold text-foreground mb-4">Resumo</h2>
 
-                <div className="space-y-1.5 mb-4">
+                <div className="space-y-2 mb-5">
                   <Label>Status</Label>
                   <Select value={status} onValueChange={(v) => {
                     const novo = v as CotacaoStatus;
@@ -1203,7 +1203,7 @@ function NovaCotacao() {
                   </Select>
                 </div>
 
-                <div className="space-y-1.5 mb-4">
+                <div className="space-y-2 mb-5">
                   <Label>Data de Venda</Label>
                   <div className="relative">
                     <DateInput className="pl-9" value={dataVenda} onChange={(iso) => setDataVenda(iso)} />
