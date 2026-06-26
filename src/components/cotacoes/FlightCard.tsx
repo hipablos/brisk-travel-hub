@@ -176,7 +176,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     const patches: Array<{ id: string; patch: Partial<Escala> }> = [];
     voo.escalas.forEach((e) => {
       const dt = calcDuracaoEscalaTrecho(e);
-      if (dt && e.duracaoTrecho !== dt) {
+      if (e.duracaoTrecho !== dt) {
         patches.push({ id: e.id, patch: { duracaoTrecho: dt } });
       }
     });
