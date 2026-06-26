@@ -318,7 +318,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     />
                     <p className="text-[11px] text-muted-foreground">Informe manualmente (ex: 21h, 1h 30m).</p>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 md:col-span-2">
                     <Label>Número do voo</Label>
                     <Input value={voo.numeroVoo ?? ""} onChange={(e) => onChange({ numeroVoo: e.target.value })} placeholder="LA 8084" />
                   </div>
@@ -334,7 +334,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-1.5 md:col-span-2">
+                  <div className="space-y-1.5">
                     <Label>Tipo do voo</Label>
                     <Select value={voo.tipo} onValueChange={(v: TipoVoo) => onChange({ tipo: v })}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
