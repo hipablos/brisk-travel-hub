@@ -100,7 +100,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label>Nome do passeio / experiência</Label>
-          <Input value={f.nome || ""} placeholder="Ex: Cristo Redentor"
+          <Input value={f.nome || ""}
             onChange={(e) => onChange({ nome: e.target.value })} />
         </div>
         <div className="space-y-2">
@@ -116,7 +116,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
 
       <PlaceAutocomplete
         label="Endereço / local"
-        placeholder="Buscar no Google Maps..."
+        placeholder=""
         value={f.endereco || ""}
         onChange={(v) => onChange({ endereco: v })}
         onPlaceSelected={handlePlace}

@@ -142,7 +142,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
             value={f.estrelas?.toString() ?? ""}
             onValueChange={(v) => onChange({ estrelas: v ? Number(v) : null })}
           >
-            <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+            <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               {[1, 2, 3, 4, 5].map((n) => (
                 <SelectItem key={n} value={n.toString()}>{"★".repeat(n)} ({n})</SelectItem>
@@ -199,7 +199,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         </div>
         <div className="space-y-2">
           <Label>Tipo acomodação</Label>
-          <Input placeholder="Ex: Suíte Luxo" value={f.tipo_acomodacao || ""}
+          <Input value={f.tipo_acomodacao || ""}
             onChange={(e) => onChange({ tipo_acomodacao: e.target.value })} />
         </div>
       </div>

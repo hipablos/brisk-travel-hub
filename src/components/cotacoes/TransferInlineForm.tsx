@@ -100,12 +100,12 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label>Origem</Label>
-          <Input value={f.origem || ""} placeholder="Aeroporto, hotel, endereço..."
+          <Input value={f.origem || ""}
             onChange={(e) => onChange({ origem: e.target.value })} />
         </div>
         <div className="space-y-2">
           <Label>Destino</Label>
-          <Input value={f.destino || ""} placeholder="Hotel, aeroporto, endereço..."
+          <Input value={f.destino || ""}
             onChange={(e) => onChange({ destino: e.target.value })} />
         </div>
       </div>
@@ -116,7 +116,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
           <DateInput
             value={f.data_ida || ""}
             onChange={(v) => onChange({ data_ida: v })}
-            placeholder="dd/mm/aaaa"
+            placeholder=""
           />
         </div>
         <div className="space-y-2">
@@ -128,7 +128,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
           <DateInput
             value={f.data_volta || ""}
             onChange={(v) => onChange({ data_volta: v })}
-            placeholder="dd/mm/aaaa"
+            placeholder=""
           />
         </div>
         <div className="space-y-2">
@@ -145,7 +145,7 @@ export function TransferInlineForm({ value: f, index, onChange, onRemove }: Prop
               value={duracao}
               readOnly
               tabIndex={-1}
-              placeholder="—"
+              placeholder=""
               className="pl-9 bg-muted text-muted-foreground cursor-not-allowed"
             />
             <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
