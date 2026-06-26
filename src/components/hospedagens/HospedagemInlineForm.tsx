@@ -188,11 +188,32 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label>Check-in</Label>
-          <Input type="datetime-local" value={f.checkin || ""} onChange={(e) => onChange({ checkin: e.target.value })} />
+          <div className="grid grid-cols-[1fr_110px] gap-2">
+            <DateInput
+              value={splitDateTime(f.checkin).dateBR}
+              onChange={(d) => onChange({ checkin: joinDateTime(d, splitDateTime(f.checkin).time) })}
+            />
+            <Input
+              type="time"
+              value={splitDateTime(f.checkin).time}
+              onChange={(e) => onChange({ checkin: joinDateTime(splitDateTime(f.checkin).dateBR, e.target.value) })}
+            />
+          </div>
         </div>
         <div className="space-y-2">
           <Label>Check-out</Label>
-          <Input type="datetime-local" value={f.checkout || ""} onChange={(e) => onChange({ checkout: e.target.value })} />
+          <div className="grid grid-cols-[1fr_110px] gap-2">
+            <DateInput
+              value={splitDateTime(f.checkout).dateBR}
+              onChange={(d) => onChange({ checkout: joinDateTime(d, splitDateTime(f.checkout).time) })}
+              defaultMonthISO={dateOnlyToNativeISO(splitDateTime(f.checkin).dateBR) || undefined}
+            />
+            <Input
+              type="time"
+              value={splitDateTime(f.checkout).time}
+              onChange={(e) => onChange({ checkout: joinDateTime(splitDateTime(f.checkout).dateBR, e.target.value) })}
+            />
+          </div>
         </div>
       </div>
 
