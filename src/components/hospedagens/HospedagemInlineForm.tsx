@@ -199,7 +199,7 @@ export function HospedagemInlineForm({ value: f, index, onChange, onRemove }: Pr
         </div>
         <div className="space-y-2">
           <Label>Tipo acomodação</Label>
-          <Input value={f.tipo_acomodacao || ""}}
+          <Input value={f.tipo_acomodacao || ""}
             onChange={(e) => onChange({ tipo_acomodacao: e.target.value })} />
         </div>
       </div>
