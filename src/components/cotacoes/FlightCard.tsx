@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
@@ -155,31 +155,42 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
   const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
 
-  // Mantém voo.duracao sincronizado com a duração TOTAL (principal + escalas).
+  // Refs guardam o último valor calculado para detectar override manual.
+  const lastCalcTotal = useRef<string | undefined>(undefined);
+  const lastCalcTrecho = useRef<string | undefined>(undefined);
+  const lastCalcEscala = useRef<Record<string, string>>({});
+
   useEffect(() => {
-    if (voo.duracao !== duracaoTotal) {
-      onChange({ duracao: duracaoTotal });
+    const current = voo.duracao;
+    const prevCalc = lastCalcTotal.current;
+    if (!current || current === "—" || current === prevCalc) {
+      if (current !== duracaoTotal) onChange({ duracao: duracaoTotal });
     }
+    lastCalcTotal.current = duracaoTotal;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoTotal]);
 
-  // Duração do trecho principal calculada automaticamente.
   useEffect(() => {
-    if (voo.duracaoTrecho !== duracaoTrechoCalculada) {
-      onChange({ duracaoTrecho: duracaoTrechoCalculada });
+    const current = voo.duracaoTrecho;
+    const prevCalc = lastCalcTrecho.current;
+    if (!current || current === "—" || current === prevCalc) {
+      if (current !== duracaoTrechoCalculada) onChange({ duracaoTrecho: duracaoTrechoCalculada });
     }
+    lastCalcTrecho.current = duracaoTrechoCalculada;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoTrechoCalculada]);
 
-  // Sincroniza a duração de cada escala (calculada das suas datas+horários).
   useEffect(() => {
     if (voo.tipo !== "com_escala") return;
     const patches: Array<{ id: string; patch: Partial<Escala> }> = [];
     voo.escalas.forEach((e) => {
       const dt = calcDuracaoEscalaTrecho(e);
-      if (e.duracaoTrecho !== dt) {
-        patches.push({ id: e.id, patch: { duracaoTrecho: dt } });
+      const prev = lastCalcEscala.current[e.id];
+      const cur = e.duracaoTrecho;
+      if (!cur || cur === "—" || cur === prev) {
+        if (cur !== dt) patches.push({ id: e.id, patch: { duracaoTrecho: dt } });
       }
+      lastCalcEscala.current[e.id] = dt;
     });
     if (patches.length === 0) return;
     onChange({
@@ -305,30 +316,27 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     <Label>Duração total do voo</Label>
                     <div className="relative">
                       <Input
-                        value={duracaoTotal === "—" ? "" : duracaoTotal}
-                        readOnly
-                        tabIndex={-1}
-                        placeholder=""
-                        className="pl-9 bg-muted text-muted-foreground cursor-not-allowed"
+                        value={voo.duracao ?? ""}
+                        onChange={(e) => onChange({ duracao: e.target.value })}
+                        placeholder={duracaoTotal}
+                        className="pl-9"
                         aria-label="Duração total do voo"
                       />
                       <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      Soma de todos os trechos e escalas.
+                      Soma de todos os trechos e escalas. Editável.
                     </p>
                   </div>
                   <div className="space-y-2">
                     <Label>Duração do trecho</Label>
                     <Input
-                      value={duracaoTrechoCalculada}
-                      readOnly
-                      tabIndex={-1}
-                      placeholder=""
-                      className="bg-muted text-muted-foreground cursor-not-allowed"
+                      value={voo.duracaoTrecho ?? ""}
+                      onChange={(e) => onChange({ duracaoTrecho: e.target.value })}
+                      placeholder={duracaoTrechoCalculada}
                     />
                     <p className="text-[11px] text-muted-foreground">
-                      Calculada automaticamente pelos horários.
+                      Calculada automaticamente pelos horários. Editável.
                     </p>
                   </div>
 
@@ -427,10 +435,12 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                         <Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Duração do trecho</Label>
-                        <div className="h-9 px-3 flex items-center rounded-md border border-border/60 bg-muted text-sm text-muted-foreground">
-                          {calcDuracaoEscalaTrecho(e) || e.duracaoTrecho || "—"}
-                        </div>
+                        <Label className="text-xs">Duração do trecho</Label>
+                        <Input
+                          value={e.duracaoTrecho ?? ""}
+                          onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })}
+                          placeholder={calcDuracaoEscalaTrecho(e) || "—"}
+                        />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Número do voo</Label>
