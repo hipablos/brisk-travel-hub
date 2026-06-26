@@ -750,16 +750,16 @@ function TransferBlock({ t }: { t: any }) {
   const fmtH = (s?: string | null) => (s ? s.slice(0, 5) : "—");
   return (
     <section className="space-y-1.5">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <Car className="size-3.5 text-[oklch(0.22_0.08_255)] shrink-0 self-center" />
-        <h3 className="text-[13px] font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.tipo || "Transfer"}</h3>
-        {(t.origem || t.destino) && (
-          <>
-            <span className="text-slate-300">·</span>
-            <span className="text-[12px] font-semibold text-slate-900">
-              {t.origem || "—"} <ArrowRight className="inline size-3 mx-0.5" /> {t.destino || "—"}
-            </span>
-          </>
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-center size-6 rounded-md bg-gradient-to-br from-[oklch(0.60_0.18_160)] to-[oklch(0.65_0.18_200)] shadow-sm">
+          <Car className="size-3.5 text-white" />
+        </div>
+        {(t.origem || t.destino) ? (
+          <span className="text-[14px] font-bold text-slate-900 tracking-tight">
+            {t.origem || "—"} <ArrowRight className="inline size-3.5 mx-0.5 text-[oklch(0.60_0.18_180)]" /> {t.destino || "—"}
+          </span>
+        ) : (
+          <span className="text-[14px] font-bold text-slate-900 tracking-tight">{t.tipo || "Transfer"}</span>
         )}
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
