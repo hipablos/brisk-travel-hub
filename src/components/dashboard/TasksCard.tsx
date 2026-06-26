@@ -368,18 +368,14 @@ export function TasksCard() {
                     {item.subtitulo}
                   </div>
                 </div>
-                {item.tipo === "voo" && (item.horaIda || item.horaVolta) ? (
+                {item.tipo === "voo" ? (
                   <div className="text-right shrink-0 leading-tight">
-                    {item.horaIda && (
-                      <div className="text-[11px] text-muted-foreground">
-                        Ida: <span className="text-foreground/80 font-medium">{item.horaIda}</span>
-                      </div>
-                    )}
-                    {item.horaVolta && (
-                      <div className="text-[11px] text-muted-foreground">
-                        Volta: <span className="text-foreground/80 font-medium">{item.horaVolta}</span>
-                      </div>
-                    )}
+                    <div className="text-[11px] text-muted-foreground">
+                      Ida: <span className="text-foreground/80 font-medium">{item.horaIda || "—"}</span>
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      Volta: <span className="text-foreground/80 font-medium">{item.horaVolta || "—"}</span>
+                    </div>
                   </div>
                 ) : item.hora ? (
                   <span className="text-xs text-muted-foreground shrink-0">
