@@ -802,7 +802,7 @@ function NovaCotacao() {
                   )}
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
+                  <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
                     <h2 className="text-lg font-semibold text-foreground">Outras Informações</h2>
                     <Button asChild type="button" variant="outline" size="sm" className="gap-2">
                       <Link to="/termos-condicoes"><FileSignature className="size-4" /> Gerenciar modelos</Link>
