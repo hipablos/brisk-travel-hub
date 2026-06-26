@@ -31,9 +31,9 @@ type ItemDia = {
   titulo: string;
   subtitulo: string;
   cotacaoId?: string;
-  horaIda?: string;
-  horaVolta?: string;
+  trecho?: "ida" | "volta";
 };
+
 
 const ICONS: Record<TipoItemDia, typeof Plane> = {
   voo: Plane,
@@ -196,18 +196,12 @@ export function TasksCard() {
           ? [c.vooVolta]
           : [];
 
-        const horaIdaCot = (idas[0] as any)?.horaSaida || "";
-        const horaVoltaCot = (voltas[0] as any)?.horaSaida || "";
-
-        [...idas, ...voltas].forEach((v: any) => {
+        const pushLeg = (v: any, trecho: "ida" | "volta") => {
           if (!v) return;
-
           if (dataDoDia(v.data) === hoje) {
             const escalasInfo =
               v.escalas?.length > 0
-                ? ` · ${v.escalas.length} escala${
-                    v.escalas.length > 1 ? "s" : ""
-                  }`
+                ? ` · ${v.escalas.length} escala${v.escalas.length > 1 ? "s" : ""}`
                 : "";
             out.push({
               tipo: "voo",
@@ -215,11 +209,9 @@ export function TasksCard() {
               titulo: nome,
               subtitulo: `${v.origem || "—"} → ${v.destino || "—"}${escalasInfo}`,
               cotacaoId: c.id,
-              horaIda: horaIdaCot,
-              horaVolta: horaVoltaCot,
+              trecho,
             });
           }
-
           if (v.tipo === "com_escala" && Array.isArray(v.escalas)) {
             v.escalas.forEach((e: any) => {
               const dataEscala = dataDoDia(e.dataPartida ?? e.dataSaida ?? null);
@@ -230,14 +222,17 @@ export function TasksCard() {
                   titulo: nome,
                   subtitulo: `Conexão: ${e.origem || "—"} → ${e.destino || "—"}`,
                   cotacaoId: c.id,
-                  horaIda: horaIdaCot,
-                  horaVolta: horaVoltaCot,
+                  trecho,
                 });
               }
             });
           }
-        });
+        };
+
+        idas.forEach((v: any) => pushLeg(v, "ida"));
+        voltas.forEach((v: any) => pushLeg(v, "volta"));
       }
+
 
 
       // Cobranças com vencimento hoje (qualquer status)
@@ -371,13 +366,12 @@ export function TasksCard() {
                 {item.tipo === "voo" ? (
                   <div className="text-right shrink-0 leading-tight">
                     <div className="text-[11px] text-muted-foreground">
-                      Ida: <span className="text-foreground/80 font-medium">{item.horaIda || "—"}</span>
-                    </div>
-                    <div className="text-[11px] text-muted-foreground">
-                      Volta: <span className="text-foreground/80 font-medium">{item.horaVolta || "—"}</span>
+                      {item.trecho === "volta" ? "Volta" : "Ida"}:{" "}
+                      <span className="text-foreground/80 font-medium">{item.hora || "—"}</span>
                     </div>
                   </div>
                 ) : item.hora ? (
+
                   <span className="text-xs text-muted-foreground shrink-0">
                     {item.hora}
                   </span>
