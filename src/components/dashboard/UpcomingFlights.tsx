@@ -27,8 +27,9 @@ export function UpcomingFlights() {
     const hoje = todayDateOnly();
     const legs: Leg[] = [];
     for (const c of cotacoes) {
-      const vIda: any = (c as any).vooIda ?? null;
-      const vVolta: any = (c as any).vooVolta ?? null;
+      const vIda: any = (c as any).vooIdas?.[0] ?? (c as any).vooIda ?? null;
+      const vVolta: any = (c as any).vooVoltas?.[0] ?? (c as any).vooVolta ?? null;
+
       const cliente = c.cliente?.nome ?? "—";
 
       const ida = normalizeDateOnly(vIda?.data ?? c.ida);

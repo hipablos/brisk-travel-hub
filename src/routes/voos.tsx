@@ -72,8 +72,9 @@ function VoosPage() {
     const items: VooItem[] = [];
     for (const c of cotacoes) {
       if (c.status !== "aprovado") continue;
-      const vIda: any = (c as any).vooIda ?? null;
-      const vVolta: any = (c as any).vooVolta ?? null;
+      const vIda: any = (c as any).vooIdas?.[0] ?? (c as any).vooIda ?? null;
+      const vVolta: any = (c as any).vooVoltas?.[0] ?? (c as any).vooVolta ?? null;
+
 
       const origemIda = splitLocal(vIda?.origem ?? c.origem);
       const destinoIda = splitLocal(vIda?.destino ?? c.destino);
