@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/collapsible";
 import {
   Plane, PlaneTakeoff, PlaneLanding, ChevronDown, Hash, Edit3,
-  Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Armchair, UtensilsCrossed, BellRing, Minus,
+  Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Minus,
   MoreHorizontal, Copy,
 } from "lucide-react";
 import {
