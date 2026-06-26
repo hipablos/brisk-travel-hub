@@ -261,7 +261,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
               <div className="grid grid-cols-1 gap-6 pt-4">
                 <div className="space-y-2">
                   <Label>Localizador</Label>
-                  <Input value={voo.localizador ?? ""} onChange={(e) => onChange({ localizador: e.target.value.toUpperCase() })} placeholder="Ex.: ABCDEF" />
+                  <Input value={voo.localizador ?? ""} onChange={(e) => onChange({ localizador: e.target.value.toUpperCase() })} />
                 </div>
               </div>
             ) : (
