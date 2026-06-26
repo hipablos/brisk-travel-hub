@@ -74,7 +74,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
       lng: e.lon,
       google_place_id: null,
       google_maps_url: `https://www.google.com/maps/search/?api=1&query=${e.lat},${e.lon}`,
-      fotos: e.imagemUrl ? [e.imagemUrl] : f.fotos,
+      fotos: e.imagens && e.imagens.length > 0 ? e.imagens : f.fotos,
     });
   };
 
