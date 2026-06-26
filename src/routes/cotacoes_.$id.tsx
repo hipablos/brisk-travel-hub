@@ -326,14 +326,14 @@ function VisualizarCotacao() {
               {cotacao.termos && (
                 <section className="border-t border-slate-200 pt-3">
                   <h3 className="text-xs font-bold text-slate-900 mb-1">Termos e Condições</h3>
-                  <p className="text-[11px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.termos}</p>
+                  <p className="text-[12px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.termos}</p>
                 </section>
               )}
 
               {cotacao.outrasInformacoes && (
                 <section className="border-t border-slate-200 pt-3">
                   <h3 className="text-xs font-bold text-slate-900 mb-1">Outras Informações</h3>
-                  <p className="text-[11px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.outrasInformacoes}</p>
+                  <p className="text-[12px] text-slate-700 whitespace-pre-wrap leading-snug">{cotacao.outrasInformacoes}</p>
                 </section>
               )}
 
@@ -651,7 +651,7 @@ function HospedagemBlock({ h }: { h: HospedagemRow }) {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px] text-slate-700">
         <div><span className="text-slate-500">Check-in:</span> <span className="font-medium text-slate-900">{formatDT(h.checkin)}</span></div>
         <div><span className="text-slate-500">Check-out:</span> <span className="font-medium text-slate-900">{formatDT(h.checkout)}</span></div>
         {h.noites != null && <div><span className="text-slate-500">Noites:</span> <span className="font-medium text-slate-900">{h.noites}</span></div>}
@@ -667,13 +667,13 @@ function HospedagemBlock({ h }: { h: HospedagemRow }) {
         {h.codigo_confirmacao && <div><span className="text-slate-500">Confirmação:</span> <span className="font-medium text-slate-900">{h.codigo_confirmacao}</span></div>}
       </div>
       {(h.endereco || local) && (
-        <div className="text-[11px] text-slate-600">
+        <div className="text-[12px] text-slate-600">
           <MapPin className="inline size-3 mr-0.5" />
           {[h.endereco, local].filter(Boolean).join(" — ")}
         </div>
       )}
       {h.observacoes_cliente && (
-        <div className="text-[11px] text-slate-700 italic">{h.observacoes_cliente}</div>
+        <div className="text-[12px] text-slate-700 italic">{h.observacoes_cliente}</div>
       )}
     </section>
   );
@@ -707,7 +707,7 @@ function ExperienciaBlock({ e }: { e: ExperienciaRow }) {
           ))}
         </div>
       )}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px] text-slate-700">
         <div><span className="text-slate-500">Data:</span> <span className="font-medium text-slate-900">{data}</span></div>
         <div><span className="text-slate-500">Horário:</span> <span className="font-medium text-slate-900">{horario}</span></div>
         {e.duracao_min != null && <div><span className="text-slate-500">Duração:</span> <span className="font-medium text-slate-900">{e.duracao_min} min</span></div>}
@@ -716,12 +716,12 @@ function ExperienciaBlock({ e }: { e: ExperienciaRow }) {
         {e.idade_minima != null && <div><span className="text-slate-500">Idade mínima:</span> <span className="font-medium text-slate-900">{e.idade_minima}+</span></div>}
       </div>
       {(e.endereco || local) && (
-        <div className="text-[11px] text-slate-600">
+        <div className="text-[12px] text-slate-600">
           <MapPin className="inline size-3 mr-0.5" />
           {[e.endereco, local].filter(Boolean).join(" — ")}
         </div>
       )}
-      {e.descricao && <div className="text-[11px] text-slate-700 italic">{e.descricao}</div>}
+      {e.descricao && <div className="text-[12px] text-slate-700 italic">{e.descricao}</div>}
     </section>
   );
 }
@@ -762,7 +762,7 @@ function TransferBlock({ t }: { t: any }) {
           <span className="text-[14px] font-bold text-slate-900 tracking-tight">{t.tipo || "Transfer"}</span>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px] text-slate-700">
         <div><span className="text-slate-500">Data de ida:</span> <span className="font-medium text-slate-900">{fmtD(t.data_ida)}</span></div>
         <div><span className="text-slate-500">Hora de ida:</span> <span className="font-medium text-slate-900">{fmtH(t.hora_ida)}</span></div>
         {(t.data_volta || t.hora_volta) && (
