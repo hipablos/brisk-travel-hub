@@ -6,10 +6,7 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import {
-  Collapsible, CollapsibleContent, CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Plane, PlaneTakeoff, PlaneLanding, ChevronDown, Hash, Edit3,
   Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Minus,
@@ -452,33 +449,10 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                 <Counter icon={Luggage} label="Despachada 32kg" value={voo.bagagens.despachada32} onChange={(n) => setBag("despachada32", n)} />
               </div>
             </div>
-
-            {/* Extras */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <ToggleRow icon={UtensilsCrossed} label="Refeição inclusa" checked={voo.refeicao} onChange={(v) => onChange({ refeicao: v })} />
-              <ToggleRow icon={Armchair} label="Assento marcado" checked={voo.assento} onChange={(v) => onChange({ assento: v })} />
-              <ToggleRow icon={BellRing} label="Alerta de check-in" checked={voo.alertaCheckin} onChange={(v) => onChange({ alertaCheckin: v })} />
-            </div>
           </div>
         </CollapsibleContent>
       </section>
     </Collapsible>
-  );
-}
-
-function ToggleRow({
-  icon: Icon, label, checked, onChange,
-}: { icon: React.ComponentType<{ className?: string }>; label: string; checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <label className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border/50 cursor-pointer hover:border-primary/40 transition-colors">
-      <div className="flex items-center gap-2 min-w-0">
-        <div className="size-8 rounded-md bg-primary/10 text-primary grid place-items-center shrink-0">
-          <Icon className="size-4" />
-        </div>
-        <span className="text-sm font-medium text-foreground truncate">{label}</span>
-      </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
-    </label>
   );
 }
 
