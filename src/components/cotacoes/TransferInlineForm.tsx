@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DateInput } from "@/components/ui/date-input";
+import { PlaceAutocomplete } from "@/components/places/PlaceAutocomplete";
 
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
