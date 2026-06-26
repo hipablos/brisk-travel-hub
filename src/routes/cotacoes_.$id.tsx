@@ -30,6 +30,7 @@ type ExperienciaRow = {
   data: string | null; hora_inicio: string | null; hora_termino: string | null;
   duracao_min: number | null; participantes: number | null; idioma: string | null;
   idade_minima: number | null; descricao: string | null;
+  fotos: string[] | null;
 };
 
 const REGIME_LABEL: Record<string, string> = {
@@ -691,6 +692,18 @@ function ExperienciaBlock({ e }: { e: ExperienciaRow }) {
         <span className="text-[12px] font-semibold text-slate-900">{e.nome}</span>
         {e.categoria && <span className="text-[10px] text-slate-500">({e.categoria})</span>}
       </div>
+      {e.fotos && e.fotos.length > 0 && (
+        <div className="grid grid-cols-4 gap-1.5">
+          {e.fotos.slice(0, 4).map((url, i) => (
+            <img
+              key={i}
+              src={url}
+              alt={`${e.nome} — foto ${i + 1}`}
+              className="w-full h-20 object-cover rounded-md border border-slate-200"
+            />
+          ))}
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-slate-700">
         <div><span className="text-slate-500">Data:</span> <span className="font-medium text-slate-900">{data}</span></div>
         <div><span className="text-slate-500">Horário:</span> <span className="font-medium text-slate-900">{horario}</span></div>

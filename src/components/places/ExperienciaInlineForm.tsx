@@ -29,6 +29,7 @@ export type ExperienciaDraft = {
   idioma: string | null;
   idade_minima: number | null;
   descricao: string | null;
+  fotos: string[] | null;
 };
 
 export const novaExperiencia = (): ExperienciaDraft => ({
@@ -50,6 +51,7 @@ export const novaExperiencia = (): ExperienciaDraft => ({
   idioma: "Português",
   idade_minima: null,
   descricao: "",
+  fotos: [],
 });
 
 const CATEGORIAS = [
@@ -84,6 +86,7 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
       google_maps_url: p.google_maps_url ?? null,
       lat: p.lat ?? null,
       lng: p.lng ?? null,
+      fotos: p.fotos && p.fotos.length > 0 ? p.fotos : f.fotos,
     });
   };
 
@@ -124,6 +127,24 @@ export function ExperienciaInlineForm({ value: f, index, onChange, onRemove }: P
         onPlaceSelected={handlePlace}
         types={["establishment"]}
       />
+
+      {f.fotos && f.fotos.length > 0 && (
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">
+            Fotos do Google ({f.fotos.length}) — usadas no orçamento em PDF
+          </Label>
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {f.fotos.map((url, i) => (
+              <img
+                key={i}
+                src={url}
+                alt={`${f.nome || "Experiência"} foto ${i + 1}`}
+                className="h-16 w-24 object-cover rounded-md border border-border/60 shrink-0"
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-6">
         <div className="space-y-2">
