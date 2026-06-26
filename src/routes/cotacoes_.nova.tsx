@@ -1012,11 +1012,11 @@ function NovaCotacao() {
                         </Button>
                       </div>
                     ) : (
-                      <div className="space-y-2">
+                      <div className="space-y-4">
                         {vendaCustos.map((v) => (
                           <div
                             key={v.id}
-                            className="flex items-center gap-2 rounded-lg border border-border/50 bg-background/40 px-3 py-2"
+                            className="flex items-center gap-4 rounded-lg border border-border/50 bg-background/40 px-4 py-3"
                           >
                             <Input
                               placeholder="Observação"
