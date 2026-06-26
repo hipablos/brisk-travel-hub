@@ -1002,7 +1002,6 @@ function NovaCotacao() {
                           >
                             <Input
                               value={v.descricao ?? ""}
-                              value={v.descricao ?? ""}
                               onChange={(e) => updVendaCusto(v.id, { descricao: e.target.value })}
                               className="flex-1"
                             />
@@ -1011,7 +1010,6 @@ function NovaCotacao() {
                               <Input
                                 type="number"
                                 step="0.01"
-                                value={v.valor || ""}
                                 value={v.valor || ""}
                                 onChange={(e) => updVendaCusto(v.id, { valor: parseFloat(e.target.value) || 0 })}
                               />
@@ -1040,7 +1038,6 @@ function NovaCotacao() {
                       <div className="flex items-center gap-3 mt-2 max-w-xs">
                         <span className="px-3 h-9 flex items-center rounded-md border border-border/40 bg-muted text-sm text-muted-foreground">R$</span>
                         <Input
-                          value={valorComparacao}
                           value={valorComparacao}
                           onChange={(e) => setValorComparacao(e.target.value)}
                         />
