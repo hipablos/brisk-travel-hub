@@ -163,7 +163,6 @@ function ReservaPage() {
           <Topbar />
         </div>
         <main className="p-6 max-w-[960px] w-full mx-auto">
-          {/* Toolbar */}
           <div className="flex items-center justify-between mb-6 print:hidden">
             <div className="flex items-center gap-3">
               <Button asChild variant="outline" size="icon">
@@ -189,12 +188,10 @@ function ReservaPage() {
             </div>
           </div>
 
-          {/* Documento */}
           <div
             id="reserva-doc"
             className="bg-white text-slate-800 rounded-lg shadow-sm overflow-hidden print:shadow-none print:rounded-none print:border-0 border border-slate-200"
           >
-            {/* Cabeçalho da agência */}
             <div className="px-5 py-2.5 border-b border-slate-200 flex items-center justify-between gap-4 print-bg">
               <BriskLogo variant="blue" className="h-6 w-auto" />
               <div className="text-right text-[10px] text-slate-600 leading-tight">
@@ -203,7 +200,6 @@ function ReservaPage() {
               </div>
             </div>
 
-            {/* Header — airline logo + localizador + botão visualizar reserva */}
             <div className="px-5 py-3 flex items-center justify-between gap-3 border-b border-slate-200">
               <AirlineLogo companhia={vooIda?.companhia ?? vooVolta?.companhia} className="h-10 w-auto" />
               <div className="flex items-stretch gap-2">
@@ -246,7 +242,6 @@ function ReservaPage() {
                 />
               )}
 
-              {/* Passageiros */}
               <section className="pt-1">
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">
                   Passageiros: {totalPax}
@@ -333,7 +328,6 @@ function ItinerarioBlock({
   const brand = voo?.companhia ? getAirlineBrand(voo.companhia) : null;
   return (
     <section>
-      {/* Header bar */}
       <div className="bg-[oklch(0.18_0.08_255)] text-white rounded-t flex items-center justify-between px-3 py-1.5 print-bg gap-2">
         <div className="flex items-center gap-1.5 font-semibold text-xs">
           <Plane className="size-3.5" />
@@ -350,7 +344,6 @@ function ItinerarioBlock({
         </div>
       </div>
 
-      {/* Duração total — visível na tela e no PDF. Link check-in só na tela */}
       {(voo?.duracao || brand?.checkinUrl) && (
         <div className="flex items-center justify-between text-[10px] text-slate-600 px-3 py-1 bg-slate-50 border-x border-slate-200 print-bg">
           {voo?.duracao ? (
@@ -367,7 +360,7 @@ function ItinerarioBlock({
               rel="noreferrer"
               className="print:hidden text-[oklch(0.22_0.08_255)] underline"
             >
-              Check-in: {brand.checkinUrl}
+              Check-in online
             </a>
           )}
         </div>
