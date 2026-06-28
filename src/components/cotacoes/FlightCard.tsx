@@ -123,65 +123,6 @@ function Counter({
   );
 }
 
-// ── AirlineSelect ─────────────────────────────────────────────────────────────
-interface AirlineSelectProps {
-  value?: string;
-  onChange: (v: string) => void;
-  size?: "sm" | "default";
-}
-
-function AirlineSelect({ value, onChange, size = "default" }: AirlineSelectProps) {
-  const [search, setSearch] = useState("");
-  const brand = value ? getAirlineBrand(value) : null;
-  const filtered = AIRLINES.filter((a) =>
-    !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.iata.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <Select value={value ?? ""} onValueChange={onChange}>
-      <SelectTrigger className={cn(size === "sm" && "h-8 text-xs")}>
-        <SelectValue placeholder="Selecione a companhia">
-          {brand ? (
-            <span className="flex items-center gap-2">
-              <span
-                className="font-bold text-sm"
-                style={{ color: brand.color }}
-              >
-                {brand.name}
-              </span>
-              <span className="text-xs text-muted-foreground">{brand.iata}</span>
-            </span>
-          ) : (
-            <span className="text-muted-foreground">Selecione a companhia</span>
-          )}
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent className="max-h-72">
-        <div className="flex items-center gap-2 px-2 pb-2 border-b border-border/50 sticky top-0 bg-popover z-10">
-          <Search className="size-3.5 text-muted-foreground shrink-0" />
-          <input
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-            placeholder="Buscar companhia..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.stopPropagation()}
-          />
-        </div>
-        {filtered.length === 0 && (
-          <div className="px-3 py-4 text-xs text-muted-foreground text-center">Nenhuma companhia encontrada</div>
-        )}
-        {filtered.map((a) => (
-          <SelectItem key={a.key} value={a.key}>
-            <span className="flex items-center gap-2">
-              <span className="font-bold min-w-[50px]" style={{ color: a.color }}>{a.name}</span>
-              <span className="text-xs text-muted-foreground">{a.iata}</span>
-            </span>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-}
 
 // ── FlightCard ────────────────────────────────────────────────────────────────
 export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total, minData }: Props) {
