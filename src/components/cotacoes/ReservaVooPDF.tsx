@@ -9,7 +9,7 @@ interface Props {
 export function ReservaVooButton({ cotacao, className }: Props) {
   const handleOpen = () => {
     const id = (cotacao as any).id ?? cotacao.code;
-    window.open(`/reserva_/${id}`, "_blank");
+    window.open(`/reserva/${id}`, "_blank");
   };
   return (
     <button
