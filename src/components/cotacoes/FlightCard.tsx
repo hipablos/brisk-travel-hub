@@ -20,7 +20,25 @@ import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR, dateOnlyToNativeISO } from "@/lib/dates";
 import { calcTempoDeVooTotal, calcDuracaoTrecho, calcDuracaoEscalaTrecho } from "@/lib/voos";
-import { getAirlineBrand } from "@/lib/airlines";
+import { getAirlineBrand, AIRLINES } from "@/lib/airlines";
+
+function AirlineSelect({ value, onChange }: { value?: string; onChange: (v: string) => void }) {
+  return (
+    <Select value={value ?? ""} onValueChange={onChange}>
+      <SelectTrigger><SelectValue placeholder="Selecione a companhia" /></SelectTrigger>
+      <SelectContent className="max-h-72">
+        {AIRLINES.map((a) => (
+          <SelectItem key={a.key} value={a.key}>
+            <span className="inline-flex items-center gap-2">
+              <span className="size-2 rounded-full" style={{ background: a.color }} />
+              {a.name} <span className="text-muted-foreground text-xs">({a.iata})</span>
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
