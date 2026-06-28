@@ -10,7 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import {
   Plane, PlaneTakeoff, PlaneLanding, ChevronDown, Hash, Edit3,
   Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Minus,
-  MoreHorizontal, Copy,
+  MoreHorizontal, Copy, Search,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -20,6 +20,7 @@ import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR, dateOnlyToNativeISO } from "@/lib/dates";
 import { calcTempoDeVooTotal, calcDuracaoTrecho, calcDuracaoEscalaTrecho } from "@/lib/voos";
+import { AIRLINES, getAirlineBrand } from "@/lib/airlines";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -33,9 +34,9 @@ export type Escala = {
   dataFim?: string;
   saida?: string;
   chegada?: string;
-  duracaoEscala?: string; // mantido p/ compat (não usado na UI nova)
+  duracaoEscala?: string;
   duracaoTrecho?: string;
-  tempoEspera?: string; // ex.: "2h 30m" — somado ao total
+  tempoEspera?: string;
 };
 
 export type Bagagens = {
@@ -74,7 +75,6 @@ export function novoVoo(): Voo {
     id: crypto.randomUUID(),
     tipo: "direto",
     escalas: [],
-    // Padrão: 1 mochila (item pessoal) + 1 mala de mão
     bagagens: { pessoal: 1, maoCabine: 1, despachada23: 0, despachada32: 0 },
     refeicao: false,
     assento: false,
@@ -92,7 +92,6 @@ interface Props {
   onDuplicate?: () => void;
   index?: number;
   total?: number;
-  /** Data mínima (DD-MM-AAAA) — normalmente a data da cotação. */
   minData?: string;
 }
 
@@ -123,6 +122,67 @@ function Counter({
   );
 }
 
+// ── AirlineSelect ─────────────────────────────────────────────────────────────
+interface AirlineSelectProps {
+  value?: string;
+  onChange: (v: string) => void;
+  size?: "sm" | "default";
+}
+
+function AirlineSelect({ value, onChange, size = "default" }: AirlineSelectProps) {
+  const [search, setSearch] = useState("");
+  const brand = value ? getAirlineBrand(value) : null;
+  const filtered = AIRLINES.filter((a) =>
+    !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.iata.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <Select value={value ?? ""} onValueChange={onChange}>
+      <SelectTrigger className={cn(size === "sm" && "h-8 text-xs")}>
+        <SelectValue placeholder="Selecione a companhia">
+          {brand ? (
+            <span className="flex items-center gap-2">
+              <span
+                className="font-bold text-sm"
+                style={{ color: brand.color }}
+              >
+                {brand.name}
+              </span>
+              <span className="text-xs text-muted-foreground">{brand.iata}</span>
+            </span>
+          ) : (
+            <span className="text-muted-foreground">Selecione a companhia</span>
+          )}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent className="max-h-72">
+        <div className="flex items-center gap-2 px-2 pb-2 border-b border-border/50 sticky top-0 bg-popover z-10">
+          <Search className="size-3.5 text-muted-foreground shrink-0" />
+          <input
+            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            placeholder="Buscar companhia..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.stopPropagation()}
+          />
+        </div>
+        {filtered.length === 0 && (
+          <div className="px-3 py-4 text-xs text-muted-foreground text-center">Nenhuma companhia encontrada</div>
+        )}
+        {filtered.map((a) => (
+          <SelectItem key={a.key} value={a.key}>
+            <span className="flex items-center gap-2">
+              <span className="font-bold min-w-[50px]" style={{ color: a.color }}>{a.name}</span>
+              <span className="text-xs text-muted-foreground">{a.iata}</span>
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+// ── FlightCard ────────────────────────────────────────────────────────────────
 export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total, minData }: Props) {
   const voo = {
     ...rawVoo,
@@ -140,9 +200,10 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
     ? `${baseTitle} ${index + 1}`
     : baseTitle;
 
+  const brand = voo.companhia ? getAirlineBrand(voo.companhia) : null;
 
   const addEscala = () => {
-    onChange({ escalas: [...voo.escalas, { id: crypto.randomUUID() }] });
+    onChange({ escalas: [...voo.escalas, { id: crypto.randomUUID(), companhia: voo.companhia }] });
   };
   const updEscala = (id: string, patch: Partial<Escala>) => {
     onChange({ escalas: voo.escalas.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
@@ -155,7 +216,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
   const duracaoTotal = useMemo(() => calcTempoDeVooTotal(voo), [voo]);
 
-  // Refs guardam o último valor calculado para detectar override manual.
   const lastCalcTotal = useRef<string | undefined>(undefined);
   const lastCalcTrecho = useRef<string | undefined>(undefined);
   const lastCalcEscala = useRef<Record<string, string>>({});
@@ -167,7 +227,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
       if (current !== duracaoTotal) onChange({ duracao: duracaoTotal });
     }
     lastCalcTotal.current = duracaoTotal;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoTotal]);
 
   useEffect(() => {
@@ -177,7 +236,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
       if (current !== duracaoTrechoCalculada) onChange({ duracaoTrecho: duracaoTrechoCalculada });
     }
     lastCalcTrecho.current = duracaoTrechoCalculada;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duracaoTrechoCalculada]);
 
   useEffect(() => {
@@ -199,7 +257,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
         return p ? { ...e, ...p.patch } : e;
       }),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [voo.escalas, voo.tipo]);
 
   const setBag = (k: keyof Bagagens, n: number) =>
@@ -219,6 +276,11 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
             <div className="min-w-0">
               <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
                 {title}
+                {brand && (
+                  <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ color: brand.color }}>
+                    {brand.name}
+                  </span>
+                )}
                 {totalEscalas > 0 && (
                   <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-secondary/15 text-secondary">
                     {totalEscalas} {totalEscalas === 1 ? "escala" : "escalas"}
@@ -265,7 +327,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
           </div>
         </div>
 
-
         <CollapsibleContent>
           <div className="px-6 pb-6 pt-2 space-y-6 border-t border-border/50">
             {voo.tipo === "localizador" ? (
@@ -278,6 +339,29 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+
+                  {/* ── Companhia aérea ── */}
+                  <div className="space-y-2 md:col-span-2">
+                    <Label>Companhia aérea</Label>
+                    <AirlineSelect
+                      value={voo.companhia}
+                      onChange={(v) => onChange({ companhia: v })}
+                    />
+                    {brand && (
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-muted-foreground">Check-in:</span>
+                        <a
+                          href={brand.checkinUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs font-medium text-primary hover:underline truncate"
+                        >
+                          {brand.checkinUrl}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <Label>Aeroporto / Cidade de origem</Label>
                     <AirportAutocomplete
@@ -324,9 +408,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       />
                       <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      Soma de todos os trechos e escalas. Editável.
-                    </p>
+                    <p className="text-[11px] text-muted-foreground">Soma de todos os trechos e escalas. Editável.</p>
                   </div>
                   <div className="space-y-2">
                     <Label>Duração do trecho</Label>
@@ -335,11 +417,8 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       onChange={(e) => onChange({ duracaoTrecho: e.target.value })}
                       placeholder={duracaoTrechoCalculada}
                     />
-                    <p className="text-[11px] text-muted-foreground">
-                      Calculada automaticamente pelos horários. Editável.
-                    </p>
+                    <p className="text-[11px] text-muted-foreground">Calculada automaticamente pelos horários. Editável.</p>
                   </div>
-
                   <div className="space-y-2 md:col-span-2">
                     <Label>Número do voo</Label>
                     <Input value={voo.numeroVoo ?? ""} onChange={(e) => onChange({ numeroVoo: e.target.value })} />
@@ -391,73 +470,94 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   <p className="text-xs text-muted-foreground text-center py-4">Nenhuma escala adicionada ainda.</p>
                 )}
 
-                {voo.escalas.map((e, idx) => (
-                  <div key={e.id} className="rounded-lg border border-border/60 bg-card p-4 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-foreground">Escala {idx + 1}</span>
-                      <Button type="button" variant="ghost" size="icon" className="size-7 text-muted-foreground hover:text-destructive" onClick={() => delEscala(e.id)}>
-                        <Trash2 className="size-3.5" />
-                      </Button>
+                {voo.escalas.map((e, idx) => {
+                  const escalaBrand = e.companhia ? getAirlineBrand(e.companhia) : null;
+                  return (
+                    <div key={e.id} className="rounded-lg border border-border/60 bg-card p-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-foreground">Escala {idx + 1}</span>
+                          {escalaBrand && (
+                            <span className="text-xs font-bold" style={{ color: escalaBrand.color }}>
+                              {escalaBrand.name}
+                            </span>
+                          )}
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" className="size-7 text-muted-foreground hover:text-destructive" onClick={() => delEscala(e.id)}>
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        {/* ── Companhia da escala ── */}
+                        <div className="space-y-1 md:col-span-2">
+                          <Label className="text-xs">Companhia aérea</Label>
+                          <AirlineSelect
+                            value={e.companhia}
+                            onChange={(v) => updEscala(e.id, { companhia: v })}
+                            size="sm"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label className="text-xs">Aeroporto de origem</Label>
+                          <AirportAutocomplete
+                            value={e.origem}
+                            onChange={(v) => updEscala(e.id, { origem: v })}
+                            onSelect={(_a, formatted) => updEscala(e.id, { origem: formatted })}
+                            placeholder=""
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Aeroporto de destino</Label>
+                          <AirportAutocomplete
+                            value={e.destino}
+                            onChange={(v) => updEscala(e.id, { destino: v })}
+                            onSelect={(_a, formatted) => updEscala(e.id, { destino: formatted })}
+                            placeholder=""
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Data de início</Label>
+                          <DateInput value={e.dataInicio ?? ""} onChange={(iso) => updEscala(e.id, { dataInicio: iso })} defaultMonthISO={sugVooISO} />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Data de fim</Label>
+                          <DateInput value={e.dataFim ?? ""} onChange={(iso) => updEscala(e.id, { dataFim: iso })} defaultMonthISO={dateOnlyToNativeISO(e.dataInicio) || sugVooISO} />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Horário de saída</Label>
+                          <Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Horário de chegada</Label>
+                          <Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Duração do trecho</Label>
+                          <Input
+                            value={e.duracaoTrecho ?? ""}
+                            onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })}
+                            placeholder={calcDuracaoEscalaTrecho(e) || "—"}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Número do voo</Label>
+                          <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Tempo em espera</Label>
+                          <Input
+                            value={e.tempoEspera ?? ""}
+                            onChange={(ev) => updEscala(e.id, { tempoEspera: ev.target.value })}
+                            placeholder="Ex.: 2h 30m"
+                          />
+                          <p className="text-[10px] text-muted-foreground">Somado à duração total do voo.</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <Label className="text-xs">Aeroporto de origem</Label>
-                        <AirportAutocomplete
-                          value={e.origem}
-                          onChange={(v) => updEscala(e.id, { origem: v })}
-                          onSelect={(_a, formatted) => updEscala(e.id, { origem: formatted })}
-                          placeholder=""
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Aeroporto de destino</Label>
-                        <AirportAutocomplete
-                          value={e.destino}
-                          onChange={(v) => updEscala(e.id, { destino: v })}
-                          onSelect={(_a, formatted) => updEscala(e.id, { destino: formatted })}
-                          placeholder=""
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Data de início</Label>
-                        <DateInput value={e.dataInicio ?? ""} onChange={(iso) => updEscala(e.id, { dataInicio: iso })} defaultMonthISO={sugVooISO} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Data de fim</Label>
-                        <DateInput value={e.dataFim ?? ""} onChange={(iso) => updEscala(e.id, { dataFim: iso })} defaultMonthISO={dateOnlyToNativeISO(e.dataInicio) || sugVooISO} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Horário de saída</Label>
-                        <Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Horário de chegada</Label>
-                        <Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Duração do trecho</Label>
-                        <Input
-                          value={e.duracaoTrecho ?? ""}
-                          onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })}
-                          placeholder={calcDuracaoEscalaTrecho(e) || "—"}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Número do voo</Label>
-                        <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Tempo em espera</Label>
-                        <Input
-                          value={e.tempoEspera ?? ""}
-                          onChange={(ev) => updEscala(e.id, { tempoEspera: ev.target.value })}
-                          placeholder="Ex.: 2h 30m"
-                        />
-                        <p className="text-[10px] text-muted-foreground">Somado à duração total do voo.</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
