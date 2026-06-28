@@ -6,16 +6,11 @@ interface Props {
   className?: string;
 }
 
-/**
- * Abre a reserva de voo na rota /reserva_/$id (padrão visual único).
- * O PDF é gerado via window.print() dentro dessa rota.
- */
 export function ReservaVooButton({ cotacao, className }: Props) {
   const handleOpen = () => {
     const id = (cotacao as any).id ?? cotacao.code;
     window.open(`/reserva/${id}`, "_blank");
   };
-
   return (
     <button
       type="button"

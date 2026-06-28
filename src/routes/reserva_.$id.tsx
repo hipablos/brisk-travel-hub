@@ -187,17 +187,17 @@ function ReservaPage() {
 
             <div className="px-5 py-3 flex items-center justify-between gap-3 border-b border-slate-200">
               <AirlineLogo companhia={vooIda?.companhia ?? vooVolta?.companhia} className="h-10 w-auto" />
-              <div className="flex items-stretch gap-2">
-                <div className="flex items-center gap-2 px-3 rounded bg-blue-50 border border-blue-100 print-bg">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 px-3 py-2 rounded bg-blue-50 border border-blue-100 print-bg">
                   <span className="text-[9px] font-semibold text-slate-600 uppercase tracking-wide">Localizador</span>
                   <span className="text-sm font-bold tracking-wider text-[oklch(0.22_0.08_255)]">{headerLocalizador}</span>
                 </div>
-                {headerBrand?.checkinUrl && (
-                  
-                    href={headerBrand.checkinUrl}
+                {headerBrand && (
+                  <a
+                    href={headerBrand.bookingUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="print:hidden px-3 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-xs font-semibold transition-colors"
+                    className="print:hidden px-3 py-2 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-xs font-semibold transition-colors"
                   >
                     Visualizar reserva
                   </a>
@@ -250,10 +250,9 @@ function ReservaPage() {
         @media print {
           html, body { background: #ffffff !important; }
           body * { visibility: hidden !important; }
-#reserva-doc, #reserva-doc * { visibility: visible !important; }
-#reserva-doc a { display: none !important; }
-#reserva-doc a { display: none !important; }
-          .print\\:hidden { display: none !important; }
+          #reserva-doc, #reserva-doc * { visibility: visible !important; }
+          .print-hidden { display: none !important; }
+          #reserva-doc a { display: none !important; }
           #reserva-doc {
             position: absolute !important;
             left: 0; top: 0;
