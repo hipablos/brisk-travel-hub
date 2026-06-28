@@ -61,6 +61,7 @@ function hydrateVoo(raw: any, fallbackOrigem?: string, fallbackDestino?: string,
         const esc = escalas[i];
         arr.push({
           numeroVoo: i === 0 ? v.numeroVoo : esc.numeroVoo,
+          classe: i === 0 ? v.classe : esc.classe,
           horaSaida: i === 0 ? v.horaSaida : (escalas[i - 1]?.saida ?? esc.saida),
           horaChegada: esc.chegada,
           origem: prevOrigem,
@@ -73,6 +74,7 @@ function hydrateVoo(raw: any, fallbackOrigem?: string, fallbackDestino?: string,
       const lastEsc = escalas[escalas.length - 1];
       arr.push({
         numeroVoo: lastEsc?.numeroVoo,
+        classe: lastEsc?.classe,
         horaSaida: lastEsc?.saida,
         horaChegada: v.horaChegada,
         origem: prevOrigem,
@@ -83,6 +85,7 @@ function hydrateVoo(raw: any, fallbackOrigem?: string, fallbackDestino?: string,
     } else if (origemOriginal || destinoOriginal || v.horaSaida || v.horaChegada || v.numeroVoo) {
       trechos = [{
         numeroVoo: v.numeroVoo,
+        classe: v.classe,
         horaSaida: v.horaSaida,
         horaChegada: v.horaChegada,
         origem: origemOriginal,
