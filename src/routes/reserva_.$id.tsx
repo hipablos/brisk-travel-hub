@@ -53,6 +53,7 @@ function getTrechos(voo: any): Trecho[] {
   if (voo.origem || voo.destino || voo.horaSaida || voo.horaChegada || voo.numeroVoo) {
     return [{
       numeroVoo: voo.numeroVoo,
+      classe: voo.classe,
       horaSaida: voo.horaSaida,
       horaChegada: voo.horaChegada,
       origem: voo.origem,
