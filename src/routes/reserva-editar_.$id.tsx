@@ -316,6 +316,18 @@ function VooForm({
                 <Input value={t.numeroVoo ?? ""} onChange={(e) => updateTrecho(i, { numeroVoo: e.target.value })} />
               </div>
               <div>
+                <Label className="text-xs">Classe do voo</Label>
+                <Select value={t.classe ?? ""} onValueChange={(v) => updateTrecho(i, { classe: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="economica">Econômica</SelectItem>
+                    <SelectItem value="premium">Premium Economy</SelectItem>
+                    <SelectItem value="executiva">Executiva</SelectItem>
+                    <SelectItem value="primeira">Primeira Classe</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <Label className="text-xs">Data</Label>
                 <DateInput value={t.data ?? dataDefault ?? ""} onChange={(iso) => updateTrecho(i, { data: iso })} />
               </div>
