@@ -21,6 +21,7 @@ const COMPANHIAS = ["GOL", "LATAM", "AZUL"];
 
 type Trecho = {
   numeroVoo?: string;
+  classe?: string;
   horaSaida?: string;
   horaChegada?: string;
   origem?: string;
