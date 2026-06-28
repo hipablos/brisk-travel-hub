@@ -250,7 +250,8 @@ function ReservaPage() {
         @media print {
           html, body { background: #ffffff !important; }
           body * { visibility: hidden !important; }
-         #reserva-doc, #reserva-doc * { visibility: visible !important; }
+#reserva-doc, #reserva-doc * { visibility: visible !important; }
+#reserva-doc a { display: none !important; }
 #reserva-doc a { display: none !important; }
           .print\\:hidden { display: none !important; }
           #reserva-doc {
