@@ -91,6 +91,7 @@ const KanbanCard = memo(function KanbanCard({
           {card.saved ? (
             <>
               <LabelsPopover cotacaoId={card.id} selected={card.labels} />
+              {card.cotacao && <ReservaVooButton cotacao={card.cotacao} />}
               <Link to="/cotacoes/$id" params={{ id: card.id }} className="p-1 hover:text-foreground" title="Visualizar PDF">
                 <Eye className="size-3.5" />
               </Link>
@@ -102,7 +103,7 @@ const KanbanCard = memo(function KanbanCard({
               >
                 <Pencil className="size-3.5" />
               </Link>
-              {card.cotacao && <ReservaVooButton cotacao={card.cotacao} />}
+
               <button
                 type="button"
                 onClick={async () => {
