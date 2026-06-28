@@ -30,6 +30,7 @@ export type Escala = {
   destino?: string;
   companhia?: string;
   numeroVoo?: string;
+  classe?: string;
   dataInicio?: string;
   dataFim?: string;
   saida?: string;
@@ -544,10 +545,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs">Número do voo</Label>
-                          <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
-                        </div>
-                        <div className="space-y-1">
                           <Label className="text-xs">Tempo em espera</Label>
                           <Input
                             value={e.tempoEspera ?? ""}
@@ -555,6 +552,24 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                             placeholder="Ex.: 2h 30m"
                           />
                           <p className="text-[10px] text-muted-foreground">Somado à duração total do voo.</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
+                          <div className="space-y-1">
+                            <Label className="text-xs">Número do voo</Label>
+                            <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">Classe do voo</Label>
+                            <Select value={e.classe ?? ""} onValueChange={(v) => updEscala(e.id, { classe: v })}>
+                              <SelectTrigger><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="economica">Econômica</SelectItem>
+                                <SelectItem value="premium">Premium Economy</SelectItem>
+                                <SelectItem value="executiva">Executiva</SelectItem>
+                                <SelectItem value="primeira">Primeira Classe</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                       </div>
                     </div>
