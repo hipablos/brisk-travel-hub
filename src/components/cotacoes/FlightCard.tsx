@@ -10,7 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import {
   Plane, PlaneTakeoff, PlaneLanding, ChevronDown, Hash, Edit3,
   Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Minus,
-  MoreHorizontal, Copy, Search,
+  MoreHorizontal, Copy,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
