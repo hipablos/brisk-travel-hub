@@ -353,16 +353,6 @@ function ItinerarioBlock({
           ) : (
             <span />
           )}
-          {brand?.checkinUrl && (
-            <a
-              href={brand.checkinUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="print:hidden text-[oklch(0.22_0.08_255)] underline"
-            >
-              Check-in online
-            </a>
-          )}
         </div>
       )}
 
