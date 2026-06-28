@@ -281,7 +281,7 @@ function TrechoRow({ t }: { t: Trecho }) {
           <Plane className="size-3.5 text-slate-700" />
           <span>{destino.iata}</span>
         </div>
-        <div className="text-[10px] text-slate-500 mt-0.5">{t.numeroVoo || ""}</div>
+        <div className="text-[10px] text-slate-500 mt-0.5">{t.numeroVoo || ""}{t.classe ? ` · ${classeLabel(t.classe)}` : ""}</div>
       </div>
       <div className="col-span-3 text-xs text-slate-700 text-right leading-tight">
         <div className="truncate">{destino.name ? `Aer. ${destino.name}` : "Aeroporto"}</div>
