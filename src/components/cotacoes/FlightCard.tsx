@@ -10,7 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import {
   Plane, PlaneTakeoff, PlaneLanding, ChevronDown, Hash, Edit3,
   Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Minus,
-  MoreHorizontal, Copy,
+  MoreHorizontal, Copy, Search,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -20,25 +20,7 @@ import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR, dateOnlyToNativeISO } from "@/lib/dates";
 import { calcTempoDeVooTotal, calcDuracaoTrecho, calcDuracaoEscalaTrecho } from "@/lib/voos";
-import { getAirlineBrand, AIRLINES } from "@/lib/airlines";
-
-function AirlineSelect({ value, onChange }: { value?: string; onChange: (v: string) => void }) {
-  return (
-    <Select value={value ?? ""} onValueChange={onChange}>
-      <SelectTrigger><SelectValue placeholder="Selecione a companhia" /></SelectTrigger>
-      <SelectContent className="max-h-72">
-        {AIRLINES.map((a) => (
-          <SelectItem key={a.key} value={a.key}>
-            <span className="inline-flex items-center gap-2">
-              <span className="size-2 rounded-full" style={{ background: a.color }} />
-              {a.name} <span className="text-muted-foreground text-xs">({a.iata})</span>
-            </span>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-}
+import { AIRLINES, getAirlineBrand } from "@/lib/airlines";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -141,8 +123,60 @@ function Counter({
   );
 }
 
+interface AirlineSelectProps {
+  value?: string;
+  onChange: (v: string) => void;
+  size?: "sm" | "default";
+}
 
-// ── FlightCard ────────────────────────────────────────────────────────────────
+function AirlineSelect({ value, onChange, size = "default" }: AirlineSelectProps) {
+  const [search, setSearch] = useState("");
+  const brand = value ? getAirlineBrand(value) : null;
+  const filtered = AIRLINES.filter((a) =>
+    !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.iata.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <Select value={value ?? ""} onValueChange={onChange}>
+      <SelectTrigger className={cn(size === "sm" && "h-8 text-xs")}>
+        <SelectValue placeholder="Selecione a companhia">
+          {brand ? (
+            <span className="flex items-center gap-2">
+              <span className="font-bold text-sm" style={{ color: brand.color }}>{brand.name}</span>
+              <span className="text-xs text-muted-foreground">{brand.iata}</span>
+            </span>
+          ) : (
+            <span className="text-muted-foreground">Selecione a companhia</span>
+          )}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent className="max-h-72">
+        <div className="flex items-center gap-2 px-2 pb-2 border-b border-border/50 sticky top-0 bg-popover z-10">
+          <Search className="size-3.5 text-muted-foreground shrink-0" />
+          <input
+            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            placeholder="Buscar companhia..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.stopPropagation()}
+          />
+        </div>
+        {filtered.length === 0 && (
+          <div className="px-3 py-4 text-xs text-muted-foreground text-center">Nenhuma companhia encontrada</div>
+        )}
+        {filtered.map((a) => (
+          <SelectItem key={a.key} value={a.key}>
+            <span className="flex items-center gap-2">
+              <span className="font-bold min-w-[50px]" style={{ color: a.color }}>{a.name}</span>
+              <span className="text-xs text-muted-foreground">{a.iata}</span>
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
 export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total, minData }: Props) {
   const voo = {
     ...rawVoo,
@@ -163,7 +197,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const brand = voo.companhia ? getAirlineBrand(voo.companhia) : null;
 
   const addEscala = () => {
-    onChange({ escalas: [...voo.escalas, { id: crypto.randomUUID() }] });
+    onChange({ escalas: [...voo.escalas, { id: crypto.randomUUID(), companhia: voo.companhia }] });
   };
   const updEscala = (id: string, patch: Partial<Escala>) => {
     onChange({ escalas: voo.escalas.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
@@ -300,64 +334,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
 
-
-                  <div className="space-y-2">
-                    <Label>Aeroporto / Cidade de origem</Label>
-                    <AirportAutocomplete
-                      value={voo.origem}
-                      onChange={(v) => onChange({ origem: v, origemInfo: undefined })}
-                      onSelect={(a, formatted) => onChange({ origem: formatted, origemInfo: a })}
-                      placeholder=""
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Aeroporto / Cidade de destino</Label>
-                    <AirportAutocomplete
-                      value={voo.destino}
-                      onChange={(v) => onChange({ destino: v, destinoInfo: undefined })}
-                      onSelect={(a, formatted) => onChange({ destino: formatted, destinoInfo: a })}
-                      placeholder=""
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Data de início do voo</Label>
-                    <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} defaultMonthISO={minCotacaoISO} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Data de fim do voo</Label>
-                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} defaultMonthISO={sugChegadaISO} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Horário de saída</Label>
-                    <Input type="time" value={voo.horaSaida ?? ""} onChange={(e) => onChange({ horaSaida: e.target.value })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Horário de chegada</Label>
-                    <Input type="time" value={voo.horaChegada ?? ""} onChange={(e) => onChange({ horaChegada: e.target.value })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Duração total do voo</Label>
-                    <div className="relative">
-                      <Input
-                        value={voo.duracao ?? ""}
-                        onChange={(e) => onChange({ duracao: e.target.value })}
-                        placeholder={duracaoTotal}
-                        className="pl-9"
-                        aria-label="Duração total do voo"
-                      />
-                      <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">Soma de todos os trechos e escalas. Editável.</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Duração do trecho</Label>
-                    <Input
-                      value={voo.duracaoTrecho ?? ""}
-                      onChange={(e) => onChange({ duracaoTrecho: e.target.value })}
-                      placeholder={duracaoTrechoCalculada}
-                    />
-                    <p className="text-[11px] text-muted-foreground">Calculada automaticamente pelos horários. Editável.</p>
-                  </div>
+                  {/* Companhia aérea + Número do voo */}
                   <div className="space-y-2 md:col-span-2">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -378,6 +355,53 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </div>
                     )}
                   </div>
+
+                  {/* Origem + Destino */}
+                  <div className="space-y-2">
+                    <Label>Aeroporto / Cidade de origem</Label>
+                    <AirportAutocomplete value={voo.origem} onChange={(v) => onChange({ origem: v, origemInfo: undefined })} onSelect={(a, formatted) => onChange({ origem: formatted, origemInfo: a })} placeholder="" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Aeroporto / Cidade de destino</Label>
+                    <AirportAutocomplete value={voo.destino} onChange={(v) => onChange({ destino: v, destinoInfo: undefined })} onSelect={(a, formatted) => onChange({ destino: formatted, destinoInfo: a })} placeholder="" />
+                  </div>
+
+                  {/* Datas */}
+                  <div className="space-y-2">
+                    <Label>Data de início do voo</Label>
+                    <DateInput value={voo.data ?? ""} onChange={(iso) => onChange({ data: iso })} defaultMonthISO={minCotacaoISO} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Data de fim do voo</Label>
+                    <DateInput value={voo.dataChegada ?? ""} onChange={(iso) => onChange({ dataChegada: iso })} defaultMonthISO={sugChegadaISO} />
+                  </div>
+
+                  {/* Horários */}
+                  <div className="space-y-2">
+                    <Label>Horário de saída</Label>
+                    <Input type="time" value={voo.horaSaida ?? ""} onChange={(e) => onChange({ horaSaida: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Horário de chegada</Label>
+                    <Input type="time" value={voo.horaChegada ?? ""} onChange={(e) => onChange({ horaChegada: e.target.value })} />
+                  </div>
+
+                  {/* Durações */}
+                  <div className="space-y-2">
+                    <Label>Duração total do voo</Label>
+                    <div className="relative">
+                      <Input value={voo.duracao ?? ""} onChange={(e) => onChange({ duracao: e.target.value })} placeholder={duracaoTotal} className="pl-9" aria-label="Duração total do voo" />
+                      <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">Soma de todos os trechos e escalas. Editável.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Duração do trecho</Label>
+                    <Input value={voo.duracaoTrecho ?? ""} onChange={(e) => onChange({ duracaoTrecho: e.target.value })} placeholder={duracaoTrechoCalculada} />
+                    <p className="text-[11px] text-muted-foreground">Calculada automaticamente pelos horários. Editável.</p>
+                  </div>
+
+                  {/* Classe + Tipo */}
                   <div className="space-y-2">
                     <Label>Classe do voo</Label>
                     <Select value={voo.classe ?? ""} onValueChange={(v) => onChange({ classe: v })}>
@@ -402,6 +426,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </SelectContent>
                     </Select>
                   </div>
+
                 </div>
               </>
             )}
@@ -412,9 +437,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   <div className="flex items-center gap-2">
                     <Plane className="size-4 text-secondary" />
                     <h3 className="text-sm font-semibold text-foreground">Escalas</h3>
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-secondary/15 text-secondary">
-                      {totalEscalas}
-                    </span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-secondary/15 text-secondary">{totalEscalas}</span>
                   </div>
                   <Button type="button" size="sm" variant="outline" className="gap-1.5" onClick={addEscala}>
                     <Plus className="size-3.5" /> Adicionar escala
@@ -433,9 +456,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-semibold text-foreground">Escala {idx + 1}</span>
                           {escalaBrand && (
-                            <span className="text-xs font-bold" style={{ color: escalaBrand.color }}>
-                              {escalaBrand.name}
-                            </span>
+                            <span className="text-xs font-bold" style={{ color: escalaBrand.color }}>{escalaBrand.name}</span>
                           )}
                         </div>
                         <Button type="button" variant="ghost" size="icon" className="size-7 text-muted-foreground hover:text-destructive" onClick={() => delEscala(e.id)}>
@@ -444,25 +465,29 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
+                        {/* Companhia + Número do voo da escala */}
+                        <div className="grid grid-cols-2 gap-4 md:col-span-2">
+                          <div className="space-y-1">
+                            <Label className="text-xs">Companhia aérea</Label>
+                            <AirlineSelect value={e.companhia} onChange={(v) => updEscala(e.id, { companhia: v })} size="sm" />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">Número do voo</Label>
+                            <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
+                          </div>
+                        </div>
 
+                        {/* Origem + Destino */}
                         <div className="space-y-1">
                           <Label className="text-xs">Aeroporto de origem</Label>
-                          <AirportAutocomplete
-                            value={e.origem}
-                            onChange={(v) => updEscala(e.id, { origem: v })}
-                            onSelect={(_a, formatted) => updEscala(e.id, { origem: formatted })}
-                            placeholder=""
-                          />
+                          <AirportAutocomplete value={e.origem} onChange={(v) => updEscala(e.id, { origem: v })} onSelect={(_a, formatted) => updEscala(e.id, { origem: formatted })} placeholder="" />
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Aeroporto de destino</Label>
-                          <AirportAutocomplete
-                            value={e.destino}
-                            onChange={(v) => updEscala(e.id, { destino: v })}
-                            onSelect={(_a, formatted) => updEscala(e.id, { destino: formatted })}
-                            placeholder=""
-                          />
+                          <AirportAutocomplete value={e.destino} onChange={(v) => updEscala(e.id, { destino: v })} onSelect={(_a, formatted) => updEscala(e.id, { destino: formatted })} placeholder="" />
                         </div>
+
+                        {/* Datas */}
                         <div className="space-y-1">
                           <Label className="text-xs">Data de início</Label>
                           <DateInput value={e.dataInicio ?? ""} onChange={(iso) => updEscala(e.id, { dataInicio: iso })} defaultMonthISO={sugVooISO} />
@@ -471,6 +496,8 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                           <Label className="text-xs">Data de fim</Label>
                           <DateInput value={e.dataFim ?? ""} onChange={(iso) => updEscala(e.id, { dataFim: iso })} defaultMonthISO={dateOnlyToNativeISO(e.dataInicio) || sugVooISO} />
                         </div>
+
+                        {/* Horários */}
                         <div className="space-y-1">
                           <Label className="text-xs">Horário de saída</Label>
                           <Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} />
@@ -479,44 +506,20 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                           <Label className="text-xs">Horário de chegada</Label>
                           <Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} />
                         </div>
+
+                        {/* Duração + Espera */}
                         <div className="space-y-1">
                           <Label className="text-xs">Duração do trecho</Label>
-                          <Input
-                            value={e.duracaoTrecho ?? ""}
-                            onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })}
-                            placeholder={calcDuracaoEscalaTrecho(e) || "—"}
-                          />
+                          <Input value={e.duracaoTrecho ?? ""} onChange={(ev) => updEscala(e.id, { duracaoTrecho: ev.target.value })} placeholder={calcDuracaoEscalaTrecho(e) || "—"} />
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Tempo em espera</Label>
-                          <Input
-                            value={e.tempoEspera ?? ""}
-                            onChange={(ev) => updEscala(e.id, { tempoEspera: ev.target.value })}
-                            placeholder="Ex.: 2h 30m"
-                          />
+                          <Input value={e.tempoEspera ?? ""} onChange={(ev) => updEscala(e.id, { tempoEspera: ev.target.value })} placeholder="Ex.: 2h 30m" />
                           <p className="text-[10px] text-muted-foreground">Somado à duração total do voo.</p>
                         </div>
-                        <div className="space-y-1 md:col-span-2">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                              <Label className="text-xs">Companhia aérea</Label>
-                              <AirlineSelect value={e.companhia} onChange={(v) => updEscala(e.id, { companhia: v })} />
-                            </div>
-                            <div className="space-y-1">
-                              <Label className="text-xs">Número do voo</Label>
-                              <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
-                            </div>
-                          </div>
-                          {escalaBrand && (
-                            <div className="flex items-center gap-3 mt-1">
-                              <span className="text-xs text-muted-foreground">Check-in:</span>
-                              <a href={escalaBrand.checkinUrl} target="_blank" rel="noreferrer" className="text-xs font-medium text-primary hover:underline truncate">
-                                {escalaBrand.checkinUrl}
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                        <div className="space-y-1 md:col-span-2">
+
+                        {/* Classe */}
+                        <div className="space-y-1">
                           <Label className="text-xs">Classe do voo</Label>
                           <Select value={e.classe ?? ""} onValueChange={(v) => updEscala(e.id, { classe: v })}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
@@ -528,6 +531,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                             </SelectContent>
                           </Select>
                         </div>
+
                       </div>
                     </div>
                   );
@@ -535,7 +539,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
               </div>
             )}
 
-            {/* Bagagens */}
             <div className="rounded-xl border border-border/50 p-6 space-y-4">
               <div className="flex items-center gap-2">
                 <Luggage className="size-4 text-primary" />
@@ -555,7 +558,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   );
 }
 
-// --- helpers ---
 function parseDur(s?: string): number {
   if (!s) return 0;
   const h = /(\d+)\s*h/i.exec(s)?.[1];
