@@ -28,12 +28,23 @@ export const Route = createFileRoute("/reserva_/$id")({
 
 type Trecho = {
   numeroVoo?: string;
+  classe?: string;
   horaSaida?: string;
   horaChegada?: string;
   origem?: string;
   destino?: string;
   data?: string;
 };
+
+function classeLabel(v?: string) {
+  const map: Record<string, string> = {
+    economica: "Econômica",
+    premium: "Premium Economy",
+    executiva: "Executiva",
+    primeira: "Primeira Classe",
+  };
+  return map[v ?? ""] ?? v ?? "";
+}
 
 function getTrechos(voo: any): Trecho[] {
   if (!voo) return [];
