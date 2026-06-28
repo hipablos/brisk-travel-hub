@@ -20,7 +20,7 @@ import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR, dateOnlyToNativeISO } from "@/lib/dates";
 import { calcTempoDeVooTotal, calcDuracaoTrecho, calcDuracaoEscalaTrecho } from "@/lib/voos";
-import { AIRLINES, getAirlineBrand } from "@/lib/airlines";
+import { getAirlineBrand } from "@/lib/airlines";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
