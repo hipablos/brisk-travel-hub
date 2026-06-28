@@ -20,7 +20,25 @@ import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR, dateOnlyToNativeISO } from "@/lib/dates";
 import { calcTempoDeVooTotal, calcDuracaoTrecho, calcDuracaoEscalaTrecho } from "@/lib/voos";
-import { getAirlineBrand } from "@/lib/airlines";
+import { getAirlineBrand, AIRLINES } from "@/lib/airlines";
+
+function AirlineSelect({ value, onChange }: { value?: string; onChange: (v: string) => void }) {
+  return (
+    <Select value={value ?? ""} onValueChange={onChange}>
+      <SelectTrigger><SelectValue placeholder="Selecione a companhia" /></SelectTrigger>
+      <SelectContent className="max-h-72">
+        {AIRLINES.map((a) => (
+          <SelectItem key={a.key} value={a.key}>
+            <span className="inline-flex items-center gap-2">
+              <span className="size-2 rounded-full" style={{ background: a.color }} />
+              {a.name} <span className="text-muted-foreground text-xs">({a.iata})</span>
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -340,23 +358,37 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                     />
                     <p className="text-[11px] text-muted-foreground">Calculada automaticamente pelos horários. Editável.</p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
-                    <div className="space-y-2">
-                      <Label>Número do voo</Label>
-                      <Input value={voo.numeroVoo ?? ""} onChange={(e) => onChange({ numeroVoo: e.target.value })} />
+                  <div className="space-y-2 md:col-span-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Companhia aérea</Label>
+                        <AirlineSelect value={voo.companhia} onChange={(v) => onChange({ companhia: v })} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Número do voo</Label>
+                        <Input value={voo.numeroVoo ?? ""} onChange={(e) => onChange({ numeroVoo: e.target.value })} />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Classe do voo</Label>
-                      <Select value={voo.classe ?? ""} onValueChange={(v) => onChange({ classe: v })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="economica">Econômica</SelectItem>
-                          <SelectItem value="premium">Premium Economy</SelectItem>
-                          <SelectItem value="executiva">Executiva</SelectItem>
-                          <SelectItem value="primeira">Primeira Classe</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {brand && (
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-muted-foreground">Check-in:</span>
+                        <a href={brand.checkinUrl} target="_blank" rel="noreferrer" className="text-xs font-medium text-primary hover:underline truncate">
+                          {brand.checkinUrl}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Classe do voo</Label>
+                    <Select value={voo.classe ?? ""} onValueChange={(v) => onChange({ classe: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="economica">Econômica</SelectItem>
+                        <SelectItem value="premium">Premium Economy</SelectItem>
+                        <SelectItem value="executiva">Executiva</SelectItem>
+                        <SelectItem value="primeira">Primeira Classe</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>Tipo do voo</Label>
