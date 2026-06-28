@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Hash, Eye, Pencil, MoreVertical, MessageSquare, GripVertical, Trash2, Copy } from "lucide-react";
+import { Eye, Pencil, MessageSquare, GripVertical, Trash2, Copy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useState, useMemo, memo } from "react";
 import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, duplicateCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
@@ -58,11 +58,7 @@ const KanbanCard = memo(function KanbanCard({
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
           <GripVertical className="size-3.5 text-muted-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <span className="text-muted-foreground font-mono bg-secondary/20 px-1.5 py-0.5 rounded">{card.code}</span>
           <span className="text-muted-foreground">{card.date}</span>
-          <div className="size-5 rounded-full bg-secondary shrink-0 overflow-hidden">
-            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${card.code}`} alt="avatar" className="w-full h-full object-cover" />
-          </div>
         </div>
         <span className="font-bold text-foreground">{card.amount}</span>
       </div>
@@ -93,8 +89,7 @@ const KanbanCard = memo(function KanbanCard({
         )}
       </div>
 
-      <div className="flex items-center justify-between pt-2 border-t border-border/40 text-muted-foreground">
-        <span className="p-1"><Hash className="size-3.5" /></span>
+      <div className="flex items-center justify-end pt-2 border-t border-border/40 text-muted-foreground">
         <div className="flex items-center gap-1">
           {card.saved ? (
             <>
@@ -141,7 +136,6 @@ const KanbanCard = memo(function KanbanCard({
               <span className="p-1 opacity-40" title="Disponível ao salvar"><Pencil className="size-3.5" /></span>
             </>
           )}
-          <span className="p-1"><MoreVertical className="size-3.5" /></span>
         </div>
       </div>
     </div>
