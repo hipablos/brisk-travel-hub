@@ -30,6 +30,7 @@ export type Escala = {
   destino?: string;
   companhia?: string;
   numeroVoo?: string;
+  classe?: string;
   dataInicio?: string;
   dataFim?: string;
   saida?: string;
