@@ -560,7 +560,7 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
               <InfoCol label="Chegada" value={`${fmtShortDate(voo?.data)} ${voo?.horaChegada ? voo.horaChegada.replace(":", "h") : ""}`.trim()} />
               <InfoCol label="Duração" value={duracaoTotal} />
               <InfoCol label="Paradas" value={escalas.length === 0 ? "Direto" : `${escalas.length} ${escalas.length === 1 ? "parada" : "paradas"}`} />
-              <InfoCol label="Voo" value={voo?.numeroVoo || "—"} />
+              <InfoCol label="Voo" value={`${voo?.numeroVoo || "—"}${voo?.classe ? ` · ${classeLabel(voo.classe)}` : ""}`} />
             </div>
 
             {/* Segmentos / escalas */}
