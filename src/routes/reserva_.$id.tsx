@@ -15,7 +15,6 @@ import type { Database } from "@/integrations/supabase/types";
 type Hospedagem = Database["public"]["Tables"]["hospedagens"]["Row"];
 type Experiencia = Database["public"]["Tables"]["experiencias"]["Row"];
 
-
 export const Route = createFileRoute("/reserva_/$id")({
   component: ReservaPage,
   head: () => ({
@@ -28,12 +27,16 @@ export const Route = createFileRoute("/reserva_/$id")({
 
 type Trecho = {
   numeroVoo?: string;
-  classe?: string;
   horaSaida?: string;
   horaChegada?: string;
   origem?: string;
   destino?: string;
   data?: string;
+  dataChegada?: string;
+  companhia?: string;
+  classe?: string;
+  duracao?: string;
+  tempoEspera?: string;
 };
 
 function classeLabel(v?: string) {
@@ -48,18 +51,37 @@ function classeLabel(v?: string) {
 
 function getTrechos(voo: any): Trecho[] {
   if (!voo) return [];
+  const principal: Trecho = {
+    numeroVoo: voo.numeroVoo,
+    horaSaida: voo.horaSaida,
+    horaChegada: voo.horaChegada,
+    origem: voo.origem,
+    destino: voo.destino,
+    data: voo.data,
+    dataChegada: voo.dataChegada,
+    companhia: voo.companhia,
+    classe: voo.classe,
+    duracao: voo.duracao,
+  };
+  if (voo.tipo === "com_escala" && Array.isArray(voo.escalas) && voo.escalas.length > 0) {
+    const escalas: Trecho[] = voo.escalas.map((e: any) => ({
+      numeroVoo: e.numeroVoo,
+      horaSaida: e.saida,
+      horaChegada: e.chegada,
+      origem: e.origem,
+      destino: e.destino,
+      data: e.dataInicio,
+      dataChegada: e.dataFim,
+      companhia: e.companhia,
+      classe: e.classe,
+      duracao: e.duracaoTrecho,
+      tempoEspera: e.tempoEspera,
+    }));
+    return [principal, ...escalas];
+  }
   if (Array.isArray(voo.trechos) && voo.trechos.length > 0) return voo.trechos as Trecho[];
-  // Fallback legacy: derive single segment from top-level fields
   if (voo.origem || voo.destino || voo.horaSaida || voo.horaChegada || voo.numeroVoo) {
-    return [{
-      numeroVoo: voo.numeroVoo,
-      classe: voo.classe,
-      horaSaida: voo.horaSaida,
-      horaChegada: voo.horaChegada,
-      origem: voo.origem,
-      destino: voo.destino,
-      data: voo.data,
-    }];
+    return [principal];
   }
   return [];
 }
@@ -86,7 +108,6 @@ function ReservaPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [cotacao, setCotacao] = useState<Cotacao | undefined>();
-
   const [hospedagens, setHospedagens] = useState<Hospedagem[]>([]);
   const [experiencias, setExperiencias] = useState<Experiencia[]>([]);
 
@@ -109,7 +130,7 @@ function ReservaPage() {
   const vooIda = cotacao.vooIda as any;
   const vooVolta = cotacao.vooVolta as any;
   const headerBrand = getAirlineBrand(vooIda?.companhia) ?? getAirlineBrand(vooVolta?.companhia);
-  const headerLocalizador = vooIda?.localizador || vooVolta?.localizador || `BRK-${cotacao.code.toUpperCase()}`;
+  const headerLocalizador = (cotacao as any).localizador || vooIda?.localizador || vooVolta?.localizador || `BRK-${cotacao.code.toUpperCase()}`;
 
   const totalPax = (cotacao.adultos ?? 0) + (cotacao.criancas ?? 0);
   const trechosIda = getTrechos(vooIda);
@@ -153,7 +174,7 @@ function ReservaPage() {
               </div>
             </div>
 
-            {/* Header — airline logo + localizador + link reserva (alinhados horizontalmente) */}
+            {/* Header — airline logo + localizador + link reserva */}
             <div className="px-5 py-3 flex items-center justify-between gap-3 border-b border-slate-200">
               <AirlineLogo companhia={vooIda?.companhia ?? vooVolta?.companhia} className="h-10 w-auto" />
               <div className="flex items-stretch gap-2">
@@ -168,7 +189,7 @@ function ReservaPage() {
                     rel="noreferrer"
                     className="px-3 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-xs font-semibold transition-colors print-bg"
                   >
-                    Visualizar reserva
+                    Check-in online
                   </a>
                 )}
               </div>
@@ -178,16 +199,16 @@ function ReservaPage() {
               <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Informações do voo</h2>
 
               {trechosIda.length > 0 && (
-                <ItinerarioBlock direction="ida" trechos={trechosIda} data={vooIda?.data ?? trechosIda[0]?.data} />
+                <ItinerarioBlock direction="ida" trechos={trechosIda} data={vooIda?.data ?? trechosIda[0]?.data} voo={vooIda} />
               )}
               {trechosVolta.length > 0 && (
-                <ItinerarioBlock direction="volta" trechos={trechosVolta} data={vooVolta?.data ?? trechosVolta[0]?.data} />
+                <ItinerarioBlock direction="volta" trechos={trechosVolta} data={vooVolta?.data ?? trechosVolta[0]?.data} voo={vooVolta} />
               )}
 
               {/* Passageiros */}
               <section className="pt-1">
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">Passageiros: {totalPax}</h3>
-                {Array.from({ length: totalPax }).map((_, i) => {
+                {Array.from({ length: Math.max(totalPax, 1) }).map((_, i) => {
                   const nome = (cotacao as any).passageirosNomes?.[i]
                     || (i === 0 ? cotacao.cliente?.nome : `Passageiro ${i + 1}`)
                     || `Passageiro ${i + 1}`;
@@ -241,55 +262,82 @@ function ReservaPage() {
   );
 }
 
-function ItinerarioBlock({ direction, trechos, data }: { direction: "ida" | "volta"; trechos: Trecho[]; data?: string }) {
+function ItinerarioBlock({ direction, trechos, data, voo }: { direction: "ida" | "volta"; trechos: Trecho[]; data?: string; voo?: any }) {
   const isIda = direction === "ida";
+  const brand = voo?.companhia ? getAirlineBrand(voo.companhia) : null;
   return (
     <section>
       {/* Header bar */}
-      <div className="bg-[oklch(0.18_0.08_255)] text-white rounded-t flex items-center justify-between px-3 py-1.5 print-bg">
+      <div className="bg-[oklch(0.18_0.08_255)] text-white rounded-t flex items-center justify-between px-3 py-1.5 print-bg gap-2">
         <div className="flex items-center gap-1.5 font-semibold text-xs">
           <Plane className="size-3.5" />
           Itinerário de {isIda ? "IDA" : "VOLTA"}
+          {brand && (
+            <span className="ml-2 text-[10px] opacity-90 font-normal">
+              {brand.name} · {brand.iata}
+            </span>
+          )}
         </div>
         <div className="text-xs font-semibold">{fmtLongDate(data)}</div>
         <div className="text-xs font-semibold">{trechos.length} {trechos.length === 1 ? "Trecho" : "Trechos"}</div>
       </div>
 
+      {/* Duração total e link check-in */}
+      {(voo?.duracao || brand?.checkinUrl) && (
+        <div className="flex items-center justify-between text-[10px] text-slate-600 px-3 py-1 bg-slate-50 border-x border-slate-200 print-bg">
+          {voo?.duracao ? <span><b>Duração total:</b> {voo.duracao}</span> : <span />}
+          {brand?.checkinUrl && (
+            <a href={brand.checkinUrl} target="_blank" rel="noreferrer" className="text-[oklch(0.22_0.08_255)] underline">
+              Check-in: {brand.checkinUrl}
+            </a>
+          )}
+        </div>
+      )}
+
       <div className="space-y-1.5 mt-1.5">
-        {trechos.map((t, i) => <TrechoRow key={i} t={t} />)}
+        {trechos.map((t, i) => <TrechoRow key={i} t={t} isEscala={i > 0} />)}
       </div>
     </section>
   );
 }
 
-function TrechoRow({ t }: { t: Trecho }) {
+function TrechoRow({ t, isEscala }: { t: Trecho; isEscala?: boolean }) {
   const origem = splitAirport(t.origem);
   const destino = splitAirport(t.destino);
   return (
-    <div className="bg-slate-50 border border-slate-200 rounded px-3 py-2.5 grid grid-cols-12 items-center gap-2 print-bg">
-      <div className="col-span-2">
-        <div className="text-lg font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.horaSaida || "—"}</div>
-        <div className="text-[10px] text-slate-500 mt-0.5">{fmtShortDate(t.data)}</div>
-      </div>
-      <div className="col-span-3 text-xs text-slate-700 leading-tight">
-        <div className="truncate">{origem.name ? `Aer. ${origem.name}` : "Aeroporto"}</div>
-        <div className="text-slate-500 truncate">{origem.city}</div>
-      </div>
-      <div className="col-span-2 flex flex-col items-center justify-center">
-        <div className="flex items-center gap-1.5 text-base font-extrabold text-[oklch(0.22_0.08_255)]">
-          <span>{origem.iata}</span>
-          <Plane className="size-3.5 text-slate-700" />
-          <span>{destino.iata}</span>
+    <div className="bg-slate-50 border border-slate-200 rounded px-3 py-2.5 print-bg">
+      {isEscala && (
+        <div className="text-[9px] font-bold uppercase tracking-wide text-amber-700 mb-1">Escala</div>
+      )}
+      <div className="grid grid-cols-12 items-center gap-2">
+        <div className="col-span-2">
+          <div className="text-lg font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.horaSaida || "—"}</div>
+          <div className="text-[10px] text-slate-500 mt-0.5">{fmtShortDate(t.data)}</div>
         </div>
-        <div className="text-[10px] text-slate-500 mt-0.5">{t.numeroVoo || ""}{t.classe ? ` · ${classeLabel(t.classe)}` : ""}</div>
-      </div>
-      <div className="col-span-3 text-xs text-slate-700 text-right leading-tight">
-        <div className="truncate">{destino.name ? `Aer. ${destino.name}` : "Aeroporto"}</div>
-        <div className="text-slate-500 truncate">{destino.city}</div>
-      </div>
-      <div className="col-span-2 text-right">
-        <div className="text-lg font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.horaChegada || "—"}</div>
-        <div className="text-[10px] text-slate-500 mt-0.5">{fmtShortDate(t.data)}</div>
+        <div className="col-span-3 text-xs text-slate-700 leading-tight">
+          <div className="truncate">{origem.name ? `Aer. ${origem.name}` : "Aeroporto"}</div>
+          <div className="text-slate-500 truncate">{origem.city}</div>
+        </div>
+        <div className="col-span-2 flex flex-col items-center justify-center">
+          <div className="flex items-center gap-1.5 text-base font-extrabold text-[oklch(0.22_0.08_255)]">
+            <span>{origem.iata}</span>
+            <Plane className="size-3.5 text-slate-700" />
+            <span>{destino.iata}</span>
+          </div>
+          <div className="text-[10px] text-slate-500 mt-0.5">
+            {[t.numeroVoo, t.classe ? classeLabel(t.classe) : null].filter(Boolean).join(" · ")}
+          </div>
+          {t.duracao && <div className="text-[10px] text-slate-600 mt-0.5">{t.duracao}</div>}
+          {t.tempoEspera && <div className="text-[10px] text-amber-700 mt-0.5">Espera: {t.tempoEspera}</div>}
+        </div>
+        <div className="col-span-3 text-xs text-slate-700 text-right leading-tight">
+          <div className="truncate">{destino.name ? `Aer. ${destino.name}` : "Aeroporto"}</div>
+          <div className="text-slate-500 truncate">{destino.city}</div>
+        </div>
+        <div className="col-span-2 text-right">
+          <div className="text-lg font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.horaChegada || "—"}</div>
+          <div className="text-[10px] text-slate-500 mt-0.5">{fmtShortDate(t.dataChegada ?? t.data)}</div>
+        </div>
       </div>
     </div>
   );
@@ -324,12 +372,22 @@ function PaxBlock({ nome, idaVoo, voltaVoo }: { nome: string; idaVoo: any; volta
                 <div className="flex flex-col items-center">
                   <Briefcase className="size-3.5 text-slate-700" />
                   <span className="font-semibold text-slate-900">{t.voo?.bagagens?.maoCabine ?? 0}</span>
-                  <span className="text-[9px] text-slate-500">10kg</span>
+                  <span className="text-[9px] text-slate-500">Mão</span>
                 </div>
                 <div className="flex flex-col items-center">
                   <Luggage className="size-3.5 text-slate-700" />
-                  <span className="font-semibold text-slate-900">{(t.voo?.bagagens?.despachada23 ?? 0) + (t.voo?.bagagens?.despachada32 ?? 0)}</span>
+                  <span className="font-semibold text-slate-900">{t.voo?.bagagens?.despachada23 ?? 0}</span>
                   <span className="text-[9px] text-slate-500">23kg</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Luggage className="size-3.5 text-slate-700" />
+                  <span className="font-semibold text-slate-900">{t.voo?.bagagens?.despachada32 ?? 0}</span>
+                  <span className="text-[9px] text-slate-500">32kg</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Briefcase className="size-3.5 text-slate-700" />
+                  <span className="font-semibold text-slate-900">{t.voo?.bagagens?.pessoal ?? 0}</span>
+                  <span className="text-[9px] text-slate-500">Pessoal</span>
                 </div>
               </div>
             </div>
@@ -419,5 +477,3 @@ function ExperienciaBlock({ e }: { e: Experiencia }) {
     </div>
   );
 }
-
-
