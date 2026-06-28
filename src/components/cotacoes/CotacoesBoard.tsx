@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Eye, Pencil, MessageSquare, GripVertical, Trash2, Copy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useState, useMemo, memo } from "react";
-import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, duplicateCotacao, type CotacaoStatus, type Cotacao } from "@/lib/cotacoes-store";
+import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, duplicateCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
 
 import { LabelsPopover } from "./LabelsPopover";
 import { ReservaVooButton } from "./ReservaVooPDF";
@@ -18,7 +18,7 @@ type QuoteCard = {
   labels: string[];
   isWhatsApp?: boolean;
   saved?: boolean;
-  cotacao?: Cotacao;
+  cotacao?: any;
 };
 
 type ColumnProps = {
@@ -44,6 +44,8 @@ const KanbanCard = memo(function KanbanCard({
   onDragCard: (id: string) => void;
   colorOf: (name: string) => string;
 }) {
+
+
   return (
     <div
       draggable
@@ -82,11 +84,6 @@ const KanbanCard = memo(function KanbanCard({
           {card.name}
           {card.isWhatsApp && <span className="size-2 rounded-full bg-green-500" title="WhatsApp" />}
         </div>
-        {card.tag && (
-          <div className="mt-1.5 inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-secondary text-secondary-foreground uppercase">
-            {card.tag}
-          </div>
-        )}
       </div>
 
       <div className="flex items-center justify-end pt-2 border-t border-border/40 text-muted-foreground">
