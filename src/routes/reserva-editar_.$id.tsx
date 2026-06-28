@@ -21,6 +21,7 @@ const COMPANHIAS = ["GOL", "LATAM", "AZUL"];
 
 type Trecho = {
   numeroVoo?: string;
+  classe?: string;
   horaSaida?: string;
   horaChegada?: string;
   origem?: string;
@@ -60,6 +61,7 @@ function hydrateVoo(raw: any, fallbackOrigem?: string, fallbackDestino?: string,
         const esc = escalas[i];
         arr.push({
           numeroVoo: i === 0 ? v.numeroVoo : esc.numeroVoo,
+          classe: i === 0 ? v.classe : esc.classe,
           horaSaida: i === 0 ? v.horaSaida : (escalas[i - 1]?.saida ?? esc.saida),
           horaChegada: esc.chegada,
           origem: prevOrigem,
@@ -72,6 +74,7 @@ function hydrateVoo(raw: any, fallbackOrigem?: string, fallbackDestino?: string,
       const lastEsc = escalas[escalas.length - 1];
       arr.push({
         numeroVoo: lastEsc?.numeroVoo,
+        classe: lastEsc?.classe,
         horaSaida: lastEsc?.saida,
         horaChegada: v.horaChegada,
         origem: prevOrigem,
@@ -82,6 +85,7 @@ function hydrateVoo(raw: any, fallbackOrigem?: string, fallbackDestino?: string,
     } else if (origemOriginal || destinoOriginal || v.horaSaida || v.horaChegada || v.numeroVoo) {
       trechos = [{
         numeroVoo: v.numeroVoo,
+        classe: v.classe,
         horaSaida: v.horaSaida,
         horaChegada: v.horaChegada,
         origem: origemOriginal,
@@ -310,6 +314,18 @@ function VooForm({
               <div>
                 <Label className="text-xs">Número do voo</Label>
                 <Input value={t.numeroVoo ?? ""} onChange={(e) => updateTrecho(i, { numeroVoo: e.target.value })} />
+              </div>
+              <div>
+                <Label className="text-xs">Classe do voo</Label>
+                <Select value={t.classe ?? ""} onValueChange={(v) => updateTrecho(i, { classe: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="economica">Econômica</SelectItem>
+                    <SelectItem value="premium">Premium Economy</SelectItem>
+                    <SelectItem value="executiva">Executiva</SelectItem>
+                    <SelectItem value="primeira">Primeira Classe</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label className="text-xs">Data</Label>

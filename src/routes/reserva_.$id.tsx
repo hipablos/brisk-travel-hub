@@ -28,12 +28,23 @@ export const Route = createFileRoute("/reserva_/$id")({
 
 type Trecho = {
   numeroVoo?: string;
+  classe?: string;
   horaSaida?: string;
   horaChegada?: string;
   origem?: string;
   destino?: string;
   data?: string;
 };
+
+function classeLabel(v?: string) {
+  const map: Record<string, string> = {
+    economica: "Econômica",
+    premium: "Premium Economy",
+    executiva: "Executiva",
+    primeira: "Primeira Classe",
+  };
+  return map[v ?? ""] ?? v ?? "";
+}
 
 function getTrechos(voo: any): Trecho[] {
   if (!voo) return [];
@@ -42,6 +53,7 @@ function getTrechos(voo: any): Trecho[] {
   if (voo.origem || voo.destino || voo.horaSaida || voo.horaChegada || voo.numeroVoo) {
     return [{
       numeroVoo: voo.numeroVoo,
+      classe: voo.classe,
       horaSaida: voo.horaSaida,
       horaChegada: voo.horaChegada,
       origem: voo.origem,
@@ -269,7 +281,7 @@ function TrechoRow({ t }: { t: Trecho }) {
           <Plane className="size-3.5 text-slate-700" />
           <span>{destino.iata}</span>
         </div>
-        <div className="text-[10px] text-slate-500 mt-0.5">{t.numeroVoo || ""}</div>
+        <div className="text-[10px] text-slate-500 mt-0.5">{t.numeroVoo || ""}{t.classe ? ` · ${classeLabel(t.classe)}` : ""}</div>
       </div>
       <div className="col-span-3 text-xs text-slate-700 text-right leading-tight">
         <div className="truncate">{destino.name ? `Aer. ${destino.name}` : "Aeroporto"}</div>
