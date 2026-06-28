@@ -2,9 +2,10 @@ import { cn } from "@/lib/utils";
 import { Eye, Pencil, MessageSquare, GripVertical, Trash2, Copy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useState, useMemo, memo } from "react";
-import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, duplicateCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
+import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, duplicateCotacao, type CotacaoStatus, type Cotacao } from "@/lib/cotacoes-store";
 
 import { LabelsPopover } from "./LabelsPopover";
+import { ReservaVooButton } from "./ReservaVooPDF";
 import { toast } from "sonner";
 
 type QuoteCard = {
@@ -17,6 +18,7 @@ type QuoteCard = {
   labels: string[];
   isWhatsApp?: boolean;
   saved?: boolean;
+  cotacao?: Cotacao;
 };
 
 type ColumnProps = {
@@ -42,8 +44,6 @@ const KanbanCard = memo(function KanbanCard({
   onDragCard: (id: string) => void;
   colorOf: (name: string) => string;
 }) {
-
-
   return (
     <div
       draggable
@@ -105,6 +105,7 @@ const KanbanCard = memo(function KanbanCard({
               >
                 <Pencil className="size-3.5" />
               </Link>
+              {card.cotacao && <ReservaVooButton cotacao={card.cotacao} />}
               <button
                 type="button"
                 onClick={async () => {
@@ -243,12 +244,13 @@ export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
       cards: items.map((c) => ({
         id: c.id,
         code: c.code,
-        date: new Date(c.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+        date: new Date(c.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }),
         amount: formatBRL(c.total),
         name: c.cliente.nome,
         tag: c.tag,
         labels: c.labels ?? [],
         saved: saved.some((s) => s.id === c.id),
+        cotacao: c,
       })),
     };
   });
