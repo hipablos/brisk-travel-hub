@@ -164,3 +164,20 @@
 }
 .pac-item { padding: 0.5rem 0.75rem; cursor: pointer; }
 .pac-item:hover { background: #f3f4f6; }
+
+/* Hide badge code, avatars, hash and more menu icons */
+[class*="badge"][class*="code"],
+[class*="cotacao-id"],
+[class*="card-id"],
+[class*="avatar"],
+[class*="user-icon"],
+[class*="hash"],
+button[aria-label="#"],
+svg[data-icon="hash"],
+[class*="more"],
+[class*="dots"],
+button[aria-label="more"],
+button[aria-label="menu"] {
+  display: none !important;
+}
+
