@@ -10,7 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import {
   Plane, PlaneTakeoff, PlaneLanding, ChevronDown, Hash, Edit3,
   Plus, Trash2, Clock, Briefcase, ShoppingBag, Luggage, Minus,
-  MoreHorizontal, Copy, Search,
+  MoreHorizontal, Copy,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -20,7 +20,7 @@ import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import type { Airport } from "@/lib/airports";
 import { dateOnlyToBR, dateOnlyToNativeISO } from "@/lib/dates";
 import { calcTempoDeVooTotal, calcDuracaoTrecho, calcDuracaoEscalaTrecho } from "@/lib/voos";
-import { AIRLINES, getAirlineBrand } from "@/lib/airlines";
+import { getAirlineBrand } from "@/lib/airlines";
 
 export type TipoVoo = "direto" | "com_escala" | "com_conexao" | "localizador";
 
@@ -123,65 +123,6 @@ function Counter({
   );
 }
 
-// ── AirlineSelect ─────────────────────────────────────────────────────────────
-interface AirlineSelectProps {
-  value?: string;
-  onChange: (v: string) => void;
-  size?: "sm" | "default";
-}
-
-function AirlineSelect({ value, onChange, size = "default" }: AirlineSelectProps) {
-  const [search, setSearch] = useState("");
-  const brand = value ? getAirlineBrand(value) : null;
-  const filtered = AIRLINES.filter((a) =>
-    !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.iata.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <Select value={value ?? ""} onValueChange={onChange}>
-      <SelectTrigger className={cn(size === "sm" && "h-8 text-xs")}>
-        <SelectValue placeholder="Selecione a companhia">
-          {brand ? (
-            <span className="flex items-center gap-2">
-              <span
-                className="font-bold text-sm"
-                style={{ color: brand.color }}
-              >
-                {brand.name}
-              </span>
-              <span className="text-xs text-muted-foreground">{brand.iata}</span>
-            </span>
-          ) : (
-            <span className="text-muted-foreground">Selecione a companhia</span>
-          )}
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent className="max-h-72">
-        <div className="flex items-center gap-2 px-2 pb-2 border-b border-border/50 sticky top-0 bg-popover z-10">
-          <Search className="size-3.5 text-muted-foreground shrink-0" />
-          <input
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-            placeholder="Buscar companhia..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.stopPropagation()}
-          />
-        </div>
-        {filtered.length === 0 && (
-          <div className="px-3 py-4 text-xs text-muted-foreground text-center">Nenhuma companhia encontrada</div>
-        )}
-        {filtered.map((a) => (
-          <SelectItem key={a.key} value={a.key}>
-            <span className="flex items-center gap-2">
-              <span className="font-bold min-w-[50px]" style={{ color: a.color }}>{a.name}</span>
-              <span className="text-xs text-muted-foreground">{a.iata}</span>
-            </span>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-}
 
 // ── FlightCard ────────────────────────────────────────────────────────────────
 export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDuplicate, index, total, minData }: Props) {
@@ -204,7 +145,7 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const brand = voo.companhia ? getAirlineBrand(voo.companhia) : null;
 
   const addEscala = () => {
-    onChange({ escalas: [...voo.escalas, { id: crypto.randomUUID(), companhia: voo.companhia }] });
+    onChange({ escalas: [...voo.escalas, { id: crypto.randomUUID() }] });
   };
   const updEscala = (id: string, patch: Partial<Escala>) => {
     onChange({ escalas: voo.escalas.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
@@ -341,27 +282,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
 
-                  {/* ── Companhia aérea ── */}
-                  <div className="space-y-2 md:col-span-2">
-                    <Label>Companhia aérea</Label>
-                    <AirlineSelect
-                      value={voo.companhia}
-                      onChange={(v) => onChange({ companhia: v })}
-                    />
-                    {brand && (
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-muted-foreground">Check-in:</span>
-                        <a
-                          href={brand.checkinUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs font-medium text-primary hover:underline truncate"
-                        >
-                          {brand.checkinUrl}
-                        </a>
-                      </div>
-                    )}
-                  </div>
 
                   <div className="space-y-2">
                     <Label>Aeroporto / Cidade de origem</Label>
@@ -492,15 +412,6 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        {/* ── Companhia da escala ── */}
-                        <div className="space-y-1 md:col-span-2">
-                          <Label className="text-xs">Companhia aérea</Label>
-                          <AirlineSelect
-                            value={e.companhia}
-                            onChange={(v) => updEscala(e.id, { companhia: v })}
-                            size="sm"
-                          />
-                        </div>
 
                         <div className="space-y-1">
                           <Label className="text-xs">Aeroporto de origem</Label>
@@ -553,23 +464,17 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                           />
                           <p className="text-[10px] text-muted-foreground">Somado à duração total do voo.</p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
-                          <div className="space-y-1">
-                            <Label className="text-xs">Número do voo</Label>
-                            <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Classe do voo</Label>
-                            <Select value={e.classe ?? ""} onValueChange={(v) => updEscala(e.id, { classe: v })}>
-                              <SelectTrigger><SelectValue /></SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="economica">Econômica</SelectItem>
-                                <SelectItem value="premium">Premium Economy</SelectItem>
-                                <SelectItem value="executiva">Executiva</SelectItem>
-                                <SelectItem value="primeira">Primeira Classe</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Classe do voo</Label>
+                          <Select value={e.classe ?? ""} onValueChange={(v) => updEscala(e.id, { classe: v })}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="economica">Econômica</SelectItem>
+                              <SelectItem value="premium">Premium Economy</SelectItem>
+                              <SelectItem value="executiva">Executiva</SelectItem>
+                              <SelectItem value="primeira">Primeira Classe</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     </div>
