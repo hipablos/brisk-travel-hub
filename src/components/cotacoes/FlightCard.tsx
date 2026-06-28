@@ -496,7 +496,27 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                           />
                           <p className="text-[10px] text-muted-foreground">Somado à duração total do voo.</p>
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 md:col-span-2">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <Label className="text-xs">Companhia aérea</Label>
+                              <AirlineSelect value={e.companhia} onChange={(v) => updEscala(e.id, { companhia: v })} />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Número do voo</Label>
+                              <Input value={e.numeroVoo ?? ""} onChange={(ev) => updEscala(e.id, { numeroVoo: ev.target.value })} />
+                            </div>
+                          </div>
+                          {escalaBrand && (
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="text-xs text-muted-foreground">Check-in:</span>
+                              <a href={escalaBrand.checkinUrl} target="_blank" rel="noreferrer" className="text-xs font-medium text-primary hover:underline truncate">
+                                {escalaBrand.checkinUrl}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-1 md:col-span-2">
                           <Label className="text-xs">Classe do voo</Label>
                           <Select value={e.classe ?? ""} onValueChange={(v) => updEscala(e.id, { classe: v })}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
