@@ -3,7 +3,20 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer, Download, Plane, Briefcase, Luggage, Hotel, Star, MapPin, Compass, Clock, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Printer,
+  Download,
+  Plane,
+  Briefcase,
+  Luggage,
+  Hotel,
+  Star,
+  MapPin,
+  Compass,
+  Clock,
+  Users,
+} from "lucide-react";
 import { BriskLogo } from "@/components/BriskLogo";
 import { getCotacao, type Cotacao } from "@/lib/cotacoes-store";
 import { getAirlineBrand } from "@/lib/airlines";
@@ -113,7 +126,10 @@ function ReservaPage() {
 
   useEffect(() => {
     getCotacao(id).then(async (c) => {
-      if (!c) { navigate({ to: "/voos" }); return; }
+      if (!c) {
+        navigate({ to: "/voos" });
+        return;
+      }
       setCotacao(c);
       const cotacaoId = (c as any).id ?? id;
       const [{ data: hosp }, { data: exps }] = await Promise.all([
@@ -130,7 +146,8 @@ function ReservaPage() {
   const vooIda = cotacao.vooIda as any;
   const vooVolta = cotacao.vooVolta as any;
   const headerBrand = getAirlineBrand(vooIda?.companhia) ?? getAirlineBrand(vooVolta?.companhia);
-  const headerLocalizador = (cotacao as any).localizador || vooIda?.localizador || vooVolta?.localizador || `BRK-${cotacao.code.toUpperCase()}`;
+  const headerLocalizador =
+    (cotacao as any).localizador || vooIda?.localizador || vooVolta?.localizador || `BRK-${cotacao.code.toUpperCase()}`;
 
   const totalPax = (cotacao.adultos ?? 0) + (cotacao.criancas ?? 0);
   const trechosIda = getTrechos(vooIda);
@@ -138,15 +155,21 @@ function ReservaPage() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <div className="print:hidden"><Sidebar /></div>
+      <div className="print:hidden">
+        <Sidebar />
+      </div>
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="print:hidden"><Topbar /></div>
+        <div className="print:hidden">
+          <Topbar />
+        </div>
         <main className="p-6 max-w-[960px] w-full mx-auto">
           {/* Toolbar */}
           <div className="flex items-center justify-between mb-6 print:hidden">
             <div className="flex items-center gap-3">
               <Button asChild variant="outline" size="icon">
-                <Link to="/voos"><ArrowLeft className="size-4" /></Link>
+                <Link to="/voos">
+                  <ArrowLeft className="size-4" />
+                </Link>
               </Button>
               <div>
                 <div className="text-sm text-muted-foreground">Reserva #{cotacao.code}</div>
@@ -157,14 +180,20 @@ function ReservaPage() {
               <Button variant="outline" onClick={() => window.print()} className="gap-2">
                 <Printer className="size-4" /> Imprimir
               </Button>
-              <Button onClick={() => window.print()} className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button
+                onClick={() => window.print()}
+                className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
                 <Download className="size-4" /> Baixar PDF
               </Button>
             </div>
           </div>
 
           {/* Documento */}
-          <div id="reserva-doc" className="bg-white text-slate-800 rounded-lg shadow-sm overflow-hidden print:shadow-none print:rounded-none print:border-0 border border-slate-200">
+          <div
+            id="reserva-doc"
+            className="bg-white text-slate-800 rounded-lg shadow-sm overflow-hidden print:shadow-none print:rounded-none print:border-0 border border-slate-200"
+          >
             {/* Cabeçalho da agência */}
             <div className="px-5 py-2.5 border-b border-slate-200 flex items-center justify-between gap-4 print-bg">
               <BriskLogo variant="blue" className="h-6 w-auto" />
@@ -174,22 +203,24 @@ function ReservaPage() {
               </div>
             </div>
 
-            {/* Header — airline logo + localizador + link reserva */}
+            {/* Header — airline logo + localizador + botão visualizar reserva */}
             <div className="px-5 py-3 flex items-center justify-between gap-3 border-b border-slate-200">
               <AirlineLogo companhia={vooIda?.companhia ?? vooVolta?.companhia} className="h-10 w-auto" />
               <div className="flex items-stretch gap-2">
                 <div className="flex items-center gap-2 px-3 rounded bg-blue-50 border border-blue-100 print-bg">
                   <span className="text-[9px] font-semibold text-slate-600 uppercase tracking-wide">Localizador</span>
-                  <span className="text-sm font-bold tracking-wider text-[oklch(0.22_0.08_255)]">{headerLocalizador}</span>
+                  <span className="text-sm font-bold tracking-wider text-[oklch(0.22_0.08_255)]">
+                    {headerLocalizador}
+                  </span>
                 </div>
-                {headerBrand && (
+                {headerBrand?.checkinUrl && (
                   <a
-                    href={headerBrand.bookingUrl}
+                    href={headerBrand.checkinUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-xs font-semibold transition-colors print-bg"
+                    className="print:hidden px-3 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-xs font-semibold transition-colors"
                   >
-                    Check-in online
+                    Visualizar reserva
                   </a>
                 )}
               </div>
@@ -199,20 +230,40 @@ function ReservaPage() {
               <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Informações do voo</h2>
 
               {trechosIda.length > 0 && (
-                <ItinerarioBlock direction="ida" trechos={trechosIda} data={vooIda?.data ?? trechosIda[0]?.data} voo={vooIda} />
+                <ItinerarioBlock
+                  direction="ida"
+                  trechos={trechosIda}
+                  data={vooIda?.data ?? trechosIda[0]?.data}
+                  voo={vooIda}
+                />
               )}
               {trechosVolta.length > 0 && (
-                <ItinerarioBlock direction="volta" trechos={trechosVolta} data={vooVolta?.data ?? trechosVolta[0]?.data} voo={vooVolta} />
+                <ItinerarioBlock
+                  direction="volta"
+                  trechos={trechosVolta}
+                  data={vooVolta?.data ?? trechosVolta[0]?.data}
+                  voo={vooVolta}
+                />
               )}
 
               {/* Passageiros */}
               <section className="pt-1">
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">Passageiros: {totalPax}</h3>
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">
+                  Passageiros: {totalPax}
+                </h3>
                 {Array.from({ length: Math.max(totalPax, 1) }).map((_, i) => {
-                  const nome = (cotacao as any).passageirosNomes?.[i]
-                    || (i === 0 ? cotacao.cliente?.nome : `Passageiro ${i + 1}`)
-                    || `Passageiro ${i + 1}`;
-                  return <PaxBlock key={i} nome={nome} idaVoo={vooIda} voltaVoo={trechosVolta.length > 0 ? vooVolta : null} />;
+                  const nome =
+                    (cotacao as any).passageirosNomes?.[i] ||
+                    (i === 0 ? cotacao.cliente?.nome : `Passageiro ${i + 1}`) ||
+                    `Passageiro ${i + 1}`;
+                  return (
+                    <PaxBlock
+                      key={i}
+                      nome={nome}
+                      idaVoo={vooIda}
+                      voltaVoo={trechosVolta.length > 0 ? vooVolta : null}
+                    />
+                  );
                 })}
               </section>
 
@@ -220,7 +271,9 @@ function ReservaPage() {
                 <section className="pt-2">
                   <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">Hospedagens</h2>
                   <div className="space-y-2">
-                    {hospedagens.map((h) => <HospedagemBlock key={h.id} h={h} />)}
+                    {hospedagens.map((h) => (
+                      <HospedagemBlock key={h.id} h={h} />
+                    ))}
                   </div>
                 </section>
               )}
@@ -229,7 +282,9 @@ function ReservaPage() {
                 <section className="pt-2">
                   <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">Experiências</h2>
                   <div className="space-y-2">
-                    {experiencias.map((e) => <ExperienciaBlock key={e.id} e={e} />)}
+                    {experiencias.map((e) => (
+                      <ExperienciaBlock key={e.id} e={e} />
+                    ))}
                   </div>
                 </section>
               )}
@@ -244,6 +299,7 @@ function ReservaPage() {
           html, body { background: #ffffff !important; }
           body * { visibility: hidden !important; }
           #reserva-doc, #reserva-doc * { visibility: visible !important; }
+          .print\\:hidden { display: none !important; }
           #reserva-doc {
             position: absolute !important;
             left: 0; top: 0;
@@ -262,7 +318,17 @@ function ReservaPage() {
   );
 }
 
-function ItinerarioBlock({ direction, trechos, data, voo }: { direction: "ida" | "volta"; trechos: Trecho[]; data?: string; voo?: any }) {
+function ItinerarioBlock({
+  direction,
+  trechos,
+  data,
+  voo,
+}: {
+  direction: "ida" | "volta";
+  trechos: Trecho[];
+  data?: string;
+  voo?: any;
+}) {
   const isIda = direction === "ida";
   const brand = voo?.companhia ? getAirlineBrand(voo.companhia) : null;
   return (
@@ -279,15 +345,28 @@ function ItinerarioBlock({ direction, trechos, data, voo }: { direction: "ida" |
           )}
         </div>
         <div className="text-xs font-semibold">{fmtLongDate(data)}</div>
-        <div className="text-xs font-semibold">{trechos.length} {trechos.length === 1 ? "Trecho" : "Trechos"}</div>
+        <div className="text-xs font-semibold">
+          {trechos.length} {trechos.length === 1 ? "Trecho" : "Trechos"}
+        </div>
       </div>
 
-      {/* Duração total e link check-in */}
+      {/* Duração total — visível na tela e no PDF. Link check-in só na tela */}
       {(voo?.duracao || brand?.checkinUrl) && (
         <div className="flex items-center justify-between text-[10px] text-slate-600 px-3 py-1 bg-slate-50 border-x border-slate-200 print-bg">
-          {voo?.duracao ? <span><b>Duração total:</b> {voo.duracao}</span> : <span />}
+          {voo?.duracao ? (
+            <span>
+              <b>Duração total:</b> {voo.duracao}
+            </span>
+          ) : (
+            <span />
+          )}
           {brand?.checkinUrl && (
-            <a href={brand.checkinUrl} target="_blank" rel="noreferrer" className="text-[oklch(0.22_0.08_255)] underline">
+            <a
+              href={brand.checkinUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="print:hidden text-[oklch(0.22_0.08_255)] underline"
+            >
               Check-in: {brand.checkinUrl}
             </a>
           )}
@@ -295,7 +374,9 @@ function ItinerarioBlock({ direction, trechos, data, voo }: { direction: "ida" |
       )}
 
       <div className="space-y-1.5 mt-1.5">
-        {trechos.map((t, i) => <TrechoRow key={i} t={t} isEscala={i > 0} />)}
+        {trechos.map((t, i) => (
+          <TrechoRow key={i} t={t} isEscala={i > 0} />
+        ))}
       </div>
     </section>
   );
@@ -306,9 +387,7 @@ function TrechoRow({ t, isEscala }: { t: Trecho; isEscala?: boolean }) {
   const destino = splitAirport(t.destino);
   return (
     <div className="bg-slate-50 border border-slate-200 rounded px-3 py-2.5 print-bg">
-      {isEscala && (
-        <div className="text-[9px] font-bold uppercase tracking-wide text-amber-700 mb-1">Escala</div>
-      )}
+      {isEscala && <div className="text-[9px] font-bold uppercase tracking-wide text-amber-700 mb-1">Escala</div>}
       <div className="grid grid-cols-12 items-center gap-2">
         <div className="col-span-2">
           <div className="text-lg font-bold text-[oklch(0.22_0.08_255)] leading-none">{t.horaSaida || "—"}</div>
@@ -346,7 +425,10 @@ function TrechoRow({ t, isEscala }: { t: Trecho; isEscala?: boolean }) {
 function PaxBlock({ nome, idaVoo, voltaVoo }: { nome: string; idaVoo: any; voltaVoo: any }) {
   const hasVolta = !!voltaVoo;
   const items = hasVolta
-    ? [{ label: "Ida", voo: idaVoo }, { label: "Volta", voo: voltaVoo }]
+    ? [
+        { label: "Ida", voo: idaVoo },
+        { label: "Volta", voo: voltaVoo },
+      ]
     : [{ label: "Ida", voo: idaVoo }];
   return (
     <div className="mb-2 border border-slate-200 rounded overflow-hidden">
@@ -371,6 +453,11 @@ function PaxBlock({ nome, idaVoo, voltaVoo }: { nome: string; idaVoo: any; volta
               <div className="flex items-center gap-2">
                 <div className="flex flex-col items-center">
                   <Briefcase className="size-3.5 text-slate-700" />
+                  <span className="font-semibold text-slate-900">{t.voo?.bagagens?.pessoal ?? 0}</span>
+                  <span className="text-[9px] text-slate-500">Pessoal</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Briefcase className="size-3.5 text-slate-700" />
                   <span className="font-semibold text-slate-900">{t.voo?.bagagens?.maoCabine ?? 0}</span>
                   <span className="text-[9px] text-slate-500">Mão</span>
                 </div>
@@ -383,11 +470,6 @@ function PaxBlock({ nome, idaVoo, voltaVoo }: { nome: string; idaVoo: any; volta
                   <Luggage className="size-3.5 text-slate-700" />
                   <span className="font-semibold text-slate-900">{t.voo?.bagagens?.despachada32 ?? 0}</span>
                   <span className="text-[9px] text-slate-500">32kg</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <Briefcase className="size-3.5 text-slate-700" />
-                  <span className="font-semibold text-slate-900">{t.voo?.bagagens?.pessoal ?? 0}</span>
-                  <span className="text-[9px] text-slate-500">Pessoal</span>
                 </div>
               </div>
             </div>
@@ -407,7 +489,9 @@ function HospedagemBlock({ h }: { h: Hospedagem }) {
           <Hotel className="size-3.5" /> {h.nome_hotel}
           {h.estrelas ? (
             <span className="ml-1 flex items-center gap-0.5">
-              {Array.from({ length: h.estrelas }).map((_, i) => <Star key={i} className="size-2.5 fill-amber-300 text-amber-300" />)}
+              {Array.from({ length: h.estrelas }).map((_, i) => (
+                <Star key={i} className="size-2.5 fill-amber-300 text-amber-300" />
+              ))}
             </span>
           ) : null}
         </div>
@@ -428,9 +512,21 @@ function HospedagemBlock({ h }: { h: Hospedagem }) {
         </div>
         {(h.numero_reserva || h.codigo_confirmacao || h.regime_alimentar) && (
           <div className="col-span-12 flex gap-3 text-[10px] text-slate-500 border-t border-slate-200 pt-1 mt-1">
-            {h.numero_reserva && <span><b className="text-slate-700">Reserva:</b> {h.numero_reserva}</span>}
-            {h.codigo_confirmacao && <span><b className="text-slate-700">Confirmação:</b> {h.codigo_confirmacao}</span>}
-            {h.regime_alimentar && <span><b className="text-slate-700">Regime:</b> {h.regime_alimentar}</span>}
+            {h.numero_reserva && (
+              <span>
+                <b className="text-slate-700">Reserva:</b> {h.numero_reserva}
+              </span>
+            )}
+            {h.codigo_confirmacao && (
+              <span>
+                <b className="text-slate-700">Confirmação:</b> {h.codigo_confirmacao}
+              </span>
+            )}
+            {h.regime_alimentar && (
+              <span>
+                <b className="text-slate-700">Regime:</b> {h.regime_alimentar}
+              </span>
+            )}
           </div>
         )}
         {h.observacoes_cliente && (
@@ -453,8 +549,10 @@ function ExperienciaBlock({ e }: { e: Experiencia }) {
         <div className="text-[10px] opacity-90 flex items-center gap-2">
           {e.data && <span>{fmtShortDate(e.data)}</span>}
           {(e.hora_inicio || e.hora_termino) && (
-            <span className="flex items-center gap-0.5"><Clock className="size-2.5" />
-              {e.hora_inicio ?? "--"}{e.hora_termino ? ` → ${e.hora_termino}` : ""}
+            <span className="flex items-center gap-0.5">
+              <Clock className="size-2.5" />
+              {e.hora_inicio ?? "--"}
+              {e.hora_termino ? ` → ${e.hora_termino}` : ""}
             </span>
           )}
           {e.duracao_min ? <span>· {e.duracao_min} min</span> : null}
@@ -466,12 +564,19 @@ function ExperienciaBlock({ e }: { e: Experiencia }) {
           <span className="truncate">{local || "Local não informado"}</span>
         </div>
         <div className="col-span-4 text-right text-slate-600 flex items-center justify-end gap-2">
-          {e.participantes ? <span className="flex items-center gap-0.5"><Users className="size-3" />{e.participantes}</span> : null}
+          {e.participantes ? (
+            <span className="flex items-center gap-0.5">
+              <Users className="size-3" />
+              {e.participantes}
+            </span>
+          ) : null}
           {e.idioma ? <span>· {e.idioma}</span> : null}
           {e.idade_minima ? <span>· {e.idade_minima}+</span> : null}
         </div>
         {e.descricao && (
-          <div className="col-span-12 text-[10px] text-slate-600 border-t border-slate-200 pt-1 mt-1">{e.descricao}</div>
+          <div className="col-span-12 text-[10px] text-slate-600 border-t border-slate-200 pt-1 mt-1">
+            {e.descricao}
+          </div>
         )}
       </div>
     </div>
