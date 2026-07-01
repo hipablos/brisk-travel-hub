@@ -252,7 +252,7 @@ function ReservaPage() {
           body * { visibility: hidden !important; }
           #reserva-doc, #reserva-doc * { visibility: visible !important; }
           .print-hidden { display: none !important; }
-          #reserva-doc a { display: none !important; }
+          #reserva-doc a { text-decoration: none !important; color: inherit; }
           #reserva-doc {
             position: absolute !important;
             left: 0; top: 0;
