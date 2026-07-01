@@ -197,7 +197,7 @@ function ReservaPage() {
                     href={headerBrand.bookingUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3 py-2 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-xs font-semibold transition-colors no-underline"
+                    className="reserva-booking-btn px-3 py-2 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white !text-white text-xs font-semibold transition-colors no-underline"
                   >
                     Visualizar reserva
                   </a>
@@ -253,6 +253,7 @@ function ReservaPage() {
           #reserva-doc, #reserva-doc * { visibility: visible !important; }
           .print-hidden { display: none !important; }
           #reserva-doc a { text-decoration: none !important; color: inherit; }
+          #reserva-doc .reserva-booking-btn, #reserva-doc .reserva-booking-btn * { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
           #reserva-doc {
             position: absolute !important;
             left: 0; top: 0;
