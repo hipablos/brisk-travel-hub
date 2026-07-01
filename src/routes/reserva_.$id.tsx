@@ -253,6 +253,7 @@ function ReservaPage() {
           #reserva-doc, #reserva-doc * { visibility: visible !important; }
           .print-hidden { display: none !important; }
           #reserva-doc a { text-decoration: none !important; color: inherit; }
+          #reserva-doc .reserva-booking-btn, #reserva-doc .reserva-booking-btn * { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
           #reserva-doc {
             position: absolute !important;
             left: 0; top: 0;
