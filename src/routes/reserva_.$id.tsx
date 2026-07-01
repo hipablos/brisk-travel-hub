@@ -197,7 +197,7 @@ function ReservaPage() {
                     href={headerBrand.bookingUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="print:hidden px-3 py-2 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-xs font-semibold transition-colors"
+                    className="px-3 py-2 flex items-center rounded bg-[oklch(0.18_0.08_255)] hover:bg-[oklch(0.22_0.08_255)] text-white text-xs font-semibold transition-colors no-underline"
                   >
                     Visualizar reserva
                   </a>
