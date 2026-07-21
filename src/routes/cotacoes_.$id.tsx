@@ -267,41 +267,53 @@ function VisualizarCotacao() {
 
                 {(() => {
                   const ids = cotacao.formasPagamentoIds ?? [];
+                  const valores = cotacao.formasPagamentoValores ?? {};
                   const selected = formasPagamento.filter((f) => ids.includes(f.id));
-                  if (selected.length === 0) return null;
+                  const hasSelected = selected.length > 0;
                   return (
                     <div className="mt-3">
-                      <div className="font-bold text-slate-900 text-xs">Forma(s) de Pagamento</div>
-                      <p className="text-[10px] italic text-slate-500 mt-0.5 mb-2">
-                        Os valores foram simulados automaticamente e podem ter pequenas variações de acordo com a plataforma de pagamento.
-                      </p>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-                        {selected.map((f) => {
-                          const calc = computeFormaTotal(cotacao.total, f);
-                          return (
-                            <div key={f.id} className="text-left">
-                              <div className="text-slate-700">{f.nome}</div>
-                              <div className="font-bold text-slate-900">
-                                R$ {formatBRL(calc.final)}
-                                {f.parcelas > 1 && (
-                                  <span className="font-normal text-slate-700"> ({f.parcelas}x de R$ {formatBRL(calc.valorParcela)})</span>
-                                )}
-                              </div>
-                              {f.observacao && (
-                                <div className="text-[10px] text-slate-500 italic">{f.observacao}</div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
+                      {hasSelected && (
+                        <>
+                          <div className="font-bold text-slate-900 text-xs">Forma(s) de Pagamento</div>
+                          <p className="text-[10px] italic text-slate-500 mt-0.5 mb-2">
+                            Os valores foram simulados automaticamente e podem ter pequenas variações de acordo com a plataforma de pagamento.
+                          </p>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                            {selected.map((f) => {
+                              const base = valores[f.id] ?? cotacao.total;
+                              const calc = computeFormaTotal(base, f);
+                              const customBase = valores[f.id] != null && valores[f.id] !== cotacao.total;
+                              return (
+                                <div key={f.id} className="text-left">
+                                  <div className="text-slate-700">{f.nome}</div>
+                                  <div className="font-bold text-slate-900">
+                                    R$ {formatBRL(calc.final)}
+                                    {f.parcelas > 1 && (
+                                      <span className="font-normal text-slate-700"> ({f.parcelas}x de R$ {formatBRL(calc.valorParcela)})</span>
+                                    )}
+                                  </div>
+                                  {customBase && (
+                                    <div className="text-[10px] text-slate-500">
+                                      sobre R$ {formatBRL(base)}
+                                    </div>
+                                  )}
+                                  {f.observacao && (
+                                    <div className="text-[10px] text-slate-500 italic">{f.observacao}</div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
 
-                      {cotacao.valorComparacao && cotacao.valorComparacao > 0 && (
-                        <div className="mt-2 text-xs">
-                          <span className="text-slate-500 line-through mr-2">R$ {formatBRL(cotacao.valorComparacao)}</span>
-                          <span className="text-emerald-600 font-semibold">
-                            Você economiza R$ {formatBRL(cotacao.valorComparacao - cotacao.total)}
-                          </span>
-                        </div>
+                          {cotacao.valorComparacao && cotacao.valorComparacao > 0 && (
+                            <div className="mt-2 text-xs">
+                              <span className="text-slate-500 line-through mr-2">R$ {formatBRL(cotacao.valorComparacao)}</span>
+                              <span className="text-emerald-600 font-semibold">
+                                Você economiza R$ {formatBRL(cotacao.valorComparacao - cotacao.total)}
+                              </span>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {cotacao.instrucoesPagamento && (
@@ -322,6 +334,7 @@ function VisualizarCotacao() {
                   );
                 })()}
               </section>
+
 
               {cotacao.termos && (
                 <section className="border-t border-slate-200 pt-3">

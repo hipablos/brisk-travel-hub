@@ -215,6 +215,7 @@ export type Cotacao = {
   vooIdas?: any[];
   vooVoltas?: any[];
   formasPagamentoIds?: string[];
+  formasPagamentoValores?: Record<string, number>;
   valorComparacao?: number;
   instrucoesPagamento?: string;
   linkPagamento?: string;
