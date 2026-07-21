@@ -1068,36 +1068,66 @@ function NovaCotacao() {
                         <div className="space-y-2">
                           {formasPagamento.filter((f) => f.ativo).map((f) => {
                             const checked = formasPagamentoIds.includes(f.id);
-                            const calc = computeFormaTotal(totalVendas || total, f);
+                            const baseValor = checked
+                              ? (formasPagamentoValores[f.id] ?? (totalVendas || total))
+                              : (totalVendas || total);
+                            const calc = computeFormaTotal(baseValor, f);
                             return (
-                              <label
-                                key={f.id}
-                                className="flex items-start gap-3 py-2 cursor-pointer text-sm"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={checked}
-                                  onChange={(e) =>
-                                    setFormasPagamentoIds((ids) =>
-                                      e.target.checked ? [...ids, f.id] : ids.filter((x) => x !== f.id)
-                                    )
-                                  }
-                                  className="mt-1"
-                                />
-                                <div className="flex-1">
-                                  <span className="text-foreground">{f.nome}</span>
-                                  <span className="text-muted-foreground ml-2 text-xs">
-                                    {f.parcelas > 1
-                                      ? `${f.parcelas}x de R$ ${formatBRL(calc.valorParcela)} (Total R$ ${formatBRL(calc.final)})`
-                                      : `R$ ${formatBRL(calc.final)}`}
-                                    {f.desconto > 0 && <span className="text-emerald-600"> · -{f.desconto}%</span>}
-                                    {f.acrescimo > 0 && <span className="text-rose-600"> · +{f.acrescimo}%</span>}
-                                  </span>
-                                </div>
-                              </label>
+                              <div key={f.id} className="border border-border/40 rounded-md p-3">
+                                <label className="flex items-start gap-3 cursor-pointer text-sm">
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={(e) =>
+                                      setFormasPagamentoIds((ids) =>
+                                        e.target.checked ? [...ids, f.id] : ids.filter((x) => x !== f.id)
+                                      )
+                                    }
+                                    className="mt-1"
+                                  />
+                                  <div className="flex-1">
+                                    <span className="text-foreground">{f.nome}</span>
+                                    <span className="text-muted-foreground ml-2 text-xs">
+                                      {f.parcelas > 1
+                                        ? `${f.parcelas}x de R$ ${formatBRL(calc.valorParcela)} (Total R$ ${formatBRL(calc.final)})`
+                                        : `R$ ${formatBRL(calc.final)}`}
+                                      {f.desconto > 0 && <span className="text-emerald-600"> · -{f.desconto}%</span>}
+                                      {f.acrescimo > 0 && <span className="text-rose-600"> · +{f.acrescimo}%</span>}
+                                    </span>
+                                  </div>
+                                </label>
+                                {checked && (
+                                  <div className="mt-2 ml-6 flex items-center gap-2">
+                                    <Label className="text-xs text-muted-foreground whitespace-nowrap">
+                                      Valor aplicado
+                                    </Label>
+                                    <span className="text-xs text-muted-foreground">R$</span>
+                                    <Input
+                                      className="h-8 w-40 text-sm"
+                                      inputMode="decimal"
+                                      value={String(formasPagamentoValores[f.id] ?? "")}
+                                      placeholder={formatBRL(totalVendas || total)}
+                                      onChange={(e) => {
+                                        const raw = e.target.value.replace(",", ".");
+                                        const num = parseFloat(raw);
+                                        setFormasPagamentoValores((prev) => {
+                                          const next = { ...prev };
+                                          if (raw === "" || Number.isNaN(num)) delete next[f.id];
+                                          else next[f.id] = num;
+                                          return next;
+                                        });
+                                      }}
+                                    />
+                                    <span className="text-[11px] text-muted-foreground">
+                                      (deixe em branco para usar o total)
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
                             );
                           })}
                         </div>
+
                       )}
                     </div>
 
