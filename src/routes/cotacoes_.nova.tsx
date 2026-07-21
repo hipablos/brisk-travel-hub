@@ -100,6 +100,7 @@ function NovaCotacao() {
   const [validade, setValidade] = useState("");
   const [pagamento, setPagamento] = useState("");
   const [formasPagamentoIds, setFormasPagamentoIds] = useState<string[]>([]);
+  const [formasPagamentoValores, setFormasPagamentoValores] = useState<Record<string, number>>({});
   const formasPagamento = useFormasPagamento();
 
   const [services, setServices] = useState<ServiceItem[]>([]);
@@ -158,6 +159,7 @@ function NovaCotacao() {
       setValidade(c.validade ?? "");
       setPagamento(c.pagamento ?? "");
       setFormasPagamentoIds(c.formasPagamentoIds ?? []);
+      setFormasPagamentoValores(c.formasPagamentoValores ?? {});
       setServices(
         c.servicos.length
           ? c.servicos
@@ -302,6 +304,7 @@ function NovaCotacao() {
       validade,
       pagamento,
       formasPagamentoIds,
+      formasPagamentoValores,
       total,
       valoresCusto,
       valoresVenda,
