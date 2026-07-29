@@ -297,9 +297,6 @@ function VisualizarCotacao() {
                                       sobre R$ {formatBRL(base)}
                                     </div>
                                   )}
-                                  {f.observacao && (
-                                    <div className="text-[10px] text-slate-500 italic">{f.observacao}</div>
-                                  )}
                                 </div>
                               );
                             })}
