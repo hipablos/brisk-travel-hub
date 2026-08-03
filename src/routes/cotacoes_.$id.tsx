@@ -480,7 +480,9 @@ function VooBlock({ direction, voo, index, total }: { direction: "ida" | "volta"
         return out;
       })();
   const isComEscala = voo?.tipo === "com_escala" && escalas.length > 0;
-  const duracaoTotal = calcTempoDeVooTotal(voo);
+  const duracaoTotal = (voo?.duracao && String(voo.duracao).trim() && String(voo.duracao).trim() !== "—")
+    ? String(voo.duracao).trim()
+    : calcTempoDeVooTotal(voo);
 
   return (
     <section className="space-y-1.5">
