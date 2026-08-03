@@ -396,16 +396,35 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                   <div className="space-y-2">
                     <Label>Duração total do voo</Label>
                     <div className="relative">
-                      <Input value={voo.duracao ?? ""} onChange={(e) => onChange({ duracao: e.target.value })} placeholder={duracaoTotal} className="pl-9" aria-label="Duração total do voo" />
+                      <Input value={voo.duracao ?? ""} onChange={(e) => onChange({ duracao: e.target.value, duracaoManual: true })} placeholder={duracaoTotal} className="pl-9" aria-label="Duração total do voo" />
                       <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground pointer-events-none" />
                     </div>
-                    <p className="text-[11px] text-muted-foreground">Soma de todos os trechos e escalas. Editável.</p>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[11px] text-muted-foreground">
+                        {voo.duracaoManual ? "Valor manual (respeita fuso horário)." : "Soma automática dos trechos e escalas. Editável."}
+                      </p>
+                      {voo.duracaoManual && (
+                        <button type="button" className="text-[11px] text-primary underline" onClick={() => onChange({ duracaoManual: false, duracao: duracaoTotal })}>
+                          Recalcular
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label>Duração do trecho</Label>
-                    <Input value={voo.duracaoTrecho ?? ""} onChange={(e) => onChange({ duracaoTrecho: e.target.value })} placeholder={duracaoTrechoCalculada} />
-                    <p className="text-[11px] text-muted-foreground">Calculada automaticamente pelos horários. Editável.</p>
+                    <Input value={voo.duracaoTrecho ?? ""} onChange={(e) => onChange({ duracaoTrecho: e.target.value, duracaoTrechoManual: true })} placeholder={duracaoTrechoCalculada} />
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[11px] text-muted-foreground">
+                        {voo.duracaoTrechoManual ? "Valor manual." : "Calculada automaticamente pelos horários. Editável."}
+                      </p>
+                      {voo.duracaoTrechoManual && (
+                        <button type="button" className="text-[11px] text-primary underline" onClick={() => onChange({ duracaoTrechoManual: false, duracaoTrecho: duracaoTrechoCalculada })}>
+                          Recalcular
+                        </button>
+                      )}
+                    </div>
                   </div>
+
 
                   {/* Classe + Tipo */}
                   <div className="space-y-2">
