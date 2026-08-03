@@ -58,7 +58,9 @@ export type Voo = {
   horaSaida?: string;
   horaChegada?: string;
   duracao?: string;
+  duracaoManual?: boolean;
   duracaoTrecho?: string;
+  duracaoTrechoManual?: boolean;
   companhia?: string;
   numeroVoo?: string;
   classe?: string;
