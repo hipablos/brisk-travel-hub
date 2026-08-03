@@ -217,22 +217,26 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const lastCalcEscala = useRef<Record<string, string>>({});
 
   useEffect(() => {
+    if (voo.duracaoManual) return;
     const current = voo.duracao;
     const prevCalc = lastCalcTotal.current;
     if (!current || current === "—" || current === prevCalc) {
       if (current !== duracaoTotal) onChange({ duracao: duracaoTotal });
     }
     lastCalcTotal.current = duracaoTotal;
-  }, [duracaoTotal]);
+  }, [duracaoTotal, voo.duracaoManual]);
 
   useEffect(() => {
+    if (voo.duracaoTrechoManual) return;
     const current = voo.duracaoTrecho;
     const prevCalc = lastCalcTrecho.current;
     if (!current || current === "—" || current === prevCalc) {
       if (current !== duracaoTrechoCalculada) onChange({ duracaoTrecho: duracaoTrechoCalculada });
     }
     lastCalcTrecho.current = duracaoTrechoCalculada;
-  }, [duracaoTrechoCalculada]);
+  }, [duracaoTrechoCalculada, voo.duracaoTrechoManual]);
+
+
 
   useEffect(() => {
     if (voo.tipo !== "com_escala") return;
