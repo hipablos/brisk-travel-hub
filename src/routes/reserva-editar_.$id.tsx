@@ -28,6 +28,9 @@ type Trecho = {
   origem?: string;
   destino?: string;
   data?: string;
+  dataChegada?: string;
+  duracao?: string;
+  tempoEspera?: string;
 };
 
 type VooData = {
@@ -35,6 +38,8 @@ type VooData = {
   localizador?: string;
   data?: string;
   assento?: string;
+  duracao?: string;
+  duracaoTrecho?: string;
   bagagens?: { pessoal?: number; maoCabine?: number; despachada23?: number; despachada32?: number };
   trechos?: Trecho[];
 };
