@@ -207,6 +207,13 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const delEscala = (id: string) => {
     onChange({ escalas: voo.escalas.filter((e) => e.id !== id) });
   };
+  // Espelha o aeroporto da escala no campo de destino (enquanto o destino não
+  // tiver sido editado manualmente para outro valor).
+  const mirrorEscalaDestino = (e: Escala, v: string): Partial<Escala> => {
+    const destinoLivre = !e.destino || e.destino === (e.origem ?? "");
+    return destinoLivre ? { origem: v, destino: v } : { origem: v };
+  };
+
 
   const totalEscalas = voo.escalas.length;
   const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
