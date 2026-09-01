@@ -86,13 +86,27 @@ function NovaCotacao() {
   const [destino, setDestino] = useState("");
   const [ida, setIda] = useState("");
   const [volta, setVolta] = useState("");
-  const [adultos, setAdultos] = useState(0);
+  const [adultos, setAdultos] = useState(1);
   const [criancas, setCriancas] = useState(0);
   const [termos, setTermos] = useState("");
   const [outrasInformacoes, setOutrasInformacoes] = useState("");
   const [termosModeloId, setTermosModeloId] = useState<string>("");
   const [outrasModeloId, setOutrasModeloId] = useState<string>("");
   const termosModelos = useTermosModelos();
+
+  useEffect(() => {
+    if (editing || termosModelos.length === 0) return;
+    const padraoTermos = termosModelos.find((m) => m.categoria === "termos" && m.padrao && m.ativo);
+    const padraoOutras = termosModelos.find((m) => m.categoria === "outras" && m.padrao && m.ativo);
+    if (padraoTermos) {
+      setTermosModeloId(padraoTermos.id);
+      setTermos(padraoTermos.conteudo);
+    }
+    if (padraoOutras) {
+      setOutrasModeloId(padraoOutras.id);
+      setOutrasInformacoes(padraoOutras.conteudo);
+    }
+  }, [editing, termosModelos]);
 
 
   const [observacoes, setObservacoes] = useState("");
@@ -147,13 +161,13 @@ function NovaCotacao() {
       setTag(c.tag ?? "");
       setOrigem(c.origem ?? "");
       setDestino(c.destino ?? "");
-      setIda(c.ida ?? "");
-      setVolta(c.volta ?? "");
-      setAdultos(c.adultos);
-      setCriancas(c.criancas);
-      setObservacoes(c.observacoes ?? "");
-      setTermos(c.termos ?? "");
-      setOutrasInformacoes(c.outrasInformacoes ?? "");
+       setIda(c.ida ?? "");
+       setVolta(c.volta ?? "");
+       setAdultos(Math.max(1, c.adultos ?? 1));
+       setCriancas(Math.max(0, c.criancas ?? 0));
+       setObservacoes(c.observacoes ?? "");
+       setTermos(c.termos ?? "");
+       setOutrasInformacoes(c.outrasInformacoes ?? "");
 
       setStatus(c.status);
       setValidade(c.validade ?? "");
@@ -298,10 +312,10 @@ function NovaCotacao() {
         id: s.id, type: s.type, description: s.description,
         value: parseFloat(s.value.replace(",", ".")) || 0,
       })),
-      observacoes,
-      termos,
-      outrasInformacoes,
-      validade,
+       observacoes,
+       termos: termos || undefined,
+       outrasInformacoes: outrasInformacoes || undefined,
+       validade,
       pagamento,
       formasPagamentoIds,
       formasPagamentoValores,

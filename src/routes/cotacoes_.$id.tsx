@@ -197,22 +197,14 @@ function VisualizarCotacao() {
                 </span>
               </div>
 
-              {/* Passageiros + dados gerais */}
-              <section className="grid grid-cols-3 gap-3 text-xs border-y border-slate-200 py-2.5">
+              {/* Passageiros */}
+              <section className="border-y border-slate-200 py-2.5 text-xs">
                 <div>
                   <div className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Passageiros</div>
                   <div className="mt-0.5 font-semibold text-slate-800">
                     {cotacao.adultos} {cotacao.adultos === 1 ? "Adulto" : "Adultos"}
                     {cotacao.criancas > 0 && `, ${cotacao.criancas} ${cotacao.criancas === 1 ? "Criança" : "Crianças"}`}
                   </div>
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Identificador</div>
-                  <div className="mt-0.5 font-semibold text-slate-800">{cotacao.tag || "—"}</div>
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Pagamento</div>
-                  <div className="mt-0.5 font-semibold text-slate-800">{cotacao.pagamento || "A combinar"}</div>
                 </div>
               </section>
 

@@ -207,6 +207,13 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
   const delEscala = (id: string) => {
     onChange({ escalas: voo.escalas.filter((e) => e.id !== id) });
   };
+  // Espelha o aeroporto da escala no campo de destino (enquanto o destino não
+  // tiver sido editado manualmente para outro valor).
+  const mirrorEscalaDestino = (e: Escala, v: string): Partial<Escala> => {
+    const destinoLivre = !e.destino || e.destino === (e.origem ?? "");
+    return destinoLivre ? { origem: v, destino: v } : { origem: v };
+  };
+
 
   const totalEscalas = voo.escalas.length;
   const duracaoTrechoCalculada = useMemo(() => calcDuracaoTrecho(voo), [voo]);
@@ -505,7 +512,12 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
                         {/* Origem + Destino */}
                         <div className="space-y-1">
                           <Label className="text-xs">Aeroporto de origem</Label>
-                          <AirportAutocomplete value={e.origem} onChange={(v) => updEscala(e.id, { origem: v })} onSelect={(_a, formatted) => updEscala(e.id, { origem: formatted })} placeholder="" />
+                          <AirportAutocomplete
+                            value={e.origem}
+                            onChange={(v) => updEscala(e.id, mirrorEscalaDestino(e, v))}
+                            onSelect={(_a, formatted) => updEscala(e.id, mirrorEscalaDestino(e, formatted))}
+                            placeholder=""
+                          />
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Aeroporto de destino</Label>
@@ -524,13 +536,14 @@ export function FlightCard({ direction, voo: rawVoo, onChange, onRemove, onDupli
 
                         {/* Horários */}
                         <div className="space-y-1">
-                          <Label className="text-xs">Horário de saída</Label>
-                          <Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} />
-                        </div>
-                        <div className="space-y-1">
                           <Label className="text-xs">Horário de chegada</Label>
                           <Input type="time" value={e.chegada ?? ""} onChange={(ev) => updEscala(e.id, { chegada: ev.target.value })} />
                         </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Horário de saída</Label>
+                          <Input type="time" value={e.saida ?? ""} onChange={(ev) => updEscala(e.id, { saida: ev.target.value })} />
+                        </div>
+
 
                         {/* Duração + Espera */}
                         <div className="space-y-1">
