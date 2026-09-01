@@ -44,23 +44,16 @@ type VooData = {
   trechos?: Trecho[];
 };
 
-// Constrói os trechos a partir do voo da cotação,
-// considerando escalas, origem/destino e horários.
+// Constrói os trechos a partir do voo da cotação, considerando escalas.
 function hydrateVoo(raw: any, fallbackOrigem?: string, fallbackDestino?: string, fallbackData?: string): VooData {
   const v = raw ?? {};
   let trechos: Trecho[] = Array.isArray(v.trechos) ? [...v.trechos] : [];
-
-  // Se já há trechos definidos, mantém.
   if (trechos.length === 0) {
     const escalas = Array.isArray(v.escalas) ? v.escalas : [];
     const origemOriginal = v.origem ?? fallbackOrigem;
     const destinoOriginal = v.destino ?? fallbackDestino;
     const data = v.data ?? fallbackData;
-
     if (escalas.length > 0) {
-      // Trecho 1: origem original → primeira escala (destino dela)
-      // Trechos seguintes: escala anterior (origem) → próxima escala (destino)
-      // Último trecho: última escala (origem) → destino original
       const arr: Trecho[] = [];
       let prevOrigem = origemOriginal;
       for (let i = 0; i < escalas.length; i++) {
@@ -73,49 +66,38 @@ function hydrateVoo(raw: any, fallbackOrigem?: string, fallbackDestino?: string,
           origem: prevOrigem,
           destino: esc.destino ?? esc.origem,
           data,
+          dataChegada: esc.dataFim ?? data,
+          duracao: i === 0 ? (v.duracaoTrecho ?? v.duracao) : esc.duracaoTrecho,
+          tempoEspera: esc.tempoEspera,
         });
         prevOrigem = esc.origem ?? esc.destino;
       }
-      // Último trecho até o destino final
-      const lastEsc = escalas[escalas.length - 1];
+      const last = escalas[escalas.length - 1];
       arr.push({
-        numeroVoo: lastEsc?.numeroVoo,
-        classe: lastEsc?.classe,
-        horaSaida: lastEsc?.saida,
+        numeroVoo: last?.numeroVoo ?? v.numeroVoo,
+        classe: last?.classe ?? v.classe,
+        horaSaida: last?.saida,
         horaChegada: v.horaChegada,
         origem: prevOrigem,
         destino: destinoOriginal,
         data,
+        dataChegada: v.dataChegada ?? last?.dataFim ?? data,
+        duracao: last?.duracaoTrecho,
       });
       trechos = arr;
     } else if (origemOriginal || destinoOriginal || v.horaSaida || v.horaChegada || v.numeroVoo) {
-      trechos = [{
-        numeroVoo: v.numeroVoo,
-        classe: v.classe,
-        horaSaida: v.horaSaida,
-        horaChegada: v.horaChegada,
-        origem: origemOriginal,
-        destino: destinoOriginal,
-        data,
-      }];
+      trechos = [{ numeroVoo: v.numeroVoo, classe: v.classe, horaSaida: v.horaSaida, horaChegada: v.horaChegada, origem: origemOriginal, destino: destinoOriginal, data, dataChegada: v.dataChegada ?? data, duracao: v.duracaoTrecho ?? v.duracao }];
     }
   }
-
-  // Default de bagagens: 1 mochila + 1 mala de mão se nada definido
   const bag = v.bagagens ?? {};
-  const bagagens = {
-    pessoal: bag.pessoal ?? 1,
-    maoCabine: bag.maoCabine ?? 1,
-    despachada23: bag.despachada23 ?? 0,
-    despachada32: bag.despachada32 ?? 0,
-  };
-
   return {
     companhia: v.companhia,
     localizador: v.localizador,
     data: v.data ?? fallbackData,
     assento: v.assento,
-    bagagens,
+    duracao: v.duracao,
+    duracaoTrecho: v.duracaoTrecho,
+    bagagens: { pessoal: bag.pessoal ?? 1, maoCabine: bag.maoCabine ?? 1, despachada23: bag.despachada23 ?? 0, despachada32: bag.despachada32 ?? 0 },
     trechos,
   };
 }
@@ -274,10 +256,18 @@ function VooForm({
           <Label className="text-xs">Localizador</Label>
           <Input value={voo.localizador ?? ""} onChange={(e) => set({ localizador: e.target.value })} />
         </div>
-        <div className="md:col-span-2">
-          <Label className="text-xs">Assentos</Label>
-          <Input value={voo.assento ?? ""} onChange={(e) => set({ assento: e.target.value })} />
-        </div>
+         <div>
+           <Label className="text-xs">Tempo total de voo</Label>
+           <Input value={voo.duracao ?? ""} onChange={(e) => set({ duracao: e.target.value })} placeholder={calcTempoDeVooTotal(voo) || "Ex.: 7h 30m"} />
+         </div>
+         <div>
+           <Label className="text-xs">Duração do trecho principal</Label>
+           <Input value={voo.duracaoTrecho ?? ""} onChange={(e) => set({ duracaoTrecho: e.target.value })} placeholder="Ex.: 7h" />
+         </div>
+         <div className="md:col-span-2">
+           <Label className="text-xs">Assentos</Label>
+           <Input value={voo.assento ?? ""} onChange={(e) => set({ assento: e.target.value })} />
+         </div>
         <div>
           <Label className="text-xs">Item pessoal / mochila</Label>
           <Input type="number" min={0} value={voo.bagagens?.pessoal ?? 1} onChange={(e) => setBag("pessoal", Number(e.target.value))} />
@@ -333,20 +323,32 @@ function VooForm({
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label className="text-xs">Data</Label>
-                <DateInput value={t.data ?? dataDefault ?? ""} onChange={(iso) => updateTrecho(i, { data: iso })} />
-              </div>
-              <div>
-                <Label className="text-xs">Hora de saída</Label>
-                <Input type="time" value={t.horaSaida ?? ""} onChange={(e) => updateTrecho(i, { horaSaida: e.target.value })} />
-              </div>
-              <div>
-                <Label className="text-xs">Hora de chegada</Label>
-                <Input type="time" value={t.horaChegada ?? ""} onChange={(e) => updateTrecho(i, { horaChegada: e.target.value })} />
-              </div>
-              <div className="md:col-span-2">
-                <Label className="text-xs">Origem</Label>
+               <div>
+                 <Label className="text-xs">Data</Label>
+                 <DateInput value={t.data ?? dataDefault ?? ""} onChange={(iso) => updateTrecho(i, { data: iso })} />
+               </div>
+               <div>
+                 <Label className="text-xs">Data de chegada</Label>
+                 <DateInput value={t.dataChegada ?? t.data ?? dataDefault ?? ""} onChange={(iso) => updateTrecho(i, { dataChegada: iso })} />
+               </div>
+               <div>
+                 <Label className="text-xs">Hora de saída</Label>
+                 <Input type="time" value={t.horaSaida ?? ""} onChange={(e) => updateTrecho(i, { horaSaida: e.target.value })} />
+               </div>
+               <div>
+                 <Label className="text-xs">Hora de chegada</Label>
+                 <Input type="time" value={t.horaChegada ?? ""} onChange={(e) => updateTrecho(i, { horaChegada: e.target.value })} />
+               </div>
+               <div>
+                 <Label className="text-xs">Duração do trecho</Label>
+                 <Input value={t.duracao ?? ""} onChange={(e) => updateTrecho(i, { duracao: e.target.value })} placeholder={calcDuracaoEscalaTrecho({ dataInicio: t.data, dataFim: t.dataChegada, saida: t.horaSaida, chegada: t.horaChegada }) || "Ex.: 3h 20m"} />
+               </div>
+               <div>
+                 <Label className="text-xs">Duração do trecho</Label>
+                 <Input value={t.duracao ?? ""} onChange={(e) => updateTrecho(i, { duracao: e.target.value })} placeholder={calcDuracaoEscalaTrecho({ dataInicio: t.data, dataFim: t.dataChegada, saida: t.horaSaida, chegada: t.horaChegada }) || "Ex.: 3h 20m"} />
+               </div>
+               <div className="md:col-span-2">
+                 <Label className="text-xs">Origem</Label>
                 <AirportAutocomplete
                   value={t.origem}
                   onChange={(v) => updateTrecho(i, { origem: v })}

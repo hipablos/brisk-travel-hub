@@ -65,39 +65,32 @@ function classeLabel(v?: string) {
 
 function getTrechos(voo: any): Trecho[] {
   if (!voo) return [];
+  if (Array.isArray(voo.trechos) && voo.trechos.length > 0) return voo.trechos as Trecho[];
   const principal: Trecho = {
-    numeroVoo: voo.numeroVoo,
-    horaSaida: voo.horaSaida,
-    horaChegada: voo.horaChegada,
-    origem: voo.origem,
-    destino: voo.destino,
-    data: voo.data,
-    dataChegada: voo.dataChegada,
-    companhia: voo.companhia,
-    classe: voo.classe,
-    duracao: voo.duracao,
+    numeroVoo: voo.numeroVoo, horaSaida: voo.horaSaida, horaChegada: voo.horaChegada,
+    origem: voo.origem, destino: voo.destino, data: voo.data, dataChegada: voo.dataChegada ?? voo.data,
+    companhia: voo.companhia, classe: voo.classe,
+    duracao: voo.duracaoTrecho ?? (voo.tipo === "direto" ? voo.duracao : undefined),
   };
   if (voo.tipo === "com_escala" && Array.isArray(voo.escalas) && voo.escalas.length > 0) {
-    const escalas: Trecho[] = voo.escalas.map((e: any) => ({
-      numeroVoo: e.numeroVoo,
-      horaSaida: e.saida,
+    const escalas: Trecho[] = voo.escalas.map((e: any, index: number) => ({
+      numeroVoo: index === 0 ? voo.numeroVoo : e.numeroVoo,
+      horaSaida: index === 0 ? voo.horaSaida : voo.escalas[index - 1]?.saida,
       horaChegada: e.chegada,
-      origem: e.origem,
-      destino: e.destino,
-      data: e.dataInicio,
-      dataChegada: e.dataFim,
-      companhia: e.companhia,
-      classe: e.classe,
-      duracao: e.duracaoTrecho,
-      tempoEspera: e.tempoEspera,
+      origem: index === 0 ? voo.origem : (voo.escalas[index - 1]?.origem ?? voo.escalas[index - 1]?.destino),
+      destino: e.destino ?? e.origem, data: index === 0 ? voo.data : (voo.escalas[index - 1]?.dataFim ?? voo.data),
+      dataChegada: e.dataFim ?? voo.data, companhia: index === 0 ? voo.companhia : e.companhia,
+      classe: index === 0 ? voo.classe : e.classe,
+      duracao: index === 0 ? (voo.duracaoTrecho ?? voo.duracao) : e.duracaoTrecho, tempoEspera: e.tempoEspera,
     }));
-    return [principal, ...escalas];
+    const last = voo.escalas[voo.escalas.length - 1];
+    escalas.push({ numeroVoo: last?.numeroVoo ?? voo.numeroVoo, horaSaida: last?.saida, horaChegada: voo.horaChegada,
+      origem: last?.origem ?? last?.destino, destino: voo.destino, data: last?.dataFim ?? voo.data,
+      dataChegada: voo.dataChegada ?? last?.dataFim ?? voo.data, companhia: last?.companhia ?? voo.companhia,
+      classe: last?.classe ?? voo.classe, duracao: last?.duracaoTrecho });
+    return escalas;
   }
-  if (Array.isArray(voo.trechos) && voo.trechos.length > 0) return voo.trechos as Trecho[];
-  if (voo.origem || voo.destino || voo.horaSaida || voo.horaChegada || voo.numeroVoo) {
-    return [principal];
-  }
-  return [];
+  return voo.origem || voo.destino || voo.horaSaida || voo.horaChegada || voo.numeroVoo ? [principal] : [];
 }
 
 function fmtLongDate(s?: string) {
@@ -290,11 +283,14 @@ function ItinerarioBlock({ direction, trechos, data, voo }: { direction: "ida" |
         <div className="text-xs font-semibold">{trechos.length} {trechos.length === 1 ? "Trecho" : "Trechos"}</div>
       </div>
 
-      {voo?.duracao && (
-        <div className="flex items-center text-[10px] text-slate-600 px-3 py-1 bg-slate-50 border-x border-slate-200 print-bg">
-          <span><b>Duração total:</b> {voo.duracao}</span>
-        </div>
-      )}
+       {(() => {
+         const total = voo?.duracao || calcTempoDeVooTotal(voo);
+         return total ? (
+           <div className="flex items-center text-[10px] text-slate-600 px-3 py-1 bg-slate-50 border-x border-slate-200 print-bg">
+             <span><b>Duração total do voo:</b> {total}</span>
+           </div>
+         ) : null;
+       })()}
 
       <div className="space-y-1.5 mt-1.5">
         {trechos.map((t, i) => <TrechoRow key={i} t={t} isEscala={i > 0} />)}
@@ -324,11 +320,11 @@ function TrechoRow({ t, isEscala }: { t: Trecho; isEscala?: boolean }) {
             <Plane className="size-3.5 text-slate-700" />
             <span>{destino.iata}</span>
           </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">
-            {[t.numeroVoo, t.classe ? classeLabel(t.classe) : null].filter(Boolean).join(" · ")}
-          </div>
-          {t.duracao && <div className="text-[10px] text-slate-600 mt-0.5">{t.duracao}</div>}
-          {t.tempoEspera && <div className="text-[10px] text-amber-700 mt-0.5">Espera: {t.tempoEspera}</div>}
+           <div className="text-[10px] text-slate-500 mt-0.5">
+             {[t.numeroVoo, t.classe ? classeLabel(t.classe) : null].filter(Boolean).join(" · ")}
+           </div>
+           {t.duracao && <div className="text-[10px] font-medium text-slate-600 mt-0.5">Duração: {t.duracao}</div>}
+           {t.tempoEspera && <div className="text-[10px] text-amber-700 mt-0.5">Espera: {t.tempoEspera}</div>}
         </div>
         <div className="col-span-3 text-xs text-slate-700 text-right leading-tight">
           <div className="truncate">{destino.name ? `Aer. ${destino.name}` : "Aeroporto"}</div>
