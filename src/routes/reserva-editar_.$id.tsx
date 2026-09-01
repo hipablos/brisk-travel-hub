@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, Plane, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Plane, Plus, Trash2, Clock } from "lucide-react";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
 import { getCotacao, saveCotacao, type Cotacao } from "@/lib/cotacoes-store";
+import { calcTempoDeVooTotal, calcDuracaoEscalaTrecho } from "@/lib/voos";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/reserva-editar_/$id")({

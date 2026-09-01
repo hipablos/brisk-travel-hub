@@ -22,6 +22,7 @@ import { getCotacao, type Cotacao } from "@/lib/cotacoes-store";
 import { getAirlineBrand } from "@/lib/airlines";
 import { AirlineLogo } from "@/components/AirlineLogo";
 import { dateOnlyToBR, weekdayName } from "@/lib/dates";
+import { calcTempoDeVooTotal } from "@/lib/voos";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 

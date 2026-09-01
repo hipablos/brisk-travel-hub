@@ -86,7 +86,7 @@ function NovaCotacao() {
   const [destino, setDestino] = useState("");
   const [ida, setIda] = useState("");
   const [volta, setVolta] = useState("");
-  const [adultos, setAdultos] = useState(0);
+  const [adultos, setAdultos] = useState(1);
   const [criancas, setCriancas] = useState(0);
   const [termos, setTermos] = useState("");
   const [outrasInformacoes, setOutrasInformacoes] = useState("");
