@@ -343,10 +343,6 @@ function VooForm({
                  <Label className="text-xs">Duração do trecho</Label>
                  <Input value={t.duracao ?? ""} onChange={(e) => updateTrecho(i, { duracao: e.target.value })} placeholder={calcDuracaoEscalaTrecho({ dataInicio: t.data, dataFim: t.dataChegada, saida: t.horaSaida, chegada: t.horaChegada }) || "Ex.: 3h 20m"} />
                </div>
-               <div>
-                 <Label className="text-xs">Duração do trecho</Label>
-                 <Input value={t.duracao ?? ""} onChange={(e) => updateTrecho(i, { duracao: e.target.value })} placeholder={calcDuracaoEscalaTrecho({ dataInicio: t.data, dataFim: t.dataChegada, saida: t.horaSaida, chegada: t.horaChegada }) || "Ex.: 3h 20m"} />
-               </div>
                <div className="md:col-span-2">
                  <Label className="text-xs">Origem</Label>
                 <AirportAutocomplete
