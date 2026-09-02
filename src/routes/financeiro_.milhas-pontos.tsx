@@ -79,7 +79,6 @@ function MilhasPontosPage() {
     const quantidade = Math.round(Number(form.quantidade.replace(/\./g, "").replace(",", ".")) || 0);
     const valorTotal = Number(form.valorTotal.replace(/\./g, "").replace(",", ".")) || 0;
     if (quantidade <= 0) { toast.error("Informe uma quantidade maior que zero."); return; }
-    if (form.tipo !== undefined) return;
     const result = await saveMilhaMovimento({
       id: editingId ?? crypto.randomUUID(), data: form.data, programa: form.programa,
       tipo: "compra", quantidade, valorTotal, banco: form.banco, formaPagamento: form.formaPagamento,
