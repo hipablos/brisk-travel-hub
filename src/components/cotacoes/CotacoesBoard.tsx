@@ -3,6 +3,7 @@ import { Eye, Pencil, MessageSquare, GripVertical, Trash2, Copy } from "lucide-r
 import { Link } from "@tanstack/react-router";
 import { useState, useMemo, memo } from "react";
 import { useCotacoes, useAllLabels, formatBRL, setCotacaoStatus, deleteCotacao, duplicateCotacao, type CotacaoStatus } from "@/lib/cotacoes-store";
+import { sincronizarMilhasCotacao } from "@/lib/milhas-store";
 
 import { LabelsPopover } from "./LabelsPopover";
 import { ReservaVooButton } from "./ReservaVooPDF";
@@ -220,11 +221,19 @@ export function CotacoesBoard({ filtros }: { filtros?: BoardFiltros }) {
     { status: "reprovado", title: "Reprovado", colorClass: "bg-destructive text-destructive-foreground" },
   ];
 
-  const handleDrop = (id: string, status: CotacaoStatus) => {
+  const handleDrop = async (id: string, status: CotacaoStatus) => {
     const cot = all.find((c) => c.id === id);
     setDraggingId(null);
     if (!cot || cot.status === status) return;
-    setCotacaoStatus(id, status);
+    await setCotacaoStatus(id, status);
+    const milhasSync = await sincronizarMilhasCotacao({
+      cotacaoId: id,
+      usarMilhas: !!cot.milhasProprias,
+      programa: cot.milhasPrograma,
+      quantidade: cot.milhasQuantidade,
+      confirmada: status === "aprovado",
+    });
+    if (milhasSync.aviso) toast.warning(milhasSync.aviso);
     const label = statuses.find((s) => s.status === status)?.title ?? status;
     toast.success(`Cotação movida para ${label}`);
   };
