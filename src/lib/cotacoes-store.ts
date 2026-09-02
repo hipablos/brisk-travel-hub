@@ -97,7 +97,7 @@ function _bindCache<T>(
   return c;
 }
 
-function _useSharedTable<T>(key: string, table: string, fetcher: () => Promise<T[]>): T[] {
+export function useSharedTable<T>(key: string, table: string, fetcher: () => Promise<T[]>): T[] {
   const uid = useAuthUserIdShared();
   const c = _ensureCache<T>(key);
   // Faz o bind a cada render (no-op se já bound); barato.
@@ -110,6 +110,10 @@ function _useSharedTable<T>(key: string, table: string, fetcher: () => Promise<T
     () => c.data,
     () => c.data,
   );
+}
+
+function _useSharedTable<T>(key: string, table: string, fetcher: () => Promise<T[]>): T[] {
+  return useSharedTable(key, table, fetcher);
 }
 
 /** Invalida o cache compartilhado de uma tabela e força um reload. */
