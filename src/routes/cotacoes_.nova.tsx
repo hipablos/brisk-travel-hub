@@ -28,6 +28,7 @@ import {
   useTermosModelos,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
+import { PROGRAMAS_MILHAS, sincronizarMilhasCotacao } from "@/lib/milhas-store";
 
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
@@ -142,6 +143,9 @@ function NovaCotacao() {
   const [valorComparacao, setValorComparacao] = useState<string>("");
   const [instrucoesPagamento, setInstrucoesPagamento] = useState("");
   const [linkPagamento, setLinkPagamento] = useState("");
+  const [milhasProprias, setMilhasProprias] = useState(false);
+  const [milhasPrograma, setMilhasPrograma] = useState<string>(PROGRAMAS_MILHAS[0]);
+  const [milhasQuantidade, setMilhasQuantidade] = useState("");
 
   // Tipo de documento (Orçamento x Venda) — controla a aba ativa
   const [activeTab, setActiveTab] = useState<"orcamento" | "venda">("orcamento");
@@ -196,6 +200,9 @@ function NovaCotacao() {
       setValorComparacao(c.valorComparacao ? String(c.valorComparacao) : "");
       setInstrucoesPagamento(c.instrucoesPagamento ?? "");
       setLinkPagamento(c.linkPagamento ?? "");
+      setMilhasProprias(c.milhasProprias ?? false);
+      setMilhasPrograma(c.milhasPrograma ?? PROGRAMAS_MILHAS[0]);
+      setMilhasQuantidade(c.milhasQuantidade ? String(c.milhasQuantidade) : "");
       const idasArr = ((c as any).vooIdas as Voo[] | undefined) ?? (c.vooIda ? [c.vooIda as Voo] : [novoVoo()]);
       const voltasArr = ((c as any).vooVoltas as Voo[] | undefined) ?? (c.vooVolta ? [c.vooVolta as Voo] : []);
       setVooIdas(idasArr.length ? idasArr : [novoVoo()]);
@@ -332,6 +339,9 @@ function NovaCotacao() {
       linkPagamento: linkPagamento || undefined,
       passageirosNomes: existing?.passageirosNomes,
       transfers,
+      milhasProprias,
+      milhasPrograma: milhasProprias ? milhasPrograma : undefined,
+      milhasQuantidade: milhasProprias ? Math.max(0, Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0) : undefined,
     };
   };
 
@@ -397,6 +407,14 @@ function NovaCotacao() {
       return;
     }
     await syncHospedagensExperiencias(saved.id, clienteId || null);
+    const milhasSync = await sincronizarMilhasCotacao({
+      cotacaoId: saved.id,
+      usarMilhas: !!saved.milhasProprias,
+      programa: saved.milhasPrograma,
+      quantidade: saved.milhasQuantidade,
+      confirmada: saved.status === "aprovado",
+    });
+    if (milhasSync.aviso) toast.warning(milhasSync.aviso);
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
     // Não navega mais automaticamente para o PDF
     if (!editing) {
@@ -452,9 +470,16 @@ function NovaCotacao() {
                     variant="destructive"
                     className="gap-2"
                     onClick={async () => {
-                      if (!confirm("Excluir esta cotação? Esta ação não pode ser desfeita.")) return;
-                      await deleteCotacao(editId);
-                      toast.success("Cotação excluída");
+                       if (!confirm("Excluir esta cotação? Esta ação não pode ser desfeita.")) return;
+                       await sincronizarMilhasCotacao({
+                         cotacaoId: editId,
+                         usarMilhas: false,
+                         programa: milhasPrograma,
+                         quantidade: Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0,
+                         confirmada: false,
+                       });
+                       await deleteCotacao(editId);
+                       toast.success("Cotação excluída");
                       navigate({ to: "/cotacoes" });
                     }}
                   >
@@ -662,8 +687,21 @@ function NovaCotacao() {
                 </PopoverContent>
               </Popover>
 
-
-
+              <section className="bg-card border border-border/50 rounded-xl p-6 space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-base font-semibold text-foreground">Milhas próprias</h2>
+                    <p className="text-xs text-muted-foreground">Controle interno; não altera o valor da cotação.</p>
+                  </div>
+                  <Switch checked={milhasProprias} onCheckedChange={setMilhasProprias} aria-label="Usar milhas próprias" />
+                </div>
+                {milhasProprias && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2"><Label>Programa de milhas</Label><Select value={milhasPrograma} onValueChange={setMilhasPrograma}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{PROGRAMAS_MILHAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-2"><Label>Quantidade utilizada</Label><Input inputMode="numeric" placeholder="10.000" value={milhasQuantidade} onChange={(e) => setMilhasQuantidade(e.target.value)} /></div>
+                  </div>
+                )}
+              </section>
 
               <section className="bg-card border border-border/50 rounded-xl p-8">
                 <div className="flex items-center justify-between mb-6">

@@ -4,7 +4,7 @@ import {
   LayoutDashboard, FileText, Calendar, Plane, Hotel,
   MapPin, ShoppingCart, ChevronDown, LogOut,
   Users, CreditCard, FileSignature, Plug, MessageCircle,
-  Settings, Palette, LogIn,
+  Settings, Palette, LogIn, Coins,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -37,6 +37,7 @@ const baseGroups: Group[] = [
     title: "Financeiro",
     items: [
       { icon: ShoppingCart, label: "Vendas", href: "/financeiro/vendas" },
+      { icon: Coins, label: "Milhas e Pontos", href: "/financeiro/milhas-pontos" },
     ],
   },
   { title: "Cadastros", items: [

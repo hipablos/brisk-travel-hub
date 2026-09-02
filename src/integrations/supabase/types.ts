@@ -629,6 +629,68 @@ export type Database = {
         }
         Relationships: []
       }
+      milhas_movimentos: {
+        Row: {
+          banco: string | null
+          cartao: string | null
+          cotacao_id: string | null
+          created_at: string
+          data: string
+          forma_pagamento: string | null
+          id: string
+          observacoes: string | null
+          parcelas: number | null
+          programa: string
+          quantidade: number
+          tipo: string
+          updated_at: string
+          user_id: string
+          valor_total: number
+        }
+        Insert: {
+          banco?: string | null
+          cartao?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          data?: string
+          forma_pagamento?: string | null
+          id?: string
+          observacoes?: string | null
+          parcelas?: number | null
+          programa: string
+          quantidade?: number
+          tipo?: string
+          updated_at?: string
+          user_id: string
+          valor_total?: number
+        }
+        Update: {
+          banco?: string | null
+          cartao?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          data?: string
+          forma_pagamento?: string | null
+          id?: string
+          observacoes?: string | null
+          parcelas?: number | null
+          programa?: string
+          quantidade?: number
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+          valor_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milhas_movimentos_cotacao_id_fkey"
+            columns: ["cotacao_id"]
+            isOneToOne: false
+            referencedRelation: "cotacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
