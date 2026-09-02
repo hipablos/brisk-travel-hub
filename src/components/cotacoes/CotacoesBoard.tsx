@@ -121,6 +121,13 @@ const KanbanCard = memo(function KanbanCard({
                 type="button"
                 onClick={async () => {
                   if (!confirm(`Excluir a cotação ${card.code}? Esta ação não pode ser desfeita.`)) return;
+                  await sincronizarMilhasCotacao({
+                    cotacaoId: card.id,
+                    usarMilhas: false,
+                    programa: card.milhasPrograma,
+                    quantidade: card.milhasQuantidade,
+                    confirmada: false,
+                  });
                   await deleteCotacao(card.id);
                   toast.success("Cotação excluída");
                 }}
