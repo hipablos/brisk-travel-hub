@@ -470,9 +470,16 @@ function NovaCotacao() {
                     variant="destructive"
                     className="gap-2"
                     onClick={async () => {
-                      if (!confirm("Excluir esta cotação? Esta ação não pode ser desfeita.")) return;
-                      await deleteCotacao(editId);
-                      toast.success("Cotação excluída");
+                       if (!confirm("Excluir esta cotação? Esta ação não pode ser desfeita.")) return;
+                       await sincronizarMilhasCotacao({
+                         cotacaoId: editId,
+                         usarMilhas: false,
+                         programa: milhasPrograma,
+                         quantidade: Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0,
+                         confirmada: false,
+                       });
+                       await deleteCotacao(editId);
+                       toast.success("Cotação excluída");
                       navigate({ to: "/cotacoes" });
                     }}
                   >

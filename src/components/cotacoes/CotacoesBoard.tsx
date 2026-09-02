@@ -124,8 +124,8 @@ const KanbanCard = memo(function KanbanCard({
                   await sincronizarMilhasCotacao({
                     cotacaoId: card.id,
                     usarMilhas: false,
-                    programa: card.milhasPrograma,
-                    quantidade: card.milhasQuantidade,
+                    programa: card.cotacao?.milhasPrograma,
+                    quantidade: card.cotacao?.milhasQuantidade,
                     confirmada: false,
                   });
                   await deleteCotacao(card.id);
