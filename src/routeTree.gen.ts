@@ -26,6 +26,7 @@ import { Route as ReservaIdRouteImport } from './routes/reserva_.$id'
 import { Route as ReservaEditarIdRouteImport } from './routes/reserva-editar_.$id'
 import { Route as IntegracoesTelegramRouteImport } from './routes/integracoes_.telegram'
 import { Route as FinanceiroVendasRouteImport } from './routes/financeiro_.vendas'
+import { Route as FinanceiroMilhasPontosRouteImport } from './routes/financeiro_.milhas-pontos'
 import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
 import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
 import { Route as ConfiguracoesMarcaRouteImport } from './routes/configuracoes.marca'
@@ -120,6 +121,11 @@ const FinanceiroVendasRoute = FinanceiroVendasRouteImport.update({
   path: '/financeiro/vendas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FinanceiroMilhasPontosRoute = FinanceiroMilhasPontosRouteImport.update({
+  id: '/financeiro_/milhas-pontos',
+  path: '/financeiro/milhas-pontos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CotacoesNovaRoute = CotacoesNovaRouteImport.update({
   id: '/cotacoes_/nova',
   path: '/cotacoes/nova',
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/configuracoes/marca': typeof ConfiguracoesMarcaRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
+  '/financeiro/milhas-pontos': typeof FinanceiroMilhasPontosRoute
   '/financeiro/vendas': typeof FinanceiroVendasRoute
   '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/configuracoes/marca': typeof ConfiguracoesMarcaRoute
   '/cotacoes/$id': typeof CotacoesIdRoute
   '/cotacoes/nova': typeof CotacoesNovaRoute
+  '/financeiro/milhas-pontos': typeof FinanceiroMilhasPontosRoute
   '/financeiro/vendas': typeof FinanceiroVendasRoute
   '/integracoes/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar/$id': typeof ReservaEditarIdRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/configuracoes/marca': typeof ConfiguracoesMarcaRoute
   '/cotacoes_/$id': typeof CotacoesIdRoute
   '/cotacoes_/nova': typeof CotacoesNovaRoute
+  '/financeiro_/milhas-pontos': typeof FinanceiroMilhasPontosRoute
   '/financeiro_/vendas': typeof FinanceiroVendasRoute
   '/integracoes_/telegram': typeof IntegracoesTelegramRoute
   '/reserva-editar_/$id': typeof ReservaEditarIdRoute
@@ -268,6 +277,7 @@ export interface FileRouteTypes {
     | '/configuracoes/marca'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
+    | '/financeiro/milhas-pontos'
     | '/financeiro/vendas'
     | '/integracoes/telegram'
     | '/reserva-editar/$id'
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/configuracoes/marca'
     | '/cotacoes/$id'
     | '/cotacoes/nova'
+    | '/financeiro/milhas-pontos'
     | '/financeiro/vendas'
     | '/integracoes/telegram'
     | '/reserva-editar/$id'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/configuracoes/marca'
     | '/cotacoes_/$id'
     | '/cotacoes_/nova'
+    | '/financeiro_/milhas-pontos'
     | '/financeiro_/vendas'
     | '/integracoes_/telegram'
     | '/reserva-editar_/$id'
@@ -350,6 +362,7 @@ export interface RootRouteChildren {
   ConfiguracoesMarcaRoute: typeof ConfiguracoesMarcaRoute
   CotacoesIdRoute: typeof CotacoesIdRoute
   CotacoesNovaRoute: typeof CotacoesNovaRoute
+  FinanceiroMilhasPontosRoute: typeof FinanceiroMilhasPontosRoute
   FinanceiroVendasRoute: typeof FinanceiroVendasRoute
   IntegracoesTelegramRoute: typeof IntegracoesTelegramRoute
   ReservaEditarIdRoute: typeof ReservaEditarIdRoute
@@ -480,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinanceiroVendasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/financeiro_/milhas-pontos': {
+      id: '/financeiro_/milhas-pontos'
+      path: '/financeiro/milhas-pontos'
+      fullPath: '/financeiro/milhas-pontos'
+      preLoaderRoute: typeof FinanceiroMilhasPontosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cotacoes_/nova': {
       id: '/cotacoes_/nova'
       path: '/cotacoes/nova'
@@ -558,6 +578,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfiguracoesMarcaRoute: ConfiguracoesMarcaRoute,
   CotacoesIdRoute: CotacoesIdRoute,
   CotacoesNovaRoute: CotacoesNovaRoute,
+  FinanceiroMilhasPontosRoute: FinanceiroMilhasPontosRoute,
   FinanceiroVendasRoute: FinanceiroVendasRoute,
   IntegracoesTelegramRoute: IntegracoesTelegramRoute,
   ReservaEditarIdRoute: ReservaEditarIdRoute,

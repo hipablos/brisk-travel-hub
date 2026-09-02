@@ -19,7 +19,7 @@ import {
   type MilhaMovimento, type MilhaTipo,
 } from "@/lib/milhas-store";
 
-export const Route = createFileRoute("/financeiro/milhas-pontos")({
+export const Route = createFileRoute("/financeiro_/milhas-pontos")({
   component: MilhasPontosPage,
   head: () => ({
     meta: [
