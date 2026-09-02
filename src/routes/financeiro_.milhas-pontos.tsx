@@ -16,7 +16,7 @@ import { useCotacoes } from "@/lib/cotacoes-store";
 import {
   PROGRAMAS_MILHAS, MILHAS_TIPO_LABELS, custoMilheiro, deleteMilhaMovimento,
   formatPontos, resumoGeral, saveMilhaMovimento, useMilhasMovimentos,
-  type MilhaMovimento, type MilhaTipo,
+  type MilhaMovimento, type MilhasTipo,
 } from "@/lib/milhas-store";
 
 export const Route = createFileRoute("/financeiro_/milhas-pontos")({
