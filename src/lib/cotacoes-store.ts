@@ -223,6 +223,9 @@ export type Cotacao = {
   outrasInformacoes?: string;
   passageirosNomes?: string[];
   transfers?: any[];
+  milhasProprias?: boolean;
+  milhasPrograma?: string;
+  milhasQuantidade?: number;
 };
 
 export const DEFAULT_TERMOS = `• Esta proposta é válida apenas para a data e horário indicados, sujeita à confirmação de disponibilidade e preço no momento da emissão.
