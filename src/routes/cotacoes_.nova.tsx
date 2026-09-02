@@ -200,6 +200,9 @@ function NovaCotacao() {
       setValorComparacao(c.valorComparacao ? String(c.valorComparacao) : "");
       setInstrucoesPagamento(c.instrucoesPagamento ?? "");
       setLinkPagamento(c.linkPagamento ?? "");
+      setMilhasProprias(c.milhasProprias ?? false);
+      setMilhasPrograma(c.milhasPrograma ?? PROGRAMAS_MILHAS[0]);
+      setMilhasQuantidade(c.milhasQuantidade ? String(c.milhasQuantidade) : "");
       const idasArr = ((c as any).vooIdas as Voo[] | undefined) ?? (c.vooIda ? [c.vooIda as Voo] : [novoVoo()]);
       const voltasArr = ((c as any).vooVoltas as Voo[] | undefined) ?? (c.vooVolta ? [c.vooVolta as Voo] : []);
       setVooIdas(idasArr.length ? idasArr : [novoVoo()]);
