@@ -831,6 +831,8 @@ export type Database = {
           tipo: string
           updated_at: string
           user_id: string
+          valor_venda_milheiro: number
+          valor_venda_total: number
         }
         Insert: {
           chave_idempotencia?: string | null
@@ -848,6 +850,8 @@ export type Database = {
           tipo: string
           updated_at?: string
           user_id: string
+          valor_venda_milheiro?: number
+          valor_venda_total?: number
         }
         Update: {
           chave_idempotencia?: string | null
@@ -865,6 +869,8 @@ export type Database = {
           tipo?: string
           updated_at?: string
           user_id?: string
+          valor_venda_milheiro?: number
+          valor_venda_total?: number
         }
         Relationships: [
           {
@@ -1266,6 +1272,16 @@ export type Database = {
         }
         Returns: number
       }
+      milhas_alocar_lote: {
+        Args: {
+          p_lote_id: string
+          p_operacao_saida_id: string
+          p_programa: string
+          p_quantidade: number
+          p_user_id: string
+        }
+        Returns: number
+      }
       milhas_atualizar_compra: {
         Args: {
           p_banco?: string
@@ -1297,9 +1313,32 @@ export type Database = {
         }
         Returns: undefined
       }
+      milhas_atualizar_transferencia_interno: {
+        Args: {
+          p_chave_idempotencia: string
+          p_data: string
+          p_observacoes: string
+          p_percentual_bonus: number
+          p_programa_destino: string
+          p_programa_origem: string
+          p_quantidade: number
+          p_taxas: number
+          p_transferencia_id: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       milhas_excluir_compra: { Args: { p_lote_id: string }; Returns: undefined }
       milhas_excluir_compra_interno: {
         Args: { p_lote_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      milhas_excluir_transferencia_interno: {
+        Args: { p_transferencia_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      milhas_excluir_utilizacao_interno: {
+        Args: { p_operacao_id: string; p_user_id: string }
         Returns: undefined
       }
       milhas_registrar_compra: {
@@ -1368,9 +1407,11 @@ export type Database = {
         Args: {
           p_ativa: boolean
           p_cotacao_id: string
+          p_lote_id?: string
           p_programa: string
           p_quantidade: number
           p_user_id: string
+          p_valor_venda_milheiro?: number
         }
         Returns: undefined
       }
