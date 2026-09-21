@@ -629,6 +629,129 @@ export type Database = {
         }
         Relationships: []
       }
+      milhas_alocacoes: {
+        Row: {
+          ativa: boolean
+          created_at: string
+          custo_milheiro: number
+          custo_total: number
+          estornada_em: string | null
+          id: string
+          lote_id: string
+          operacao_saida_id: string
+          quantidade: number
+          user_id: string
+        }
+        Insert: {
+          ativa?: boolean
+          created_at?: string
+          custo_milheiro: number
+          custo_total: number
+          estornada_em?: string | null
+          id?: string
+          lote_id: string
+          operacao_saida_id: string
+          quantidade: number
+          user_id: string
+        }
+        Update: {
+          ativa?: boolean
+          created_at?: string
+          custo_milheiro?: number
+          custo_total?: number
+          estornada_em?: string | null
+          id?: string
+          lote_id?: string
+          operacao_saida_id?: string
+          quantidade?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milhas_alocacoes_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "milhas_lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milhas_alocacoes_operacao_saida_id_fkey"
+            columns: ["operacao_saida_id"]
+            isOneToOne: false
+            referencedRelation: "milhas_operacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      milhas_lotes: {
+        Row: {
+          created_at: string
+          custo_milheiro: number
+          custo_total: number
+          data_entrada: string
+          id: string
+          movimento_origem_id: string | null
+          observacoes: string | null
+          operacao_origem_id: string
+          origem: string
+          programa: string
+          quantidade_disponivel: number
+          quantidade_original: number
+          quantidade_utilizada: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custo_milheiro?: number
+          custo_total?: number
+          data_entrada: string
+          id?: string
+          movimento_origem_id?: string | null
+          observacoes?: string | null
+          operacao_origem_id: string
+          origem: string
+          programa: string
+          quantidade_disponivel: number
+          quantidade_original: number
+          quantidade_utilizada?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custo_milheiro?: number
+          custo_total?: number
+          data_entrada?: string
+          id?: string
+          movimento_origem_id?: string | null
+          observacoes?: string | null
+          operacao_origem_id?: string
+          origem?: string
+          programa?: string
+          quantidade_disponivel?: number
+          quantidade_original?: number
+          quantidade_utilizada?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milhas_lotes_movimento_origem_id_fkey"
+            columns: ["movimento_origem_id"]
+            isOneToOne: true
+            referencedRelation: "milhas_movimentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milhas_lotes_operacao_origem_id_fkey"
+            columns: ["operacao_origem_id"]
+            isOneToOne: true
+            referencedRelation: "milhas_operacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       milhas_movimentos: {
         Row: {
           banco: string | null
@@ -687,6 +810,170 @@ export type Database = {
             columns: ["cotacao_id"]
             isOneToOne: false
             referencedRelation: "cotacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      milhas_operacoes: {
+        Row: {
+          chave_idempotencia: string | null
+          cotacao_id: string | null
+          created_at: string
+          custo_total: number
+          data: string
+          descricao: string | null
+          id: string
+          movimento_id: string | null
+          operacao_estornada_id: string | null
+          programa: string
+          quantidade: number
+          status: string
+          tipo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chave_idempotencia?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          custo_total?: number
+          data?: string
+          descricao?: string | null
+          id?: string
+          movimento_id?: string | null
+          operacao_estornada_id?: string | null
+          programa: string
+          quantidade: number
+          status?: string
+          tipo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chave_idempotencia?: string | null
+          cotacao_id?: string | null
+          created_at?: string
+          custo_total?: number
+          data?: string
+          descricao?: string | null
+          id?: string
+          movimento_id?: string | null
+          operacao_estornada_id?: string | null
+          programa?: string
+          quantidade?: number
+          status?: string
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milhas_operacoes_cotacao_id_fkey"
+            columns: ["cotacao_id"]
+            isOneToOne: false
+            referencedRelation: "cotacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milhas_operacoes_movimento_id_fkey"
+            columns: ["movimento_id"]
+            isOneToOne: true
+            referencedRelation: "milhas_movimentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milhas_operacoes_operacao_estornada_id_fkey"
+            columns: ["operacao_estornada_id"]
+            isOneToOne: false
+            referencedRelation: "milhas_operacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      milhas_transferencias: {
+        Row: {
+          chave_idempotencia: string
+          created_at: string
+          custo_milheiro_destino: number
+          custo_total_destino: number
+          custo_transferido: number
+          data: string
+          id: string
+          lote_destino_id: string
+          observacoes: string | null
+          operacao_entrada_id: string
+          operacao_saida_id: string
+          percentual_bonus: number
+          programa_destino: string
+          programa_origem: string
+          quantidade_bonus: number
+          quantidade_recebida: number
+          quantidade_transferida: number
+          taxas: number
+          user_id: string
+        }
+        Insert: {
+          chave_idempotencia: string
+          created_at?: string
+          custo_milheiro_destino: number
+          custo_total_destino: number
+          custo_transferido: number
+          data?: string
+          id?: string
+          lote_destino_id: string
+          observacoes?: string | null
+          operacao_entrada_id: string
+          operacao_saida_id: string
+          percentual_bonus?: number
+          programa_destino: string
+          programa_origem: string
+          quantidade_bonus?: number
+          quantidade_recebida: number
+          quantidade_transferida: number
+          taxas?: number
+          user_id: string
+        }
+        Update: {
+          chave_idempotencia?: string
+          created_at?: string
+          custo_milheiro_destino?: number
+          custo_total_destino?: number
+          custo_transferido?: number
+          data?: string
+          id?: string
+          lote_destino_id?: string
+          observacoes?: string | null
+          operacao_entrada_id?: string
+          operacao_saida_id?: string
+          percentual_bonus?: number
+          programa_destino?: string
+          programa_origem?: string
+          quantidade_bonus?: number
+          quantidade_recebida?: number
+          quantidade_transferida?: number
+          taxas?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milhas_transferencias_lote_destino_id_fkey"
+            columns: ["lote_destino_id"]
+            isOneToOne: true
+            referencedRelation: "milhas_lotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milhas_transferencias_operacao_entrada_id_fkey"
+            columns: ["operacao_entrada_id"]
+            isOneToOne: true
+            referencedRelation: "milhas_operacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milhas_transferencias_operacao_saida_id_fkey"
+            columns: ["operacao_saida_id"]
+            isOneToOne: true
+            referencedRelation: "milhas_operacoes"
             referencedColumns: ["id"]
           },
         ]
@@ -969,6 +1256,73 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      milhas_alocar_fifo: {
+        Args: {
+          p_operacao_saida_id: string
+          p_programa: string
+          p_quantidade: number
+          p_user_id: string
+        }
+        Returns: number
+      }
+      milhas_atualizar_compra: {
+        Args: {
+          p_banco?: string
+          p_cartao?: string
+          p_data: string
+          p_forma_pagamento?: string
+          p_lote_id: string
+          p_observacoes?: string
+          p_parcelas?: number
+          p_programa: string
+          p_quantidade: number
+          p_valor_total: number
+        }
+        Returns: undefined
+      }
+      milhas_excluir_compra: { Args: { p_lote_id: string }; Returns: undefined }
+      milhas_registrar_compra: {
+        Args: {
+          p_banco?: string
+          p_cartao?: string
+          p_chave_idempotencia?: string
+          p_data: string
+          p_forma_pagamento?: string
+          p_observacoes?: string
+          p_parcelas?: number
+          p_programa: string
+          p_quantidade: number
+          p_valor_total: number
+        }
+        Returns: string
+      }
+      milhas_registrar_transferencia: {
+        Args: {
+          p_chave_idempotencia?: string
+          p_data: string
+          p_observacoes?: string
+          p_percentual_bonus?: number
+          p_programa_destino: string
+          p_programa_origem: string
+          p_quantidade: number
+          p_taxas?: number
+        }
+        Returns: string
+      }
+      milhas_reverter_operacao: {
+        Args: { p_criar_estorno?: boolean; p_operacao_id: string }
+        Returns: undefined
+      }
+      milhas_sincronizar_cotacao_interno: {
+        Args: {
+          p_ativa: boolean
+          p_cotacao_id: string
+          p_programa: string
+          p_quantidade: number
+          p_user_id: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
