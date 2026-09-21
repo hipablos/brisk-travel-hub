@@ -1,267 +1,45 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useSharedTable } from "@/lib/cotacoes-store";
+import { invalidateSharedTable, useSharedTable } from "@/lib/cotacoes-store";
+import {
+  excluirCompraMilhasFn, registrarTransferenciaMilhasFn, salvarCompraMilhasFn,
+  sincronizarCotacaoMilhasFn, type CompraMilhasInput, type TransferenciaMilhasInput,
+} from "@/lib/milhas.functions";
 
-export const PROGRAMAS_MILHAS = [
-  "Livelo",
-  "LATAM Pass",
-  "Smiles",
-  "Azul Fidelidade",
-  "Iberia Plus",
-] as const;
-
+export const PROGRAMAS_MILHAS = ["Livelo", "LATAM Pass", "Smiles", "Azul Fidelidade", "Iberia Plus"] as const;
 export type ProgramaMilhas = (typeof PROGRAMAS_MILHAS)[number] | string;
-
-export type MilhasTipo = "compra" | "utilizacao" | "estorno" | "ajuste";
-
+export type MilhasTipo = "compra" | "utilizacao" | "estorno" | "ajuste" | "transferencia_saida" | "transferencia_entrada";
 export const MILHAS_TIPO_LABELS: Record<MilhasTipo, string> = {
-  compra: "Compra",
-  utilizacao: "Utilização",
-  estorno: "Estorno",
-  ajuste: "Ajuste",
+  compra: "Compra", utilizacao: "Utilização", estorno: "Estorno", ajuste: "Ajuste",
+  transferencia_saida: "Transferência enviada", transferencia_entrada: "Transferência recebida",
 };
 
-export type MilhaMovimento = {
-  id: string;
-  data: string; // ISO "YYYY-MM-DD"
-  programa: ProgramaMilhas;
-  tipo: MilhasTipo;
-  quantidade: number;
-  valorTotal: number;
-  banco?: string;
-  formaPagamento?: string;
-  cartao?: string;
-  parcelas?: number;
-  observacoes?: string;
-  cotacaoId?: string;
-  createdAt: string;
-};
+export type MilhaMovimento = { id:string; data:string; programa:ProgramaMilhas; tipo:MilhasTipo; quantidade:number; valorTotal:number; banco?:string; formaPagamento?:string; cartao?:string; parcelas?:number; observacoes?:string; cotacaoId?:string; createdAt:string };
+export type MilhaLote = { id:string; programa:ProgramaMilhas; origem:string; dataEntrada:string; quantidadeOriginal:number; quantidadeUtilizada:number; quantidadeDisponivel:number; custoTotal:number; custoMilheiro:number; observacoes?:string; movimentoOrigemId?:string; operacaoOrigemId:string; createdAt:string };
+export type MilhaTransferencia = { id:string; data:string; programaOrigem:string; programaDestino:string; quantidadeTransferida:number; percentualBonus:number; quantidadeBonus:number; quantidadeRecebida:number; custoTransferido:number; taxas:number; custoTotalDestino:number; custoMilheiroDestino:number; loteDestinoId:string; observacoes?:string; createdAt:string };
 
-function rowToMovimento(row: any): MilhaMovimento {
-  return {
-    id: row.id,
-    data: row.data,
-    programa: row.programa,
-    tipo: row.tipo,
-    quantidade: Number(row.quantidade ?? 0),
-    valorTotal: Number(row.valor_total ?? 0),
-    banco: row.banco ?? undefined,
-    formaPagamento: row.forma_pagamento ?? undefined,
-    cartao: row.cartao ?? undefined,
-    parcelas: row.parcelas ?? undefined,
-    observacoes: row.observacoes ?? undefined,
-    cotacaoId: row.cotacao_id ?? undefined,
-    createdAt: row.created_at,
-  };
-}
+const rowToMovimento = (r:any):MilhaMovimento => ({ id:r.id,data:r.data,programa:r.programa,tipo:r.tipo,quantidade:Number(r.quantidade||0),valorTotal:Number(r.valor_total||0),banco:r.banco??undefined,formaPagamento:r.forma_pagamento??undefined,cartao:r.cartao??undefined,parcelas:r.parcelas??undefined,observacoes:r.observacoes??undefined,cotacaoId:r.cotacao_id??undefined,createdAt:r.created_at });
+const rowToLote = (r:any):MilhaLote => ({ id:r.id,programa:r.programa,origem:r.origem,dataEntrada:r.data_entrada,quantidadeOriginal:Number(r.quantidade_original||0),quantidadeUtilizada:Number(r.quantidade_utilizada||0),quantidadeDisponivel:Number(r.quantidade_disponivel||0),custoTotal:Number(r.custo_total||0),custoMilheiro:Number(r.custo_milheiro||0),observacoes:r.observacoes??undefined,movimentoOrigemId:r.movimento_origem_id??undefined,operacaoOrigemId:r.operacao_origem_id,createdAt:r.created_at });
+const rowToTransferencia = (r:any):MilhaTransferencia => ({ id:r.id,data:r.data,programaOrigem:r.programa_origem,programaDestino:r.programa_destino,quantidadeTransferida:Number(r.quantidade_transferida||0),percentualBonus:Number(r.percentual_bonus||0),quantidadeBonus:Number(r.quantidade_bonus||0),quantidadeRecebida:Number(r.quantidade_recebida||0),custoTransferido:Number(r.custo_transferido||0),taxas:Number(r.taxas||0),custoTotalDestino:Number(r.custo_total_destino||0),custoMilheiroDestino:Number(r.custo_milheiro_destino||0),loteDestinoId:r.lote_destino_id,observacoes:r.observacoes??undefined,createdAt:r.created_at });
 
-export async function fetchMilhasMovimentos(): Promise<MilhaMovimento[]> {
-  const { data, error } = await supabase
-    .from("milhas_movimentos")
-    .select("*")
-    .order("data", { ascending: false })
-    .order("created_at", { ascending: false });
-  if (error) {
-    console.error("[milhas] fetch error:", error);
-    return [];
-  }
-  return (data ?? []).map(rowToMovimento);
-}
+export async function fetchMilhasMovimentos(){ const {data,error}=await supabase.from("milhas_movimentos").select("*").order("data",{ascending:false}).order("created_at",{ascending:false}); if(error){console.error("[milhas]",error);return [];} return (data??[]).map(rowToMovimento); }
+export async function fetchMilhasLotes(){ const {data,error}=await supabase.from("milhas_lotes").select("*").order("data_entrada",{ascending:true}).order("created_at",{ascending:true}); if(error){console.error("[milhas lotes]",error);return [];} return (data??[]).map(rowToLote); }
+export async function fetchMilhasTransferencias(){ const {data,error}=await supabase.from("milhas_transferencias").select("*").order("data",{ascending:false}).order("created_at",{ascending:false}); if(error){console.error("[milhas transferências]",error);return [];} return (data??[]).map(rowToTransferencia); }
+export const useMilhasMovimentos=()=>useSharedTable<MilhaMovimento>("milhas_movimentos","milhas_movimentos",fetchMilhasMovimentos);
+export const useMilhasLotes=()=>useSharedTable<MilhaLote>("milhas_lotes","milhas_lotes",fetchMilhasLotes);
+export const useMilhasTransferencias=()=>useSharedTable<MilhaTransferencia>("milhas_transferencias","milhas_transferencias",fetchMilhasTransferencias);
+function refresh(){ ["milhas_movimentos","milhas_lotes","milhas_transferencias"].forEach(invalidateSharedTable); }
+export async function salvarCompraMilhas(input:CompraMilhasInput){ const result=await salvarCompraMilhasFn({data:input}); refresh(); return result; }
+export async function excluirCompraMilhas(loteId:string){ const result=await excluirCompraMilhasFn({data:{loteId}}); refresh(); return result; }
+export async function registrarTransferenciaMilhas(input:TransferenciaMilhasInput){ const result=await registrarTransferenciaMilhasFn({data:input}); refresh(); return result; }
 
-export function useMilhasMovimentos() {
-  return useSharedTable<MilhaMovimento>("milhas_movimentos", "milhas_movimentos", fetchMilhasMovimentos);
-}
+export function custoMilheiro(valorTotal:number, quantidade:number){ return quantidade ? valorTotal/quantidade*1000 : 0; }
+export type ResumoPrograma={ programa:ProgramaMilhas; saldo:number; pontosComprados:number; investido:number; custoMedioMilheiro:number; compras:number; utilizados:number };
+export function resumoPorProgramaLotes(lotes:MilhaLote[],programa:ProgramaMilhas):ResumoPrograma { const items=lotes.filter(l=>l.programa===programa); const saldo=items.reduce((s,l)=>s+l.quantidadeDisponivel,0); const investido=items.reduce((s,l)=>s+(l.quantidadeDisponivel/1000*l.custoMilheiro),0); return {programa,saldo,pontosComprados:items.reduce((s,l)=>s+l.quantidadeOriginal,0),investido,custoMedioMilheiro:custoMilheiro(investido,saldo),compras:items.filter(l=>l.origem==="compra").length,utilizados:items.reduce((s,l)=>s+l.quantidadeUtilizada,0)}; }
+export function resumoGeralLotes(lotes:MilhaLote[]){ const programas=Array.from(new Set<string>([...PROGRAMAS_MILHAS,...lotes.map(l=>l.programa)])); const resumos=programas.map(p=>resumoPorProgramaLotes(lotes,p)); const saldo=resumos.reduce((s,r)=>s+r.saldo,0); const investido=resumos.reduce((s,r)=>s+r.investido,0); return {resumos,saldo,investido,compras:resumos.reduce((s,r)=>s+r.compras,0),custoMedioMilheiro:custoMilheiro(investido,saldo)}; }
+// Compatibilidade com telas legadas.
+export function resumoPorPrograma(movs:MilhaMovimento[],programa:ProgramaMilhas):ResumoPrograma { const p=movs.filter(m=>m.programa===programa); const entradas=p.filter(m=>m.tipo==="compra"||m.tipo==="estorno"||m.tipo==="transferencia_entrada"); const saidas=p.filter(m=>m.tipo==="utilizacao"||m.tipo==="transferencia_saida"); const pontosComprados=entradas.reduce((s,m)=>s+m.quantidade,0); const investido=entradas.reduce((s,m)=>s+m.valorTotal,0); return {programa,saldo:pontosComprados-saidas.reduce((s,m)=>s+m.quantidade,0),pontosComprados,investido,custoMedioMilheiro:custoMilheiro(investido,pontosComprados),compras:p.filter(m=>m.tipo==="compra").length,utilizados:saidas.reduce((s,m)=>s+m.quantidade,0)}; }
+export function resumoGeral(movs:MilhaMovimento[]){ const resumos=Array.from(new Set<string>([...PROGRAMAS_MILHAS,...movs.map(m=>m.programa)])).map(p=>resumoPorPrograma(movs,p)); const saldo=resumos.reduce((s,r)=>s+r.saldo,0),investido=resumos.reduce((s,r)=>s+r.investido,0),pontos=resumos.reduce((s,r)=>s+r.pontosComprados,0); return {resumos,saldo,investido,compras:resumos.reduce((s,r)=>s+r.compras,0),custoMedioMilheiro:custoMilheiro(investido,pontos)}; }
+export const formatPontos=(n:number)=>Math.round(n).toLocaleString("pt-BR");
 
-async function currentUserId(): Promise<string | null> {
-  const { data } = await supabase.auth.getUser();
-  return data.user?.id ?? null;
-}
-
-export type MilhaMovimentoInput = Omit<MilhaMovimento, "createdAt"> & { createdAt?: string };
-
-export async function saveMilhaMovimento(m: MilhaMovimentoInput): Promise<MilhaMovimento | null> {
-  const uid = await currentUserId();
-  if (!uid) return null;
-  const payload = {
-    user_id: uid,
-    data: m.data,
-    programa: m.programa,
-    tipo: m.tipo,
-    quantidade: Math.round(m.quantidade || 0),
-    valor_total: m.valorTotal || 0,
-    banco: m.banco || null,
-    forma_pagamento: m.formaPagamento || null,
-    cartao: m.cartao || null,
-    parcelas: m.parcelas ?? null,
-    observacoes: m.observacoes || null,
-    cotacao_id: m.cotacaoId || null,
-  };
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(m.id ?? "");
-  if (isUuid) {
-    const { data: existing } = await supabase
-      .from("milhas_movimentos").select("id").eq("id", m.id).maybeSingle();
-    if (existing) {
-      const { data, error } = await supabase
-        .from("milhas_movimentos").update(payload).eq("id", m.id).select().single();
-      if (error) { console.error("[milhas] update error:", error); return null; }
-      return rowToMovimento(data);
-    }
-  }
-  const { data, error } = await supabase.from("milhas_movimentos").insert(payload).select().single();
-  if (error) { console.error("[milhas] insert error:", error); return null; }
-  return rowToMovimento(data);
-}
-
-export async function deleteMilhaMovimento(id: string) {
-  const { error } = await supabase.from("milhas_movimentos").delete().eq("id", id);
-  if (error) console.error("[milhas] delete error:", error);
-}
-
-// ---------- Cálculos ----------
-
-/** Custo do milheiro: valor pago ÷ quantidade × 1.000 */
-export function custoMilheiro(valorTotal: number, quantidade: number): number {
-  if (!quantidade) return 0;
-  return (valorTotal / quantidade) * 1000;
-}
-
-export type ResumoPrograma = {
-  programa: ProgramaMilhas;
-  saldo: number;
-  pontosComprados: number;
-  investido: number;
-  custoMedioMilheiro: number;
-  compras: number;
-  utilizados: number;
-};
-
-export function resumoPorPrograma(movs: MilhaMovimento[], programa: ProgramaMilhas): ResumoPrograma {
-  const doPrograma = movs.filter((m) => m.programa === programa);
-  const compras = doPrograma.filter((m) => m.tipo === "compra");
-  const pontosComprados = compras.reduce((s, m) => s + m.quantidade, 0);
-  const investido = compras.reduce((s, m) => s + m.valorTotal, 0);
-  const utilizados = doPrograma.filter((m) => m.tipo === "utilizacao").reduce((s, m) => s + m.quantidade, 0);
-  const estornados = doPrograma.filter((m) => m.tipo === "estorno").reduce((s, m) => s + m.quantidade, 0);
-  const ajustes = doPrograma.filter((m) => m.tipo === "ajuste").reduce((s, m) => s + m.quantidade, 0);
-  return {
-    programa,
-    saldo: pontosComprados + ajustes + estornados - utilizados,
-    pontosComprados,
-    investido,
-    custoMedioMilheiro: custoMilheiro(investido, pontosComprados),
-    compras: compras.length,
-    utilizados: utilizados - estornados,
-  };
-}
-
-export function resumoGeral(movs: MilhaMovimento[]) {
-  const programas = Array.from(new Set<string>([...PROGRAMAS_MILHAS, ...movs.map((m) => m.programa)]));
-  const resumos = programas.map((p) => resumoPorPrograma(movs, p));
-  const saldo = resumos.reduce((s, r) => s + r.saldo, 0);
-  const pontosComprados = resumos.reduce((s, r) => s + r.pontosComprados, 0);
-  const investido = resumos.reduce((s, r) => s + r.investido, 0);
-  const compras = resumos.reduce((s, r) => s + r.compras, 0);
-  return {
-    resumos,
-    saldo,
-    investido,
-    compras,
-    custoMedioMilheiro: custoMilheiro(investido, pontosComprados),
-  };
-}
-
-export function formatPontos(n: number) {
-  return Math.round(n).toLocaleString("pt-BR");
-}
-
-// ---------- Integração com Cotações ----------
-
-export type MilhasCotacaoInfo = {
-  cotacaoId: string;
-  usarMilhas: boolean;
-  programa?: string;
-  quantidade?: number;
-  /** true quando a cotação está confirmada/emitida (status aprovado) */
-  confirmada: boolean;
-};
-
-/**
- * Sincroniza o estoque de milhas com uma cotação.
- * - Cotação confirmada + milhas próprias → registra (ou ajusta) a utilização.
- * - Cotação cancelada/reprovada → registra um estorno, mantendo o histórico.
- * Nunca duplica: só existe UMA utilização por cotação/programa.
- */
-export async function sincronizarMilhasCotacao(
-  info: MilhasCotacaoInfo,
-): Promise<{ changed: boolean; aviso?: string }> {
-  const uid = await currentUserId();
-  if (!uid) return { changed: false };
-
-  const { data: rowsRaw } = await supabase
-    .from("milhas_movimentos")
-    .select("*")
-    .eq("cotacao_id", info.cotacaoId);
-  const rows = (rowsRaw ?? []).map(rowToMovimento);
-  const utilizacao = rows.find((r) => r.tipo === "utilizacao");
-  const estornos = rows.filter((r) => r.tipo === "estorno");
-
-  const ativo = info.confirmada && info.usarMilhas && !!info.programa && (info.quantidade ?? 0) > 0;
-
-  if (!ativo) {
-    if (utilizacao && estornos.length === 0) {
-      await saveMilhaMovimento({
-        id: crypto.randomUUID(),
-        data: new Date().toISOString().slice(0, 10),
-        programa: utilizacao.programa,
-        tipo: "estorno",
-        quantidade: utilizacao.quantidade,
-        valorTotal: utilizacao.valorTotal,
-        observacoes: "Estorno automático (cotação cancelada ou milhas removidas)",
-        cotacaoId: info.cotacaoId,
-      });
-      return { changed: true };
-    }
-    return { changed: false };
-  }
-
-  // Utilização ativa: remove estornos anteriores (reativação da cotação)
-  for (const e of estornos) await deleteMilhaMovimento(e.id);
-
-  const todos = await fetchMilhasMovimentos();
-  const resumo = resumoPorPrograma(todos, info.programa!);
-  const quantidade = Math.round(info.quantidade!);
-  const custoInterno = (quantidade / 1000) * resumo.custoMedioMilheiro;
-
-  // Saldo já considera a utilização anterior desta cotação (se existir)
-  const anterior = utilizacao && utilizacao.programa === info.programa ? utilizacao.quantidade : 0;
-  const saldoDisponivel = resumo.saldo + anterior;
-  const aviso =
-    quantidade > saldoDisponivel
-      ? `Saldo insuficiente em ${info.programa}: disponível ${formatPontos(saldoDisponivel)}, necessário ${formatPontos(quantidade)}.`
-      : undefined;
-
-  if (utilizacao) {
-    const igual =
-      utilizacao.programa === info.programa && utilizacao.quantidade === quantidade;
-    if (igual) return { changed: false, aviso };
-    await saveMilhaMovimento({
-      ...utilizacao,
-      programa: info.programa!,
-      quantidade,
-      valorTotal: custoInterno,
-      cotacaoId: info.cotacaoId,
-    });
-    return { changed: true, aviso };
-  }
-
-  await saveMilhaMovimento({
-    id: crypto.randomUUID(),
-    data: new Date().toISOString().slice(0, 10),
-    programa: info.programa!,
-    tipo: "utilizacao",
-    quantidade,
-    valorTotal: custoInterno,
-    observacoes: "Utilização automática de milhas próprias na cotação",
-    cotacaoId: info.cotacaoId,
-  });
-  return { changed: true, aviso };
-}
+export type MilhasCotacaoInfo={cotacaoId:string;usarMilhas:boolean;programa?:string;quantidade?:number;confirmada:boolean};
+export async function sincronizarMilhasCotacao(info:MilhasCotacaoInfo):Promise<{changed:boolean;aviso?:string}>{ try { const result=await sincronizarCotacaoMilhasFn({data:{cotacaoId:info.cotacaoId,ativa:info.confirmada&&info.usarMilhas,programa:info.programa,quantidade:info.quantidade}}); refresh(); return result; } catch(error){ const message=error instanceof Error?error.message:String(error); if(/saldo insuficiente/i.test(message)) return {changed:false,aviso:message}; throw error; } }
