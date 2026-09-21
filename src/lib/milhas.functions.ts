@@ -106,7 +106,7 @@ export const registrarTransferenciaMilhasFn = createServerFn({ method: "POST" })
 
 export const sincronizarCotacaoMilhasFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { cotacaoId: string; ativa: boolean; programa?: string; quantidade?: number }) => data)
+  .inputValidator((data: { cotacaoId: string; ativa: boolean; programa?: string; quantidade?: number; loteId?: string; valorVendaMilheiro?: number }) => data)
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.rpc("milhas_sincronizar_cotacao_interno", {
@@ -115,7 +115,57 @@ export const sincronizarCotacaoMilhasFn = createServerFn({ method: "POST" })
       p_ativa: data.ativa,
       p_programa: data.programa || "",
       p_quantidade: Math.round(data.quantidade || 0),
+      p_lote_id: data.loteId,
+      p_valor_venda_milheiro: data.valorVendaMilheiro || 0,
     });
     fail(error);
     return { changed: true };
+  });
+
+export const excluirUtilizacaoMilhasFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { operacaoId: string }) => data)
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.rpc("milhas_excluir_utilizacao_interno", {
+      p_user_id: context.userId,
+      p_operacao_id: data.operacaoId,
+    });
+    fail(error);
+    return { ok: true };
+  });
+
+export const excluirTransferenciaMilhasFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { transferenciaId: string }) => data)
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.rpc("milhas_excluir_transferencia_interno", {
+      p_user_id: context.userId,
+      p_transferencia_id: data.transferenciaId,
+    });
+    fail(error);
+    return { ok: true };
+  });
+
+export const atualizarTransferenciaMilhasFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: TransferenciaMilhasInput & { transferenciaId: string }) => data)
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: id, error } = await supabaseAdmin.rpc("milhas_atualizar_transferencia_interno", {
+      p_user_id: context.userId,
+      p_transferencia_id: data.transferenciaId,
+      p_data: data.data,
+      p_programa_origem: data.programaOrigem,
+      p_programa_destino: data.programaDestino,
+      p_quantidade: Math.round(data.quantidade),
+      p_percentual_bonus: data.percentualBonus,
+      p_taxas: data.taxas,
+      p_observacoes: data.observacoes || "",
+      p_chave_idempotencia: data.chaveIdempotencia || crypto.randomUUID(),
+    });
+    fail(error);
+    if (!id) throw new Error("A transferência foi atualizada sem retornar a operação.");
+    return { id };
   });
