@@ -28,7 +28,7 @@ import {
   useTermosModelos,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
-import { PROGRAMAS_MILHAS, custoMilheiro, formatPontos, useMilhasLotes } from "@/lib/milhas-store";
+import { PROGRAMAS_MILHAS, formatPontos, useMilhasLotes } from "@/lib/milhas-store";
 
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
