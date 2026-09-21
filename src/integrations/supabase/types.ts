@@ -1281,7 +1281,27 @@ export type Database = {
         }
         Returns: undefined
       }
+      milhas_atualizar_compra_interno: {
+        Args: {
+          p_banco?: string
+          p_cartao?: string
+          p_data: string
+          p_forma_pagamento?: string
+          p_lote_id: string
+          p_observacoes?: string
+          p_parcelas?: number
+          p_programa: string
+          p_quantidade: number
+          p_user_id: string
+          p_valor_total: number
+        }
+        Returns: undefined
+      }
       milhas_excluir_compra: { Args: { p_lote_id: string }; Returns: undefined }
+      milhas_excluir_compra_interno: {
+        Args: { p_lote_id: string; p_user_id: string }
+        Returns: undefined
+      }
       milhas_registrar_compra: {
         Args: {
           p_banco?: string
@@ -1297,6 +1317,22 @@ export type Database = {
         }
         Returns: string
       }
+      milhas_registrar_compra_interno: {
+        Args: {
+          p_banco?: string
+          p_cartao?: string
+          p_chave_idempotencia?: string
+          p_data: string
+          p_forma_pagamento?: string
+          p_observacoes?: string
+          p_parcelas?: number
+          p_programa: string
+          p_quantidade: number
+          p_user_id: string
+          p_valor_total: number
+        }
+        Returns: string
+      }
       milhas_registrar_transferencia: {
         Args: {
           p_chave_idempotencia?: string
@@ -1307,6 +1343,20 @@ export type Database = {
           p_programa_origem: string
           p_quantidade: number
           p_taxas?: number
+        }
+        Returns: string
+      }
+      milhas_registrar_transferencia_interno: {
+        Args: {
+          p_chave_idempotencia?: string
+          p_data: string
+          p_observacoes?: string
+          p_percentual_bonus?: number
+          p_programa_destino: string
+          p_programa_origem: string
+          p_quantidade: number
+          p_taxas?: number
+          p_user_id: string
         }
         Returns: string
       }
