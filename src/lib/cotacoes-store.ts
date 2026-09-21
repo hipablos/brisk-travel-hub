@@ -352,7 +352,8 @@ export async function saveCotacao(c: Cotacao): Promise<Cotacao | null> {
 
 export async function setCotacaoStatus(id: string, status: CotacaoStatus) {
   const { error } = await supabase.from("cotacoes").update({ status }).eq("id", id);
-  if (error) console.error("[cotacoes] setStatus error:", error);
+  if (error) { console.error("[cotacoes] setStatus error:", error); return false; }
+  return true;
 }
 
 export async function deleteCotacao(id: string) {

@@ -28,7 +28,7 @@ import {
   useTermosModelos,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
-import { PROGRAMAS_MILHAS, sincronizarMilhasCotacao } from "@/lib/milhas-store";
+import { PROGRAMAS_MILHAS } from "@/lib/milhas-store";
 
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
@@ -407,14 +407,6 @@ function NovaCotacao() {
       return;
     }
     await syncHospedagensExperiencias(saved.id, clienteId || null);
-    const milhasSync = await sincronizarMilhasCotacao({
-      cotacaoId: saved.id,
-      usarMilhas: !!saved.milhasProprias,
-      programa: saved.milhasPrograma,
-      quantidade: saved.milhasQuantidade,
-      confirmada: saved.status === "aprovado",
-    });
-    if (milhasSync.aviso) toast.warning(milhasSync.aviso);
     toast.success(editing ? "Cotação atualizada!" : "Cotação salva!");
     // Não navega mais automaticamente para o PDF
     if (!editing) {
@@ -471,13 +463,6 @@ function NovaCotacao() {
                     className="gap-2"
                     onClick={async () => {
                        if (!confirm("Excluir esta cotação? Esta ação não pode ser desfeita.")) return;
-                       await sincronizarMilhasCotacao({
-                         cotacaoId: editId,
-                         usarMilhas: false,
-                         programa: milhasPrograma,
-                         quantidade: Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0,
-                         confirmada: false,
-                       });
                        await deleteCotacao(editId);
                        toast.success("Cotação excluída");
                       navigate({ to: "/cotacoes" });
