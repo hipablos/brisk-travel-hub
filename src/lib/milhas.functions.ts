@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 function fail(error: { message?: string } | null) {
   if (error) throw new Error(error.message || "Não foi possível concluir a operação de milhas.");
@@ -24,6 +23,7 @@ export const salvarCompraMilhasFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: CompraMilhasInput) => data)
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.loteId) {
       const { error } = await supabaseAdmin.rpc("milhas_atualizar_compra_interno", {
         p_user_id: context.userId,
@@ -55,13 +55,15 @@ export const salvarCompraMilhasFn = createServerFn({ method: "POST" })
       p_chave_idempotencia: data.chaveIdempotencia || crypto.randomUUID(),
     });
     fail(error);
-    return { id: id! };
+    if (!id) throw new Error("A compra foi processada sem retornar o lote.");
+    return { id };
   });
 
 export const excluirCompraMilhasFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { loteId: string }) => data)
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.rpc("milhas_excluir_compra_interno", {
       p_user_id: context.userId,
       p_lote_id: data.loteId,
@@ -85,6 +87,7 @@ export const registrarTransferenciaMilhasFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: TransferenciaMilhasInput) => data)
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: id, error } = await supabaseAdmin.rpc("milhas_registrar_transferencia_interno", {
       p_user_id: context.userId,
       p_data: data.data,
@@ -97,13 +100,15 @@ export const registrarTransferenciaMilhasFn = createServerFn({ method: "POST" })
       p_chave_idempotencia: data.chaveIdempotencia || crypto.randomUUID(),
     });
     fail(error);
-    return { id: id! };
+    if (!id) throw new Error("A transferência foi processada sem retornar a operação.");
+    return { id };
   });
 
 export const sincronizarCotacaoMilhasFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { cotacaoId: string; ativa: boolean; programa?: string; quantidade?: number }) => data)
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.rpc("milhas_sincronizar_cotacao_interno", {
       p_user_id: context.userId,
       p_cotacao_id: data.cotacaoId,
