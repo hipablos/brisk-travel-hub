@@ -10,165 +10,51 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CreditCard, Landmark, Pencil, Plus, Save, Trash2, Wallet, X } from "lucide-react";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowRightLeft, Boxes, CreditCard, Landmark, Pencil, Plus, Save, Trash2, Wallet, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCotacoes } from "@/lib/cotacoes-store";
-import {
-  PROGRAMAS_MILHAS, MILHAS_TIPO_LABELS, custoMilheiro, deleteMilhaMovimento,
-  formatPontos, resumoGeral, saveMilhaMovimento, useMilhasMovimentos,
-  type MilhaMovimento, type MilhasTipo,
-} from "@/lib/milhas-store";
+import { PROGRAMAS_MILHAS, MILHAS_TIPO_LABELS, custoMilheiro, excluirCompraMilhas, formatPontos, registrarTransferenciaMilhas, resumoGeralLotes, salvarCompraMilhas, useMilhasLotes, useMilhasMovimentos, useMilhasTransferencias, type MilhaLote, type MilhaMovimento, type MilhasTipo } from "@/lib/milhas-store";
 
-export const Route = createFileRoute("/financeiro_/milhas-pontos")({
-  component: MilhasPontosPage,
-  head: () => ({
-    meta: [
-      { title: "Brisk Viagens — Milhas e Pontos" },
-      { name: "description", content: "Controle compras, saldo e custo real de pontos e milhas da agência." },
-      { property: "og:title", content: "Brisk Viagens — Milhas e Pontos" },
-      { property: "og:description", content: "Controle financeiro de pontos e milhas." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
-});
+export const Route = createFileRoute("/financeiro_/milhas-pontos")({ component: MilhasPontosPage, head:()=>({meta:[{title:"Brisk Viagens — Milhas e Pontos"},{name:"description",content:"Controle de estoque, lotes e custos de pontos e milhas."}]}) });
+type FormState={data:string;programa:string;quantidade:string;valorTotal:string;banco:string;formaPagamento:string;cartao:string;parcelas:string;observacoes:string};
+type TransferState={data:string;programaOrigem:string;programaDestino:string;quantidade:string;bonus:string;taxas:string;observacoes:string};
+const today=()=>new Date().toISOString().slice(0,10);
+const emptyForm=():FormState=>({data:today(),programa:PROGRAMAS_MILHAS[0],quantidade:"",valorTotal:"",banco:"",formaPagamento:"",cartao:"",parcelas:"1",observacoes:""});
+const emptyTransfer=():TransferState=>({data:today(),programaOrigem:PROGRAMAS_MILHAS[0],programaDestino:PROGRAMAS_MILHAS[1],quantidade:"",bonus:"0",taxas:"0",observacoes:""});
+const num=(v:string)=>Number(v.replace(/\./g,"").replace(",","."))||0;
+const brl=(v:number)=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const dateBr=(v:string)=>new Date(`${v}T12:00:00`).toLocaleDateString("pt-BR");
 
-type FormState = {
-  data: string;
-  programa: string;
-  quantidade: string;
-  valorTotal: string;
-  banco: string;
-  formaPagamento: string;
-  cartao: string;
-  parcelas: string;
-  observacoes: string;
-};
-
-const emptyForm = (): FormState => ({
-  data: new Date().toISOString().slice(0, 10), programa: PROGRAMAS_MILHAS[0], quantidade: "",
-  valorTotal: "", banco: "", formaPagamento: "", cartao: "", parcelas: "1", observacoes: "",
-});
-
-function brl(value: number) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+function MilhasPontosPage(){
+ const movimentos=useMilhasMovimentos(), lotes=useMilhasLotes(), transferencias=useMilhasTransferencias(), cotacoes=useCotacoes();
+ const [form,setForm]=useState<FormState>(emptyForm); const [editingLote,setEditingLote]=useState<string|null>(null); const [transferOpen,setTransferOpen]=useState(false); const [transfer,setTransfer]=useState<TransferState>(emptyTransfer); const [saving,setSaving]=useState(false);
+ const [filtroPrograma,setFiltroPrograma]=useState("todos"),[filtroInicio,setFiltroInicio]=useState(""),[filtroFim,setFiltroFim]=useState("");
+ const resumo=useMemo(()=>resumoGeralLotes(lotes),[lotes]);
+ const filtered=useMemo(()=>movimentos.filter(m=>(filtroPrograma==="todos"||m.programa===filtroPrograma)&&(!filtroInicio||m.data>=filtroInicio)&&(!filtroFim||m.data<=filtroFim)),[movimentos,filtroPrograma,filtroInicio,filtroFim]);
+ const update=(k:keyof FormState,v:string)=>setForm(c=>({...c,[k]:v})); const reset=()=>{setForm(emptyForm());setEditingLote(null)};
+ const compraMov=(l:MilhaLote)=>movimentos.find(m=>m.id===l.movimentoOrigemId);
+ const submit=async(e:React.FormEvent)=>{e.preventDefault();if(num(form.quantidade)<=0)return toast.error("Informe uma quantidade maior que zero.");setSaving(true);try{await salvarCompraMilhas({loteId:editingLote??undefined,data:form.data,programa:form.programa,quantidade:num(form.quantidade),valorTotal:num(form.valorTotal),banco:form.banco,formaPagamento:form.formaPagamento,cartao:form.cartao,parcelas:Math.max(1,num(form.parcelas)),observacoes:form.observacoes,chaveIdempotencia:crypto.randomUUID()});toast.success(editingLote?"Compra atualizada.":"Compra registrada em um novo lote.");reset()}catch(err){toast.error(err instanceof Error?err.message:"Não foi possível salvar a compra.")}finally{setSaving(false)}};
+ const edit=(l:MilhaLote)=>{const m=compraMov(l);setEditingLote(l.id);setForm({data:l.dataEntrada,programa:l.programa,quantidade:String(l.quantidadeOriginal),valorTotal:String(l.custoTotal),banco:m?.banco??"",formaPagamento:m?.formaPagamento??"",cartao:m?.cartao??"",parcelas:String(m?.parcelas??1),observacoes:l.observacoes??m?.observacoes??""});window.scrollTo({top:0,behavior:"smooth"})};
+ const remove=async(l:MilhaLote)=>{if(l.quantidadeUtilizada>0)return toast.error("Este lote já foi utilizado e seu histórico deve ser preservado.");if(!confirm("Excluir esta compra e o lote correspondente?"))return;try{await excluirCompraMilhas(l.id);toast.success("Compra excluída.")}catch(err){toast.error(err instanceof Error?err.message:"Não foi possível excluir.")}};
+ const submitTransfer=async()=>{const q=Math.round(num(transfer.quantidade)),bonus=num(transfer.bonus),taxas=num(transfer.taxas);if(q<=0)return toast.error("Informe a quantidade a transferir.");if(transfer.programaOrigem===transfer.programaDestino)return toast.error("Escolha programas diferentes.");setSaving(true);try{await registrarTransferenciaMilhas({data:transfer.data,programaOrigem:transfer.programaOrigem,programaDestino:transfer.programaDestino,quantidade:q,percentualBonus:bonus,taxas,observacoes:transfer.observacoes,chaveIdempotencia:crypto.randomUUID()});toast.success("Transferência registrada com baixa FIFO.");setTransfer(emptyTransfer());setTransferOpen(false)}catch(err){toast.error(err instanceof Error?err.message:"Não foi possível transferir.")}finally{setSaving(false)}};
+ const qTransfer=Math.round(num(transfer.quantidade)),qBonus=Math.round(qTransfer*num(transfer.bonus)/100),qRecebida=qTransfer+qBonus;
+ return <div className="min-h-screen bg-background flex"><Sidebar/><div className="flex-1 flex flex-col min-w-0"><Topbar/><main className="p-4 md:p-6 space-y-6 max-w-[1600px] w-full mx-auto">
+  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3"><div><p className="text-sm text-muted-foreground">Financeiro</p><h1 className="text-2xl font-semibold">Milhas e Pontos</h1><p className="text-sm text-muted-foreground mt-1">Estoque por lotes, custos históricos e transferências rastreáveis.</p></div><Button onClick={()=>setTransferOpen(true)}><ArrowRightLeft className="size-4 mr-2"/>Registrar transferência</Button></div>
+  <div className="grid grid-cols-2 xl:grid-cols-4 gap-3"><Metric icon={<Wallet className="size-4"/>} label="Saldo disponível" value={formatPontos(resumo.saldo)}/><Metric icon={<Landmark className="size-4"/>} label="Custo do estoque" value={brl(resumo.investido)}/><Metric icon={<CreditCard className="size-4"/>} label="Custo médio / milheiro" value={brl(resumo.custoMedioMilheiro)}/><Metric icon={<Boxes className="size-4"/>} label="Lotes com saldo" value={String(lotes.filter(l=>l.quantidadeDisponivel>0).length)}/></div>
+  <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">{resumo.resumos.map(r=><Card key={r.programa} className="border-border/60"><CardHeader className="pb-2"><CardTitle className="text-sm">{r.programa}</CardTitle></CardHeader><CardContent><p className="text-xl font-bold">{formatPontos(r.saldo)}</p><p className="text-xs text-muted-foreground">saldo disponível</p><div className="pt-2 text-xs flex justify-between"><span className="text-muted-foreground">Custo estoque</span><strong>{brl(r.investido)}</strong></div><div className="text-xs flex justify-between"><span className="text-muted-foreground">Milheiro médio</span><strong>{brl(r.custoMedioMilheiro)}</strong></div></CardContent></Card>)}</section>
+  <Card><CardHeader><CardTitle className="text-lg">{editingLote?"Editar compra":"Registrar compra"}</CardTitle></CardHeader><CardContent><form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4"><Field label="Data"><Input type="date" value={form.data} onChange={e=>update("data",e.target.value)} required/></Field><Field label="Programa"><ProgramSelect value={form.programa} onChange={v=>update("programa",v)}/></Field><Field label="Quantidade"><Input value={form.quantidade} onChange={e=>update("quantidade",e.target.value)} placeholder="78.000" required/></Field><Field label="Valor total pago (R$)"><Input value={form.valorTotal} onChange={e=>update("valorTotal",e.target.value)} placeholder="2.354,36" required/></Field><Field label="Banco"><Input value={form.banco} onChange={e=>update("banco",e.target.value)}/></Field><Field label="Forma de pagamento"><Input value={form.formaPagamento} onChange={e=>update("formaPagamento",e.target.value)}/></Field><Field label="Cartão"><Input value={form.cartao} onChange={e=>update("cartao",e.target.value)}/></Field><Field label="Parcelas"><Input type="number" min="1" value={form.parcelas} onChange={e=>update("parcelas",e.target.value)}/></Field><div className="md:col-span-2 xl:col-span-4"><Field label="Observações"><Textarea rows={2} value={form.observacoes} onChange={e=>update("observacoes",e.target.value)}/></Field></div><div className="md:col-span-2 xl:col-span-4 flex flex-wrap justify-between items-center gap-3 border-t pt-3"><p className="text-sm text-muted-foreground">Custo do milheiro: <strong className="text-foreground">{brl(custoMilheiro(num(form.valorTotal),num(form.quantidade)))}</strong></p><div className="flex gap-2">{editingLote&&<Button type="button" variant="outline" onClick={reset}><X className="size-4 mr-2"/>Cancelar</Button>}<Button disabled={saving}><Save className="size-4 mr-2"/>{editingLote?"Salvar alterações":"Registrar compra"}</Button></div></div></form></CardContent></Card>
+  <Tabs defaultValue="lotes"><TabsList><TabsTrigger value="lotes">Lotes</TabsTrigger><TabsTrigger value="historico">Histórico</TabsTrigger><TabsTrigger value="transferencias">Transferências</TabsTrigger></TabsList>
+   <TabsContent value="lotes"><Card><CardHeader><CardTitle className="text-lg">Estoque por lote · FIFO</CardTitle></CardHeader><CardContent className="p-0"><ScrollTable headers={["Entrada","Lote","Programa","Origem","Original","Utilizado","Disponível","Custo total","Custo/milheiro","Ações"]}>{lotes.map(l=><TableRow key={l.id}><TableCell>{dateBr(l.dataEntrada)}</TableCell><TableCell className="font-mono text-xs">{l.id.slice(0,8)}</TableCell><TableCell className="font-medium">{l.programa}</TableCell><TableCell><Badge variant="secondary">{l.origem==="transferencia"?"Transferência":"Compra"}</Badge></TableCell><TableCell>{formatPontos(l.quantidadeOriginal)}</TableCell><TableCell>{formatPontos(l.quantidadeUtilizada)}</TableCell><TableCell className="font-semibold">{formatPontos(l.quantidadeDisponivel)}</TableCell><TableCell>{brl(l.custoTotal)}</TableCell><TableCell>{brl(l.custoMilheiro)}</TableCell><TableCell><div className="flex">{l.origem==="compra"&&<><Button variant="ghost" size="icon" title="Editar" disabled={l.quantidadeUtilizada>0} onClick={()=>edit(l)}><Pencil className="size-4"/></Button><Button variant="ghost" size="icon" title="Excluir" disabled={l.quantidadeUtilizada>0} onClick={()=>remove(l)}><Trash2 className="size-4"/></Button></>}</div></TableCell></TableRow>)}</ScrollTable></CardContent></Card></TabsContent>
+   <TabsContent value="historico"><Card><CardHeader className="flex flex-col lg:flex-row lg:items-center justify-between gap-4"><CardTitle className="text-lg">Histórico de movimentações</CardTitle><div className="flex flex-wrap gap-2"><Select value={filtroPrograma} onValueChange={setFiltroPrograma}><SelectTrigger className="w-[180px]"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="todos">Todos os programas</SelectItem>{resumo.resumos.map(r=><SelectItem value={r.programa} key={r.programa}>{r.programa}</SelectItem>)}</SelectContent></Select><Input type="date" value={filtroInicio} onChange={e=>setFiltroInicio(e.target.value)}/><Input type="date" value={filtroFim} onChange={e=>setFiltroFim(e.target.value)}/></div></CardHeader><CardContent className="p-0"><ScrollTable headers={["Data","Programa","Movimentação","Quantidade","Custo","Custo/milheiro","Cotação"]}>{filtered.map(m=>{const entrada=["compra","estorno","transferencia_entrada"].includes(m.tipo);const cot=m.cotacaoId?cotacoes.find(c=>c.id===m.cotacaoId):undefined;return <TableRow key={m.id}><TableCell>{dateBr(m.data)}</TableCell><TableCell className="font-medium">{m.programa}</TableCell><TableCell><Badge variant={m.tipo==="compra"?"default":"secondary"}>{MILHAS_TIPO_LABELS[m.tipo as MilhasTipo]??m.tipo}</Badge></TableCell><TableCell className={entrada?"text-emerald-600":"text-destructive"}>{entrada?"+":"-"}{formatPontos(m.quantidade)}</TableCell><TableCell>{brl(m.valorTotal)}</TableCell><TableCell>{brl(custoMilheiro(m.valorTotal,m.quantidade))}</TableCell><TableCell>{cot?`#${cot.code}`:"—"}</TableCell></TableRow>})}</ScrollTable></CardContent></Card></TabsContent>
+   <TabsContent value="transferencias"><Card><CardHeader><CardTitle className="text-lg">Transferências entre programas</CardTitle></CardHeader><CardContent className="p-0"><ScrollTable headers={["Data","Origem","Destino","Enviado","Bônus","Recebido","Custo transferido","Taxas","Custo destino","Milheiro destino"]}>{transferencias.map(t=><TableRow key={t.id}><TableCell>{dateBr(t.data)}</TableCell><TableCell>{t.programaOrigem}</TableCell><TableCell>{t.programaDestino}</TableCell><TableCell>{formatPontos(t.quantidadeTransferida)}</TableCell><TableCell>{t.percentualBonus}% (+{formatPontos(t.quantidadeBonus)})</TableCell><TableCell className="font-semibold">{formatPontos(t.quantidadeRecebida)}</TableCell><TableCell>{brl(t.custoTransferido)}</TableCell><TableCell>{brl(t.taxas)}</TableCell><TableCell>{brl(t.custoTotalDestino)}</TableCell><TableCell>{brl(t.custoMilheiroDestino)}</TableCell></TableRow>)}</ScrollTable></CardContent></Card></TabsContent>
+  </Tabs>
+ </main></div>
+ <Dialog open={transferOpen} onOpenChange={setTransferOpen}><DialogContent className="max-w-2xl"><DialogHeader><DialogTitle>Transferir pontos ou milhas</DialogTitle></DialogHeader><div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><Field label="Data"><Input type="date" value={transfer.data} onChange={e=>setTransfer(c=>({...c,data:e.target.value}))}/></Field><div/><Field label="Programa de origem"><ProgramSelect value={transfer.programaOrigem} onChange={v=>setTransfer(c=>({...c,programaOrigem:v}))}/></Field><Field label="Programa de destino"><ProgramSelect value={transfer.programaDestino} onChange={v=>setTransfer(c=>({...c,programaDestino:v}))}/></Field><Field label="Quantidade transferida"><Input value={transfer.quantidade} onChange={e=>setTransfer(c=>({...c,quantidade:e.target.value}))}/></Field><Field label="Bonificação (%)"><Input value={transfer.bonus} onChange={e=>setTransfer(c=>({...c,bonus:e.target.value}))}/></Field><Field label="Taxas adicionais (R$)"><Input value={transfer.taxas} onChange={e=>setTransfer(c=>({...c,taxas:e.target.value}))}/></Field><div className="rounded-lg bg-muted p-3 text-sm"><p>Bônus: <strong>{formatPontos(qBonus)}</strong></p><p>Total recebido: <strong>{formatPontos(qRecebida)}</strong></p></div><div className="sm:col-span-2"><Field label="Observações"><Textarea value={transfer.observacoes} onChange={e=>setTransfer(c=>({...c,observacoes:e.target.value}))}/></Field></div></div><p className="text-xs text-muted-foreground">O custo dos lotes de origem será baixado por FIFO. As taxas serão incorporadas ao custo do novo lote de destino.</p><DialogFooter><Button variant="outline" onClick={()=>setTransferOpen(false)}>Cancelar</Button><Button disabled={saving} onClick={submitTransfer}><ArrowRightLeft className="size-4 mr-2"/>Confirmar transferência</Button></DialogFooter></DialogContent></Dialog>
+ </div>;
 }
-
-function MilhasPontosPage() {
-  const movimentos = useMilhasMovimentos();
-  const cotacoes = useCotacoes();
-  const [form, setForm] = useState<FormState>(emptyForm);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [filtroPrograma, setFiltroPrograma] = useState("todos");
-  const [filtroInicio, setFiltroInicio] = useState("");
-  const [filtroFim, setFiltroFim] = useState("");
-
-  const resumo = useMemo(() => resumoGeral(movimentos), [movimentos]);
-  const filtered = useMemo(() => movimentos.filter((m) => {
-    if (filtroPrograma !== "todos" && m.programa !== filtroPrograma) return false;
-    if (filtroInicio && m.data < filtroInicio) return false;
-    if (filtroFim && m.data > filtroFim) return false;
-    return true;
-  }), [movimentos, filtroPrograma, filtroInicio, filtroFim]);
-
-  const update = (key: keyof FormState, value: string) => setForm((current) => ({ ...current, [key]: value }));
-  const reset = () => { setForm(emptyForm()); setEditingId(null); };
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const quantidade = Math.round(Number(form.quantidade.replace(/\./g, "").replace(",", ".")) || 0);
-    const valorTotal = Number(form.valorTotal.replace(/\./g, "").replace(",", ".")) || 0;
-    if (quantidade <= 0) { toast.error("Informe uma quantidade maior que zero."); return; }
-    const result = await saveMilhaMovimento({
-      id: editingId ?? crypto.randomUUID(), data: form.data, programa: form.programa,
-      tipo: "compra", quantidade, valorTotal, banco: form.banco, formaPagamento: form.formaPagamento,
-      cartao: form.cartao, parcelas: Math.max(1, Number(form.parcelas) || 1), observacoes: form.observacoes,
-    });
-    if (!result) { toast.error("Não foi possível salvar a compra."); return; }
-    toast.success(editingId ? "Compra atualizada." : "Compra registrada.");
-    reset();
-  };
-
-  const edit = (movement: MilhaMovimento) => {
-    setEditingId(movement.id);
-    setForm({
-      data: movement.data, programa: movement.programa, quantidade: String(movement.quantidade),
-      valorTotal: String(movement.valorTotal), banco: movement.banco ?? "", formaPagamento: movement.formaPagamento ?? "",
-      cartao: movement.cartao ?? "", parcelas: String(movement.parcelas ?? 1), observacoes: movement.observacoes ?? "",
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const remove = async (movement: MilhaMovimento) => {
-    if (movement.tipo !== "compra") { toast.error("Utilizações e estornos são gerenciados pela cotação."); return; }
-    if (!confirm("Excluir esta compra de milhas?")) return;
-    await deleteMilhaMovimento(movement.id);
-    toast.success("Compra excluída.");
-  };
-
-  return (
-    <div className="min-h-screen bg-background flex">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Topbar />
-        <main className="p-6 space-y-6 max-w-[1600px] w-full mx-auto">
-          <div>
-            <p className="text-sm text-muted-foreground">Financeiro</p>
-            <h1 className="text-2xl font-semibold text-foreground">Milhas e Pontos</h1>
-            <p className="text-sm text-muted-foreground mt-1">Acompanhe o estoque e o custo real das suas compras de pontos.</p>
-          </div>
-
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-            <Metric icon={<Wallet className="size-4" />} label="Pontos disponíveis" value={formatPontos(resumo.saldo)} />
-            <Metric icon={<Landmark className="size-4" />} label="Total investido" value={brl(resumo.investido)} />
-            <Metric icon={<CreditCard className="size-4" />} label="Custo médio / milheiro" value={brl(resumo.custoMedioMilheiro)} />
-            <Metric icon={<Plus className="size-4" />} label="Quantidade de compras" value={String(resumo.compras)} />
-          </div>
-
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            {resumo.resumos.map((item) => (
-              <Card key={item.programa} className="border-border/60">
-                <CardHeader className="pb-2"><CardTitle className="text-sm font-semibold">{item.programa}</CardTitle></CardHeader>
-                <CardContent className="space-y-1">
-                  <p className="text-xl font-bold text-foreground">{formatPontos(item.saldo)}</p>
-                  <p className="text-xs text-muted-foreground">saldo disponível</p>
-                  <div className="pt-2 text-xs text-muted-foreground flex justify-between"><span>Investido</span><strong className="text-foreground">{brl(item.investido)}</strong></div>
-                  <div className="text-xs text-muted-foreground flex justify-between"><span>Milheiro</span><strong className="text-foreground">{brl(item.custoMedioMilheiro)}</strong></div>
-                </CardContent>
-              </Card>
-            ))}
-          </section>
-
-          <Card className="border-border/60">
-            <CardHeader><CardTitle className="text-lg">{editingId ? "Editar compra" : "Registrar compra de pontos ou milhas"}</CardTitle></CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                <Field label="Data"><Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} required /></Field>
-                <Field label="Programa"><Select value={form.programa} onValueChange={(v) => update("programa", v)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{PROGRAMAS_MILHAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent></Select></Field>
-                <Field label="Quantidade de pontos/milhas"><Input inputMode="numeric" placeholder="78.000" value={form.quantidade} onChange={(e) => update("quantidade", e.target.value)} required /></Field>
-                <Field label="Valor total pago (R$)"><Input inputMode="decimal" placeholder="2.354,36" value={form.valorTotal} onChange={(e) => update("valorTotal", e.target.value)} required /></Field>
-                <Field label="Banco"><Input value={form.banco} onChange={(e) => update("banco", e.target.value)} /></Field>
-                <Field label="Forma de pagamento"><Input placeholder="PIX, cartão, boleto..." value={form.formaPagamento} onChange={(e) => update("formaPagamento", e.target.value)} /></Field>
-                <Field label="Cartão"><Input value={form.cartao} onChange={(e) => update("cartao", e.target.value)} /></Field>
-                <Field label="Parcelas"><Input type="number" min="1" value={form.parcelas} onChange={(e) => update("parcelas", e.target.value)} /></Field>
-                <div className="md:col-span-2 xl:col-span-4"><Field label="Observações"><Textarea rows={2} value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} /></Field></div>
-                <div className="md:col-span-2 xl:col-span-4 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/60">
-                  <p className="text-sm text-muted-foreground">Custo do milheiro: <strong className="text-foreground">{brl(custoMilheiro(Number(form.valorTotal.replace(/\./g, "").replace(",", ".")) || 0, Number(form.quantidade.replace(/\./g, "").replace(",", ".")) || 0))}</strong></p>
-                  <div className="flex gap-2"><Button type="button" variant="outline" onClick={reset} className={editingId ? "" : "hidden"}><X className="size-4 mr-2" />Cancelar</Button><Button type="submit"><Save className="size-4 mr-2" />{editingId ? "Salvar alterações" : "Registrar compra"}</Button></div>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/60">
-            <CardHeader className="flex flex-col lg:flex-row lg:items-center justify-between gap-4"><CardTitle className="text-lg">Histórico de movimentações</CardTitle><div className="flex flex-wrap gap-2"><Select value={filtroPrograma} onValueChange={setFiltroPrograma}><SelectTrigger className="w-[170px]"><SelectValue placeholder="Todos os programas" /></SelectTrigger><SelectContent><SelectItem value="todos">Todos os programas</SelectItem>{resumo.resumos.map((r) => <SelectItem key={r.programa} value={r.programa}>{r.programa}</SelectItem>)}</SelectContent></Select><Input type="date" aria-label="Data inicial" value={filtroInicio} onChange={(e) => setFiltroInicio(e.target.value)} /><Input type="date" aria-label="Data final" value={filtroFim} onChange={(e) => setFiltroFim(e.target.value)} /></div></CardHeader>
-            <CardContent className="p-0"><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Programa</TableHead><TableHead>Movimentação</TableHead><TableHead>Quantidade</TableHead><TableHead>Valor</TableHead><TableHead>Custo/milheiro</TableHead><TableHead>Banco</TableHead><TableHead>Pagamento</TableHead><TableHead>Cotação</TableHead><TableHead className="text-right">Ações</TableHead></TableRow></TableHeader><TableBody>{filtered.length === 0 ? <TableRow><TableCell colSpan={10} className="text-center text-muted-foreground py-10">Nenhuma movimentação encontrada.</TableCell></TableRow> : filtered.map((m) => { const cot = m.cotacaoId ? cotacoes.find((c) => c.id === m.cotacaoId) : undefined; const signed = m.tipo === "compra" || m.tipo === "estorno" ? m.quantidade : -m.quantidade; return <TableRow key={m.id}><TableCell>{new Date(`${m.data}T12:00:00`).toLocaleDateString("pt-BR")}</TableCell><TableCell className="font-medium">{m.programa}</TableCell><TableCell><Badge variant={m.tipo === "compra" ? "default" : "secondary"}>{MILHAS_TIPO_LABELS[m.tipo as MilhasTipo]}</Badge></TableCell><TableCell className={signed < 0 ? "text-destructive" : "text-emerald-600"}>{signed > 0 ? "+" : ""}{formatPontos(signed)}</TableCell><TableCell>{brl(m.valorTotal)}</TableCell><TableCell>{m.tipo === "compra" ? brl(custoMilheiro(m.valorTotal, m.quantidade)) : brl(custoMilheiro(m.valorTotal, m.quantidade))}</TableCell><TableCell>{m.banco || "—"}</TableCell><TableCell>{m.formaPagamento || "—"}</TableCell><TableCell>{cot ? `#${cot.code}` : "—"}</TableCell><TableCell className="text-right"><div className="flex justify-end gap-1">{m.tipo === "compra" && <><Button variant="ghost" size="icon" title="Editar compra" onClick={() => edit(m)}><Pencil className="size-4" /></Button><Button variant="ghost" size="icon" title="Excluir compra" onClick={() => remove(m)}><Trash2 className="size-4" /></Button></>}</div></TableCell></TableRow> })}</TableBody></Table></div></CardContent>
-          </Card>
-        </main>
-      </div>
-    </div>
-  );
-}
-
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) { return <Card className="border-border/60"><CardContent className="p-4"><div className="flex items-center gap-2 text-muted-foreground text-xs"><span className="text-primary">{icon}</span>{label}</div><p className="text-xl font-bold text-foreground mt-2 truncate">{value}</p></CardContent></Card>; }
-function Field({ label, children }: { label: string; children: React.ReactNode }) { return <div className="space-y-2"><Label>{label}</Label>{children}</div>; }
+function ProgramSelect({value,onChange}:{value:string;onChange:(v:string)=>void}){return <Select value={value} onValueChange={onChange}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent>{PROGRAMAS_MILHAS.map(p=><SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent></Select>}
+function ScrollTable({headers,children}:{headers:string[];children:React.ReactNode}){return <div className="overflow-x-auto"><Table><TableHeader><TableRow>{headers.map(h=><TableHead key={h}>{h}</TableHead>)}</TableRow></TableHeader><TableBody>{children}</TableBody></Table></div>}
+function Metric({icon,label,value}:{icon:React.ReactNode;label:string;value:string}){return <Card><CardContent className="p-4"><div className="flex gap-2 text-xs text-muted-foreground"><span className="text-primary">{icon}</span>{label}</div><p className="text-xl font-bold mt-2 truncate">{value}</p></CardContent></Card>}
+function Field({label,children}:{label:string;children:React.ReactNode}){return <div className="space-y-2"><Label>{label}</Label>{children}</div>}
