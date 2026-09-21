@@ -1,9 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { invalidateSharedTable, useSharedTable } from "@/lib/cotacoes-store";
-import {
-  excluirCompraMilhasFn, registrarTransferenciaMilhasFn, salvarCompraMilhasFn,
-  sincronizarCotacaoMilhasFn, type CompraMilhasInput, type TransferenciaMilhasInput,
-} from "@/lib/milhas.functions";
+import { useSharedTable } from "@/lib/cotacoes-store";
 
 export const PROGRAMAS_MILHAS = ["Livelo", "LATAM Pass", "Smiles", "Azul Fidelidade", "Iberia Plus"] as const;
 export type ProgramaMilhas = (typeof PROGRAMAS_MILHAS)[number] | string;
@@ -27,11 +23,6 @@ export async function fetchMilhasTransferencias(){ const {data,error}=await supa
 export const useMilhasMovimentos=()=>useSharedTable<MilhaMovimento>("milhas_movimentos","milhas_movimentos",fetchMilhasMovimentos);
 export const useMilhasLotes=()=>useSharedTable<MilhaLote>("milhas_lotes","milhas_lotes",fetchMilhasLotes);
 export const useMilhasTransferencias=()=>useSharedTable<MilhaTransferencia>("milhas_transferencias","milhas_transferencias",fetchMilhasTransferencias);
-function refresh(){ ["milhas_movimentos","milhas_lotes","milhas_transferencias"].forEach(invalidateSharedTable); }
-export async function salvarCompraMilhas(input:CompraMilhasInput){ const result=await salvarCompraMilhasFn({data:input}); refresh(); return result; }
-export async function excluirCompraMilhas(loteId:string){ const result=await excluirCompraMilhasFn({data:{loteId}}); refresh(); return result; }
-export async function registrarTransferenciaMilhas(input:TransferenciaMilhasInput){ const result=await registrarTransferenciaMilhasFn({data:input}); refresh(); return result; }
-
 export function custoMilheiro(valorTotal:number, quantidade:number){ return quantidade ? valorTotal/quantidade*1000 : 0; }
 export type ResumoPrograma={ programa:ProgramaMilhas; saldo:number; pontosComprados:number; investido:number; custoMedioMilheiro:number; compras:number; utilizados:number };
 export function resumoPorProgramaLotes(lotes:MilhaLote[],programa:ProgramaMilhas):ResumoPrograma { const items=lotes.filter(l=>l.programa===programa); const saldo=items.reduce((s,l)=>s+l.quantidadeDisponivel,0); const investido=items.reduce((s,l)=>s+(l.quantidadeDisponivel/1000*l.custoMilheiro),0); return {programa,saldo,pontosComprados:items.reduce((s,l)=>s+l.quantidadeOriginal,0),investido,custoMedioMilheiro:custoMilheiro(investido,saldo),compras:items.filter(l=>l.origem==="compra").length,utilizados:items.reduce((s,l)=>s+l.quantidadeUtilizada,0)}; }
@@ -41,5 +32,3 @@ export function resumoPorPrograma(movs:MilhaMovimento[],programa:ProgramaMilhas)
 export function resumoGeral(movs:MilhaMovimento[]){ const resumos=Array.from(new Set<string>([...PROGRAMAS_MILHAS,...movs.map(m=>m.programa)])).map(p=>resumoPorPrograma(movs,p)); const saldo=resumos.reduce((s,r)=>s+r.saldo,0),investido=resumos.reduce((s,r)=>s+r.investido,0),pontos=resumos.reduce((s,r)=>s+r.pontosComprados,0); return {resumos,saldo,investido,compras:resumos.reduce((s,r)=>s+r.compras,0),custoMedioMilheiro:custoMilheiro(investido,pontos)}; }
 export const formatPontos=(n:number)=>Math.round(n).toLocaleString("pt-BR");
 
-export type MilhasCotacaoInfo={cotacaoId:string;usarMilhas:boolean;programa?:string;quantidade?:number;confirmada:boolean};
-export async function sincronizarMilhasCotacao(info:MilhasCotacaoInfo):Promise<{changed:boolean;aviso?:string}>{ try { const result=await sincronizarCotacaoMilhasFn({data:{cotacaoId:info.cotacaoId,ativa:info.confirmada&&info.usarMilhas,programa:info.programa,quantidade:info.quantidade}}); refresh(); return result; } catch(error){ const message=error instanceof Error?error.message:String(error); if(/saldo insuficiente/i.test(message)) return {changed:false,aviso:message}; throw error; } }
