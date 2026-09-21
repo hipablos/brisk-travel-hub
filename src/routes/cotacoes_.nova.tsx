@@ -28,7 +28,7 @@ import {
   useTermosModelos,
   type CotacaoStatus, type Cotacao, type ValorCusto, type ValorVenda, type VendaLinha,
 } from "@/lib/cotacoes-store";
-import { PROGRAMAS_MILHAS } from "@/lib/milhas-store";
+import { PROGRAMAS_MILHAS, formatPontos, useMilhasLotes } from "@/lib/milhas-store";
 
 import { FlightCard, novoVoo, type Voo } from "@/components/cotacoes/FlightCard";
 import { ClienteAutocomplete } from "@/components/cotacoes/ClienteAutocomplete";
@@ -146,6 +146,9 @@ function NovaCotacao() {
   const [milhasProprias, setMilhasProprias] = useState(false);
   const [milhasPrograma, setMilhasPrograma] = useState<string>(PROGRAMAS_MILHAS[0]);
   const [milhasQuantidade, setMilhasQuantidade] = useState("");
+  const [milhasLoteId, setMilhasLoteId] = useState("");
+  const [milhasValorVendaMilheiro, setMilhasValorVendaMilheiro] = useState("");
+  const milhasLotes = useMilhasLotes();
 
   // Tipo de documento (Orçamento x Venda) — controla a aba ativa
   const [activeTab, setActiveTab] = useState<"orcamento" | "venda">("orcamento");
@@ -203,6 +206,8 @@ function NovaCotacao() {
       setMilhasProprias(c.milhasProprias ?? false);
       setMilhasPrograma(c.milhasPrograma ?? PROGRAMAS_MILHAS[0]);
       setMilhasQuantidade(c.milhasQuantidade ? String(c.milhasQuantidade) : "");
+      setMilhasLoteId(c.milhasLoteId ?? "");
+      setMilhasValorVendaMilheiro(c.milhasValorVendaMilheiro ? String(c.milhasValorVendaMilheiro) : "");
       const idasArr = ((c as any).vooIdas as Voo[] | undefined) ?? (c.vooIda ? [c.vooIda as Voo] : [novoVoo()]);
       const voltasArr = ((c as any).vooVoltas as Voo[] | undefined) ?? (c.vooVolta ? [c.vooVolta as Voo] : []);
       setVooIdas(idasArr.length ? idasArr : [novoVoo()]);
@@ -342,6 +347,8 @@ function NovaCotacao() {
       milhasProprias,
       milhasPrograma: milhasProprias ? milhasPrograma : undefined,
       milhasQuantidade: milhasProprias ? Math.max(0, Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0) : undefined,
+      milhasLoteId: milhasProprias ? milhasLoteId || undefined : undefined,
+      milhasValorVendaMilheiro: milhasProprias ? Math.max(0, Number(milhasValorVendaMilheiro.replace(/\./g, "").replace(",", ".")) || 0) : undefined,
     };
   };
 
@@ -399,6 +406,18 @@ function NovaCotacao() {
 
   const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    const quantidadeMilhas = Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0;
+    if (milhasProprias && (!milhasLoteId || quantidadeMilhas <= 0)) {
+      toast.error("Escolha o lote e informe a quantidade de milhas.");
+      return;
+    }
+    const loteSelecionado = milhasLotes.find((l) => l.id === milhasLoteId);
+    const quantidadeDisponivel = (loteSelecionado?.quantidadeDisponivel ?? 0) +
+      (editing && loteSelecionado ? Math.max(0, Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0) : 0);
+    if (milhasProprias && loteSelecionado && quantidadeMilhas > quantidadeDisponivel) {
+      toast.error("A quantidade informada é maior que o saldo disponível no lote.");
+      return;
+    }
     const cotacao = await buildCotacao();
     if (!cotacao) return;
     const saved = await saveCotacao(cotacao);
@@ -682,8 +701,11 @@ function NovaCotacao() {
                 </div>
                 {milhasProprias && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label>Programa de milhas</Label><Select value={milhasPrograma} onValueChange={setMilhasPrograma}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{PROGRAMAS_MILHAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-2"><Label>Programa de milhas</Label><Select value={milhasPrograma} onValueChange={(value) => { setMilhasPrograma(value); setMilhasLoteId(""); }}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{PROGRAMAS_MILHAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent></Select></div>
                     <div className="space-y-2"><Label>Quantidade utilizada</Label><Input inputMode="numeric" placeholder="10.000" value={milhasQuantidade} onChange={(e) => setMilhasQuantidade(e.target.value)} /></div>
+                    <div className="space-y-2 md:col-span-2"><Label>Lote utilizado</Label><Select value={milhasLoteId} onValueChange={setMilhasLoteId}><SelectTrigger><SelectValue placeholder="Escolha o lote" /></SelectTrigger><SelectContent>{milhasLotes.filter((l) => l.programa === milhasPrograma && (l.quantidadeDisponivel > 0 || l.id === milhasLoteId)).map((l) => <SelectItem key={l.id} value={l.id}>Lote {l.id.slice(0, 8)} · {formatPontos(l.quantidadeDisponivel)} disponíveis · custo {formatBRL(l.custoMilheiro)}/milheiro</SelectItem>)}</SelectContent></Select></div>
+                    <div className="space-y-2"><Label>Valor de venda do milheiro (R$)</Label><Input inputMode="decimal" placeholder="45,00" value={milhasValorVendaMilheiro} onChange={(e) => setMilhasValorVendaMilheiro(e.target.value)} /></div>
+                    <div className="rounded-md border border-border bg-muted/40 p-3 text-sm"><p className="text-muted-foreground">Venda prevista</p><p className="font-semibold text-foreground">R$ {formatBRL((Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0) / 1000 * (Number(milhasValorVendaMilheiro.replace(/\./g, "").replace(",", ".")) || 0))}</p>{milhasLoteId && <p className="mt-1 text-xs text-muted-foreground">Custo estimado: R$ {formatBRL((Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0) / 1000 * (milhasLotes.find((l) => l.id === milhasLoteId)?.custoMilheiro ?? 0))}</p>}</div>
                   </div>
                 )}
               </section>
