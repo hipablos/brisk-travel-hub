@@ -9,3 +9,4 @@
 - [x] Corrigir baixa automática de milhas por cotação, incluir lote e valor de venda do milheiro, previsões financeiras e manutenção segura do histórico
   - [x] Criar regras de baixa por lote e correção segura no banco
   - [x] Conectar os campos e ações nas telas
+- [x] Disponibilizar edição e exclusão diretamente em todos os lançamentos editáveis do histórico de Milhas e Pontos
