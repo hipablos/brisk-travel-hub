@@ -232,6 +232,7 @@ export type Cotacao = {
   milhasQuantidade?: number;
   milhasLoteId?: string;
   milhasValorVendaMilheiro?: number;
+  valorIndividual?: number;
 };
 
 export const DEFAULT_TERMOS = `• Esta proposta é válida apenas para a data e horário indicados, sujeita à confirmação de disponibilidade e preço no momento da emissão.

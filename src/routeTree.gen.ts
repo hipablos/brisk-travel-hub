@@ -9,86 +9,36 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VoosRouteImport } from './routes/voos'
-import { Route as TermosCondicoesRouteImport } from './routes/termos-condicoes'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as PerfilRouteImport } from './routes/perfil'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as IntegracoesRouteImport } from './routes/integracoes'
-import { Route as HospedagensRouteImport } from './routes/hospedagens'
-import { Route as FormasPagamentoRouteImport } from './routes/formas-pagamento'
-import { Route as ExperienciasRouteImport } from './routes/experiencias'
-import { Route as CotacoesRouteImport } from './routes/cotacoes'
-import { Route as ClientesRouteImport } from './routes/clientes'
-import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ReservaIdRouteImport } from './routes/reserva_.$id'
-import { Route as ReservaEditarIdRouteImport } from './routes/reserva-editar_.$id'
-import { Route as IntegracoesTelegramRouteImport } from './routes/integracoes_.telegram'
-import { Route as FinanceiroVendasRouteImport } from './routes/financeiro_.vendas'
-import { Route as FinanceiroMilhasPontosRouteImport } from './routes/financeiro_.milhas-pontos'
-import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
-import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
-import { Route as ConfiguracoesMarcaRouteImport } from './routes/configuracoes.marca'
-import { Route as ConfiguracoesLayoutLoginRouteImport } from './routes/configuracoes.layout-login'
+import { Route as CalendarioRouteImport } from './routes/calendario'
+import { Route as ClientesRouteImport } from './routes/clientes'
+import { Route as CotacoesRouteImport } from './routes/cotacoes'
+import { Route as ExperienciasRouteImport } from './routes/experiencias'
+import { Route as FormasPagamentoRouteImport } from './routes/formas-pagamento'
+import { Route as HospedagensRouteImport } from './routes/hospedagens'
+import { Route as IntegracoesRouteImport } from './routes/integracoes'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as TermosCondicoesRouteImport } from './routes/termos-condicoes'
+import { Route as VoosRouteImport } from './routes/voos'
 import { Route as ClientesNovoRouteImport } from './routes/clientes_.novo'
-import { Route as ApiPublicHooksTelegramProcessarAlertasRouteImport } from './routes/api/public/hooks/telegram-processar-alertas'
-import { Route as ApiPublicHooksTelegramCheckinRouteImport } from './routes/api/public/hooks/telegram-checkin'
+import { Route as ConfiguracoesLayoutLoginRouteImport } from './routes/configuracoes.layout-login'
+import { Route as ConfiguracoesMarcaRouteImport } from './routes/configuracoes.marca'
+import { Route as CotacoesIdRouteImport } from './routes/cotacoes_.$id'
+import { Route as CotacoesNovaRouteImport } from './routes/cotacoes_.nova'
+import { Route as FinanceiroMilhasPontosRouteImport } from './routes/financeiro_.milhas-pontos'
+import { Route as FinanceiroVendasRouteImport } from './routes/financeiro_.vendas'
+import { Route as IntegracoesTelegramRouteImport } from './routes/integracoes_.telegram'
+import { Route as ReservaEditarIdRouteImport } from './routes/reserva-editar_.$id'
+import { Route as ReservaIdRouteImport } from './routes/reserva_.$id'
 import { Route as ApiPublicHooksCalendarioNotificarRouteImport } from './routes/api/public/hooks/calendario-notificar'
+import { Route as ApiPublicHooksTelegramCheckinRouteImport } from './routes/api/public/hooks/telegram-checkin'
+import { Route as ApiPublicHooksTelegramProcessarAlertasRouteImport } from './routes/api/public/hooks/telegram-processar-alertas'
 
-const VoosRoute = VoosRouteImport.update({
-  id: '/voos',
-  path: '/voos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermosCondicoesRoute = TermosCondicoesRouteImport.update({
-  id: '/termos-condicoes',
-  path: '/termos-condicoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PerfilRoute = PerfilRouteImport.update({
-  id: '/perfil',
-  path: '/perfil',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IntegracoesRoute = IntegracoesRouteImport.update({
-  id: '/integracoes',
-  path: '/integracoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HospedagensRoute = HospedagensRouteImport.update({
-  id: '/hospedagens',
-  path: '/hospedagens',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FormasPagamentoRoute = FormasPagamentoRouteImport.update({
-  id: '/formas-pagamento',
-  path: '/formas-pagamento',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExperienciasRoute = ExperienciasRouteImport.update({
-  id: '/experiencias',
-  path: '/experiencias',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CotacoesRoute = CotacoesRouteImport.update({
-  id: '/cotacoes',
-  path: '/cotacoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClientesRoute = ClientesRouteImport.update({
-  id: '/clientes',
-  path: '/clientes',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CalendarioRoute = CalendarioRouteImport.update({
@@ -96,49 +46,64 @@ const CalendarioRoute = CalendarioRouteImport.update({
   path: '/calendario',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ClientesRoute = ClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReservaIdRoute = ReservaIdRouteImport.update({
-  id: '/reserva_/$id',
-  path: '/reserva/$id',
+const CotacoesRoute = CotacoesRouteImport.update({
+  id: '/cotacoes',
+  path: '/cotacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReservaEditarIdRoute = ReservaEditarIdRouteImport.update({
-  id: '/reserva-editar_/$id',
-  path: '/reserva-editar/$id',
+const ExperienciasRoute = ExperienciasRouteImport.update({
+  id: '/experiencias',
+  path: '/experiencias',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IntegracoesTelegramRoute = IntegracoesTelegramRouteImport.update({
-  id: '/integracoes_/telegram',
-  path: '/integracoes/telegram',
+const FormasPagamentoRoute = FormasPagamentoRouteImport.update({
+  id: '/formas-pagamento',
+  path: '/formas-pagamento',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FinanceiroVendasRoute = FinanceiroVendasRouteImport.update({
-  id: '/financeiro_/vendas',
-  path: '/financeiro/vendas',
+const HospedagensRoute = HospedagensRouteImport.update({
+  id: '/hospedagens',
+  path: '/hospedagens',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FinanceiroMilhasPontosRoute = FinanceiroMilhasPontosRouteImport.update({
-  id: '/financeiro_/milhas-pontos',
-  path: '/financeiro/milhas-pontos',
+const IntegracoesRoute = IntegracoesRouteImport.update({
+  id: '/integracoes',
+  path: '/integracoes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CotacoesNovaRoute = CotacoesNovaRouteImport.update({
-  id: '/cotacoes_/nova',
-  path: '/cotacoes/nova',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CotacoesIdRoute = CotacoesIdRouteImport.update({
-  id: '/cotacoes_/$id',
-  path: '/cotacoes/$id',
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConfiguracoesMarcaRoute = ConfiguracoesMarcaRouteImport.update({
-  id: '/configuracoes/marca',
-  path: '/configuracoes/marca',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosCondicoesRoute = TermosCondicoesRouteImport.update({
+  id: '/termos-condicoes',
+  path: '/termos-condicoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VoosRoute = VoosRouteImport.update({
+  id: '/voos',
+  path: '/voos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientesNovoRoute = ClientesNovoRouteImport.update({
+  id: '/clientes_/novo',
+  path: '/clientes/novo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConfiguracoesLayoutLoginRoute =
@@ -147,15 +112,50 @@ const ConfiguracoesLayoutLoginRoute =
     path: '/configuracoes/layout-login',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ClientesNovoRoute = ClientesNovoRouteImport.update({
-  id: '/clientes_/novo',
-  path: '/clientes/novo',
+const ConfiguracoesMarcaRoute = ConfiguracoesMarcaRouteImport.update({
+  id: '/configuracoes/marca',
+  path: '/configuracoes/marca',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHooksTelegramProcessarAlertasRoute =
-  ApiPublicHooksTelegramProcessarAlertasRouteImport.update({
-    id: '/api/public/hooks/telegram-processar-alertas',
-    path: '/api/public/hooks/telegram-processar-alertas',
+const CotacoesIdRoute = CotacoesIdRouteImport.update({
+  id: '/cotacoes_/$id',
+  path: '/cotacoes/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CotacoesNovaRoute = CotacoesNovaRouteImport.update({
+  id: '/cotacoes_/nova',
+  path: '/cotacoes/nova',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinanceiroMilhasPontosRoute = FinanceiroMilhasPontosRouteImport.update({
+  id: '/financeiro_/milhas-pontos',
+  path: '/financeiro/milhas-pontos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinanceiroVendasRoute = FinanceiroVendasRouteImport.update({
+  id: '/financeiro_/vendas',
+  path: '/financeiro/vendas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegracoesTelegramRoute = IntegracoesTelegramRouteImport.update({
+  id: '/integracoes_/telegram',
+  path: '/integracoes/telegram',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReservaEditarIdRoute = ReservaEditarIdRouteImport.update({
+  id: '/reserva-editar_/$id',
+  path: '/reserva-editar/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReservaIdRoute = ReservaIdRouteImport.update({
+  id: '/reserva_/$id',
+  path: '/reserva/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksCalendarioNotificarRoute =
+  ApiPublicHooksCalendarioNotificarRouteImport.update({
+    id: '/api/public/hooks/calendario-notificar',
+    path: '/api/public/hooks/calendario-notificar',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksTelegramCheckinRoute =
@@ -164,10 +164,10 @@ const ApiPublicHooksTelegramCheckinRoute =
     path: '/api/public/hooks/telegram-checkin',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksCalendarioNotificarRoute =
-  ApiPublicHooksCalendarioNotificarRouteImport.update({
-    id: '/api/public/hooks/calendario-notificar',
-    path: '/api/public/hooks/calendario-notificar',
+const ApiPublicHooksTelegramProcessarAlertasRoute =
+  ApiPublicHooksTelegramProcessarAlertasRouteImport.update({
+    id: '/api/public/hooks/telegram-processar-alertas',
+    path: '/api/public/hooks/telegram-processar-alertas',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -374,81 +374,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/voos': {
-      id: '/voos'
-      path: '/voos'
-      fullPath: '/voos'
-      preLoaderRoute: typeof VoosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/termos-condicoes': {
-      id: '/termos-condicoes'
-      path: '/termos-condicoes'
-      fullPath: '/termos-condicoes'
-      preLoaderRoute: typeof TermosCondicoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/perfil': {
-      id: '/perfil'
-      path: '/perfil'
-      fullPath: '/perfil'
-      preLoaderRoute: typeof PerfilRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/integracoes': {
-      id: '/integracoes'
-      path: '/integracoes'
-      fullPath: '/integracoes'
-      preLoaderRoute: typeof IntegracoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hospedagens': {
-      id: '/hospedagens'
-      path: '/hospedagens'
-      fullPath: '/hospedagens'
-      preLoaderRoute: typeof HospedagensRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/formas-pagamento': {
-      id: '/formas-pagamento'
-      path: '/formas-pagamento'
-      fullPath: '/formas-pagamento'
-      preLoaderRoute: typeof FormasPagamentoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/experiencias': {
-      id: '/experiencias'
-      path: '/experiencias'
-      fullPath: '/experiencias'
-      preLoaderRoute: typeof ExperienciasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cotacoes': {
-      id: '/cotacoes'
-      path: '/cotacoes'
-      fullPath: '/cotacoes'
-      preLoaderRoute: typeof CotacoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/clientes': {
-      id: '/clientes'
-      path: '/clientes'
-      fullPath: '/clientes'
-      preLoaderRoute: typeof ClientesRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calendario': {
@@ -458,74 +388,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalendarioRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/clientes': {
+      id: '/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof ClientesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reserva_/$id': {
-      id: '/reserva_/$id'
-      path: '/reserva/$id'
-      fullPath: '/reserva/$id'
-      preLoaderRoute: typeof ReservaIdRouteImport
+    '/cotacoes': {
+      id: '/cotacoes'
+      path: '/cotacoes'
+      fullPath: '/cotacoes'
+      preLoaderRoute: typeof CotacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reserva-editar_/$id': {
-      id: '/reserva-editar_/$id'
-      path: '/reserva-editar/$id'
-      fullPath: '/reserva-editar/$id'
-      preLoaderRoute: typeof ReservaEditarIdRouteImport
+    '/experiencias': {
+      id: '/experiencias'
+      path: '/experiencias'
+      fullPath: '/experiencias'
+      preLoaderRoute: typeof ExperienciasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/integracoes_/telegram': {
-      id: '/integracoes_/telegram'
-      path: '/integracoes/telegram'
-      fullPath: '/integracoes/telegram'
-      preLoaderRoute: typeof IntegracoesTelegramRouteImport
+    '/formas-pagamento': {
+      id: '/formas-pagamento'
+      path: '/formas-pagamento'
+      fullPath: '/formas-pagamento'
+      preLoaderRoute: typeof FormasPagamentoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/financeiro_/vendas': {
-      id: '/financeiro_/vendas'
-      path: '/financeiro/vendas'
-      fullPath: '/financeiro/vendas'
-      preLoaderRoute: typeof FinanceiroVendasRouteImport
+    '/hospedagens': {
+      id: '/hospedagens'
+      path: '/hospedagens'
+      fullPath: '/hospedagens'
+      preLoaderRoute: typeof HospedagensRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/financeiro_/milhas-pontos': {
-      id: '/financeiro_/milhas-pontos'
-      path: '/financeiro/milhas-pontos'
-      fullPath: '/financeiro/milhas-pontos'
-      preLoaderRoute: typeof FinanceiroMilhasPontosRouteImport
+    '/integracoes': {
+      id: '/integracoes'
+      path: '/integracoes'
+      fullPath: '/integracoes'
+      preLoaderRoute: typeof IntegracoesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cotacoes_/nova': {
-      id: '/cotacoes_/nova'
-      path: '/cotacoes/nova'
-      fullPath: '/cotacoes/nova'
-      preLoaderRoute: typeof CotacoesNovaRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cotacoes_/$id': {
-      id: '/cotacoes_/$id'
-      path: '/cotacoes/$id'
-      fullPath: '/cotacoes/$id'
-      preLoaderRoute: typeof CotacoesIdRouteImport
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/configuracoes/marca': {
-      id: '/configuracoes/marca'
-      path: '/configuracoes/marca'
-      fullPath: '/configuracoes/marca'
-      preLoaderRoute: typeof ConfiguracoesMarcaRouteImport
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/configuracoes/layout-login': {
-      id: '/configuracoes/layout-login'
-      path: '/configuracoes/layout-login'
-      fullPath: '/configuracoes/layout-login'
-      preLoaderRoute: typeof ConfiguracoesLayoutLoginRouteImport
+    '/termos-condicoes': {
+      id: '/termos-condicoes'
+      path: '/termos-condicoes'
+      fullPath: '/termos-condicoes'
+      preLoaderRoute: typeof TermosCondicoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/voos': {
+      id: '/voos'
+      path: '/voos'
+      fullPath: '/voos'
+      preLoaderRoute: typeof VoosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clientes_/novo': {
@@ -535,11 +472,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientesNovoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/telegram-processar-alertas': {
-      id: '/api/public/hooks/telegram-processar-alertas'
-      path: '/api/public/hooks/telegram-processar-alertas'
-      fullPath: '/api/public/hooks/telegram-processar-alertas'
-      preLoaderRoute: typeof ApiPublicHooksTelegramProcessarAlertasRouteImport
+    '/configuracoes/layout-login': {
+      id: '/configuracoes/layout-login'
+      path: '/configuracoes/layout-login'
+      fullPath: '/configuracoes/layout-login'
+      preLoaderRoute: typeof ConfiguracoesLayoutLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes/marca': {
+      id: '/configuracoes/marca'
+      path: '/configuracoes/marca'
+      fullPath: '/configuracoes/marca'
+      preLoaderRoute: typeof ConfiguracoesMarcaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cotacoes_/$id': {
+      id: '/cotacoes_/$id'
+      path: '/cotacoes/$id'
+      fullPath: '/cotacoes/$id'
+      preLoaderRoute: typeof CotacoesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cotacoes_/nova': {
+      id: '/cotacoes_/nova'
+      path: '/cotacoes/nova'
+      fullPath: '/cotacoes/nova'
+      preLoaderRoute: typeof CotacoesNovaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/financeiro_/milhas-pontos': {
+      id: '/financeiro_/milhas-pontos'
+      path: '/financeiro/milhas-pontos'
+      fullPath: '/financeiro/milhas-pontos'
+      preLoaderRoute: typeof FinanceiroMilhasPontosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/financeiro_/vendas': {
+      id: '/financeiro_/vendas'
+      path: '/financeiro/vendas'
+      fullPath: '/financeiro/vendas'
+      preLoaderRoute: typeof FinanceiroVendasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integracoes_/telegram': {
+      id: '/integracoes_/telegram'
+      path: '/integracoes/telegram'
+      fullPath: '/integracoes/telegram'
+      preLoaderRoute: typeof IntegracoesTelegramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reserva-editar_/$id': {
+      id: '/reserva-editar_/$id'
+      path: '/reserva-editar/$id'
+      fullPath: '/reserva-editar/$id'
+      preLoaderRoute: typeof ReservaEditarIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reserva_/$id': {
+      id: '/reserva_/$id'
+      path: '/reserva/$id'
+      fullPath: '/reserva/$id'
+      preLoaderRoute: typeof ReservaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/calendario-notificar': {
+      id: '/api/public/hooks/calendario-notificar'
+      path: '/api/public/hooks/calendario-notificar'
+      fullPath: '/api/public/hooks/calendario-notificar'
+      preLoaderRoute: typeof ApiPublicHooksCalendarioNotificarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/telegram-checkin': {
@@ -549,11 +549,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTelegramCheckinRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/calendario-notificar': {
-      id: '/api/public/hooks/calendario-notificar'
-      path: '/api/public/hooks/calendario-notificar'
-      fullPath: '/api/public/hooks/calendario-notificar'
-      preLoaderRoute: typeof ApiPublicHooksCalendarioNotificarRouteImport
+    '/api/public/hooks/telegram-processar-alertas': {
+      id: '/api/public/hooks/telegram-processar-alertas'
+      path: '/api/public/hooks/telegram-processar-alertas'
+      fullPath: '/api/public/hooks/telegram-processar-alertas'
+      preLoaderRoute: typeof ApiPublicHooksTelegramProcessarAlertasRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

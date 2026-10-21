@@ -89,6 +89,7 @@ function NovaCotacao() {
   const [volta, setVolta] = useState("");
   const [adultos, setAdultos] = useState(1);
   const [criancas, setCriancas] = useState(0);
+  const [valorIndividual, setValorIndividual] = useState("");
   const [termos, setTermos] = useState("");
   const [outrasInformacoes, setOutrasInformacoes] = useState("");
   const [termosModeloId, setTermosModeloId] = useState<string>("");
@@ -172,6 +173,7 @@ function NovaCotacao() {
        setVolta(c.volta ?? "");
        setAdultos(Math.max(1, c.adultos ?? 1));
        setCriancas(Math.max(0, c.criancas ?? 0));
+       setValorIndividual(c.valorIndividual ? String(c.valorIndividual) : "");
        setObservacoes(c.observacoes ?? "");
        setTermos(c.termos ?? "");
        setOutrasInformacoes(c.outrasInformacoes ?? "");
@@ -281,10 +283,15 @@ function NovaCotacao() {
     setServices((s) => s.map((x) => (x.id === id ? { ...x, ...patch } : x)));
   };
 
-  const total = useMemo(
-    () => services.reduce((sum, s) => sum + (parseFloat(s.value.replace(",", ".")) || 0), 0),
-    [services]
+  const totalPax = Math.max(1, adultos + criancas);
+  const valorIndividualNum = useMemo(
+    () => parseFloat(valorIndividual.replace(/\./g, "").replace(",", ".")) || 0,
+    [valorIndividual]
   );
+  const total = useMemo(() => {
+    if (valorIndividualNum > 0) return valorIndividualNum * totalPax;
+    return services.reduce((sum, s) => sum + (parseFloat(s.value.replace(",", ".")) || 0), 0);
+  }, [valorIndividualNum, totalPax, services]);
 
   const buildCotacao = async (): Promise<Cotacao | null> => {
     const cliente = clientes.find((c) => c.id === clienteId) ?? {
@@ -332,6 +339,7 @@ function NovaCotacao() {
       formasPagamentoIds,
       formasPagamentoValores,
       total,
+      valorIndividual: valorIndividualNum > 0 ? valorIndividualNum : undefined,
       valoresCusto,
       valoresVenda,
       vendaCustos,
@@ -1297,7 +1305,31 @@ function NovaCotacao() {
 
 
 
+                 <div className="space-y-2 mb-4">
+                  <Label>Valor individual por pessoa (R$)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 h-9 flex items-center rounded-md border border-border/40 bg-muted text-sm text-muted-foreground">R$</span>
+                    <Input
+                      inputMode="decimal"
+                      placeholder="0,00"
+                      value={valorIndividual}
+                      onChange={(e) => setValorIndividual(e.target.value)}
+                    />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    O total é calculado automaticamente: valor individual × {totalPax} passageiro{totalPax === 1 ? "" : "s"}.
+                  </p>
+                </div>
+
                 <div className="border-t border-border/50 pt-4 space-y-2">
+                  {valorIndividualNum > 0 && (
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <span>Valor por pessoa</span><span>R$ {formatBRL(valorIndividualNum)}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Passageiros</span><span>{totalPax}</span>
+                  </div>
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <span>Itens</span><span>{services.length}</span>
                   </div>
@@ -1305,7 +1337,7 @@ function NovaCotacao() {
                     <span>Subtotal</span><span>R$ {formatBRL(total)}</span>
                   </div>
                   <div className={cn("flex items-center justify-between pt-2 border-t border-border/50")}>
-                    <span className="font-semibold text-foreground">Total</span>
+                    <span className="font-semibold text-foreground">Total{valorIndividualNum > 0 ? ` (${totalPax} passageiro${totalPax === 1 ? "" : "s"})` : ""}</span>
                     <span className="text-xl font-bold text-secondary">R$ {formatBRL(total)}</span>
                   </div>
                 </div>

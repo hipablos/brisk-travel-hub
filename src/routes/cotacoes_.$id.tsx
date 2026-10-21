@@ -251,8 +251,16 @@ function VisualizarCotacao() {
                       <span className="font-medium text-slate-900">R$ {formatBRL(s.value)}</span>
                     </div>
                   ))}
+                  {cotacao.valorIndividual ? (
+                    <div className="flex items-baseline justify-between pt-1.5 mt-1 border-t border-slate-200">
+                      <span className="text-slate-700">Valor por pessoa</span>
+                      <span className="font-medium text-slate-900">R$ {formatBRL(cotacao.valorIndividual)}</span>
+                    </div>
+                  ) : null}
                   <div className="flex items-baseline justify-between pt-1.5 mt-1 border-t border-slate-200">
-                    <span className="font-bold text-slate-900 text-sm">Total</span>
+                    <span className="font-bold text-slate-900 text-sm">
+                      Total{cotacao.valorIndividual ? ` (${Math.max(1, (cotacao.adultos ?? 1) + (cotacao.criancas ?? 0))} passageiros)` : ""}
+                    </span>
                     <span className="font-bold text-slate-900 text-sm">R$ {formatBRL(cotacao.total)}</span>
                   </div>
                 </div>
