@@ -10,3 +10,5 @@
   - [x] Criar regras de baixa por lote e correção segura no banco
   - [x] Conectar os campos e ações nas telas
 - [x] Disponibilizar edição e exclusão diretamente em todos os lançamentos editáveis do histórico de Milhas e Pontos
+
+- [x] Valor individual por pessoa na cotação: total automático (valor × passageiros), campo no painel lateral e exibição no PDF do cliente (2026-10-21)
