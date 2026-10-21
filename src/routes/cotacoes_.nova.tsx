@@ -1305,7 +1305,31 @@ function NovaCotacao() {
 
 
 
+                 <div className="space-y-2 mb-4">
+                  <Label>Valor individual por pessoa (R$)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 h-9 flex items-center rounded-md border border-border/40 bg-muted text-sm text-muted-foreground">R$</span>
+                    <Input
+                      inputMode="decimal"
+                      placeholder="0,00"
+                      value={valorIndividual}
+                      onChange={(e) => setValorIndividual(e.target.value)}
+                    />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    O total é calculado automaticamente: valor individual × {totalPax} passageiro{totalPax === 1 ? "" : "s"}.
+                  </p>
+                </div>
+
                 <div className="border-t border-border/50 pt-4 space-y-2">
+                  {valorIndividualNum > 0 && (
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <span>Valor por pessoa</span><span>R$ {formatBRL(valorIndividualNum)}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Passageiros</span><span>{totalPax}</span>
+                  </div>
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <span>Itens</span><span>{services.length}</span>
                   </div>
@@ -1313,7 +1337,7 @@ function NovaCotacao() {
                     <span>Subtotal</span><span>R$ {formatBRL(total)}</span>
                   </div>
                   <div className={cn("flex items-center justify-between pt-2 border-t border-border/50")}>
-                    <span className="font-semibold text-foreground">Total</span>
+                    <span className="font-semibold text-foreground">Total{valorIndividualNum > 0 ? ` (${totalPax} passageiro${totalPax === 1 ? "" : "s"})` : ""}</span>
                     <span className="text-xl font-bold text-secondary">R$ {formatBRL(total)}</span>
                   </div>
                 </div>
