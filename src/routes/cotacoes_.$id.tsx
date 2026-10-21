@@ -292,6 +292,15 @@ function VisualizarCotacao() {
                                       <span className="font-normal text-slate-700"> ({f.parcelas}x de R$ {formatBRL(calc.valorParcela)})</span>
                                     )}
                                   </div>
+                                  {cotacao.valorIndividual ? (() => {
+                                    const calcInd = computeFormaTotal(cotacao.valorIndividual!, f);
+                                    return (
+                                      <div className="text-[10px] text-slate-500">
+                                        por pessoa: R$ {formatBRL(calcInd.final)}
+                                        {f.parcelas > 1 && ` (${f.parcelas}x de R$ ${formatBRL(calcInd.valorParcela)})`}
+                                      </div>
+                                    );
+                                  })() : null}
                                   {customBase && (
                                     <div className="text-[10px] text-slate-500">
                                       sobre R$ {formatBRL(base)}
