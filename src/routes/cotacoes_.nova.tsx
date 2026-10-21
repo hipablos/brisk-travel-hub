@@ -89,6 +89,7 @@ function NovaCotacao() {
   const [volta, setVolta] = useState("");
   const [adultos, setAdultos] = useState(1);
   const [criancas, setCriancas] = useState(0);
+  const [valorIndividual, setValorIndividual] = useState("");
   const [termos, setTermos] = useState("");
   const [outrasInformacoes, setOutrasInformacoes] = useState("");
   const [termosModeloId, setTermosModeloId] = useState<string>("");
@@ -172,6 +173,7 @@ function NovaCotacao() {
        setVolta(c.volta ?? "");
        setAdultos(Math.max(1, c.adultos ?? 1));
        setCriancas(Math.max(0, c.criancas ?? 0));
+       setValorIndividual(c.valorIndividual ? String(c.valorIndividual) : "");
        setObservacoes(c.observacoes ?? "");
        setTermos(c.termos ?? "");
        setOutrasInformacoes(c.outrasInformacoes ?? "");
@@ -281,10 +283,15 @@ function NovaCotacao() {
     setServices((s) => s.map((x) => (x.id === id ? { ...x, ...patch } : x)));
   };
 
-  const total = useMemo(
-    () => services.reduce((sum, s) => sum + (parseFloat(s.value.replace(",", ".")) || 0), 0),
-    [services]
+  const totalPax = Math.max(1, adultos + criancas);
+  const valorIndividualNum = useMemo(
+    () => parseFloat(valorIndividual.replace(/\./g, "").replace(",", ".")) || 0,
+    [valorIndividual]
   );
+  const total = useMemo(() => {
+    if (valorIndividualNum > 0) return valorIndividualNum * totalPax;
+    return services.reduce((sum, s) => sum + (parseFloat(s.value.replace(",", ".")) || 0), 0);
+  }, [valorIndividualNum, totalPax, services]);
 
   const buildCotacao = async (): Promise<Cotacao | null> => {
     const cliente = clientes.find((c) => c.id === clienteId) ?? {
@@ -332,6 +339,7 @@ function NovaCotacao() {
       formasPagamentoIds,
       formasPagamentoValores,
       total,
+      valorIndividual: valorIndividualNum > 0 ? valorIndividualNum : undefined,
       valoresCusto,
       valoresVenda,
       vendaCustos,
