@@ -127,6 +127,9 @@ export function invalidateSharedTable(key: string) {
 
 
 
+export type PaxTrechoDetalhe = { assento?: string; pessoal?: number; maoCabine?: number; despachada23?: number; despachada32?: number };
+export type PaxDetalhe = { ida?: PaxTrechoDetalhe; volta?: PaxTrechoDetalhe };
+
 export type CotacaoStatus = "aguardando" | "aguardando_cliente" | "aprovado" | "reprovado";
 
 export type CotacaoServico = {
@@ -202,6 +205,10 @@ export type Cotacao = {
   volta?: string;
   adultos: number;
   criancas: number;
+  /** Bebês (até 24 meses) — não pagantes */
+  bebes?: number;
+  /** Assento e bagagens individuais por passageiro na reserva */
+  passageirosDetalhes?: PaxDetalhe[];
   servicos: CotacaoServico[];
   observacoes?: string;
   validade?: string;

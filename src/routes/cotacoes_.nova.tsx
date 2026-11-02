@@ -89,6 +89,7 @@ function NovaCotacao() {
   const [volta, setVolta] = useState("");
   const [adultos, setAdultos] = useState(1);
   const [criancas, setCriancas] = useState(0);
+  const [bebes, setBebes] = useState(0);
   const [valorIndividual, setValorIndividual] = useState("");
   const [termos, setTermos] = useState("");
   const [outrasInformacoes, setOutrasInformacoes] = useState("");
@@ -173,6 +174,7 @@ function NovaCotacao() {
        setVolta(c.volta ?? "");
        setAdultos(Math.max(1, c.adultos ?? 1));
        setCriancas(Math.max(0, c.criancas ?? 0));
+       setBebes(Math.max(0, c.bebes ?? 0));
        setValorIndividual(c.valorIndividual ? String(c.valorIndividual) : "");
        setObservacoes(c.observacoes ?? "");
        setTermos(c.termos ?? "");
@@ -322,7 +324,7 @@ function NovaCotacao() {
       destino: destino || vooIda?.destino,
       ida: ida || vooIda?.data,
       volta: volta || vooVolta?.data,
-      adultos, criancas,
+      adultos, criancas, bebes,
       vooIda,
       vooVolta: vooVolta ?? undefined,
       vooIdas,
@@ -662,16 +664,18 @@ function NovaCotacao() {
                     <span className="text-sm text-muted-foreground">
                       {adultos} adulto{adultos === 1 ? "" : "s"}
                       {criancas > 0 ? `, ${criancas} criança${criancas === 1 ? "" : "s"}` : ""}
+                      {bebes > 0 ? `, ${bebes} bebê${bebes === 1 ? "" : "s"}` : ""}
                     </span>
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-72 p-3 space-y-3" align="end">
                   {[
-                    { label: "Adultos", value: adultos, set: setAdultos, min: 1 },
-                    { label: "Crianças", value: criancas, set: setCriancas, min: 0 },
+                    { label: "Adultos", hint: "15 anos ou mais", value: adultos, set: setAdultos, min: 1 },
+                    { label: "Crianças", hint: "2 a 14 anos", value: criancas, set: setCriancas, min: 0 },
+                    { label: "Bebês", hint: "Até 24 meses · não pagante", value: bebes, set: setBebes, min: 0 },
                   ].map((row) => (
                     <div key={row.label} className="flex items-center justify-between">
-                      <span className="text-sm text-foreground">{row.label}</span>
+                      <div className="flex flex-col"><span className="text-sm text-foreground">{row.label}</span><span className="text-[11px] text-muted-foreground">{row.hint}</span></div>
                       <div className="flex items-center gap-2">
                         <Button
                           type="button"
