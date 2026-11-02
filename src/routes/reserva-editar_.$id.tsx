@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Save, Plane, Plus, Trash2, Clock } from "lucide-react";
 import { AirportAutocomplete } from "@/components/cotacoes/AirportAutocomplete";
-import { getCotacao, saveCotacao, type Cotacao } from "@/lib/cotacoes-store";
+import { getCotacao, saveCotacao, type Cotacao, type PaxDetalhe, type PaxTrechoDetalhe } from "@/lib/cotacoes-store";
 import { calcTempoDeVooTotal, calcDuracaoEscalaTrecho } from "@/lib/voos";
 import { toast } from "sonner";
 
@@ -109,6 +109,7 @@ function ReservaEditarPage() {
   const [vooIda, setVooIda] = useState<VooData>({ trechos: [] });
   const [vooVolta, setVooVolta] = useState<VooData>({ trechos: [] });
   const [passageiros, setPassageiros] = useState<string[]>([]);
+  const [detalhes, setDetalhes] = useState<PaxDetalhe[]>([]);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -117,10 +118,13 @@ function ReservaEditarPage() {
       setCotacao(c);
       setVooIda(hydrateVoo(c.vooIda, c.origem, c.destino, c.ida));
       setVooVolta(hydrateVoo(c.vooVolta, c.destino, c.origem, c.volta));
-      const total = (c.adultos ?? 0) + (c.criancas ?? 0);
+      const total = (c.adultos ?? 0) + (c.criancas ?? 0) + (c.bebes ?? 0);
       const nomes = c.passageirosNomes ?? [];
       const arr = Array.from({ length: total }, (_, i) => nomes[i] ?? (i === 0 ? c.cliente?.nome ?? "" : ""));
       setPassageiros(arr);
+      const base = (v: any): PaxTrechoDetalhe => ({ assento: "", pessoal: v?.bagagens?.pessoal ?? 1, maoCabine: v?.bagagens?.maoCabine ?? 1, despachada23: 0, despachada32: 0 });
+      const prev = c.passageirosDetalhes ?? [];
+      setDetalhes(Array.from({ length: total }, (_, i) => prev[i] ?? { ida: base(c.vooIda), volta: base(c.vooVolta) }));
     });
   }, [id, navigate]);
 
@@ -133,6 +137,7 @@ function ReservaEditarPage() {
       vooIda,
       vooVolta,
       passageirosNomes: passageiros,
+      passageirosDetalhes: detalhes,
     };
     await saveCotacao(updated);
     setSaving(false);
@@ -166,17 +171,31 @@ function ReservaEditarPage() {
             <section>
               <h2 className="font-semibold mb-3 text-foreground">Passageiros</h2>
               <div className="space-y-2">
-                {passageiros.map((p, i) => (
-                  <div key={i}>
-                    <Label className="text-xs">Passageiro {i + 1}</Label>
-                    <Input
-                      value={p}
-                      onChange={(e) => {
-                        const arr = [...passageiros]; arr[i] = e.target.value; setPassageiros(arr);
-                      }}
-                    />
-                  </div>
-                ))}
+                {passageiros.map((p, i) => {
+                  const tipo = i < (cotacao.adultos ?? 0) ? "Adulto" : i < (cotacao.adultos ?? 0) + (cotacao.criancas ?? 0) ? "Criança" : "Bebê";
+                  const temVolta = !!(cotacao.volta || (vooVolta.trechos ?? []).length > 0);
+                  const setDet = (k: "ida" | "volta", patch: Partial<PaxTrechoDetalhe>) => {
+                    setDetalhes((arr) => arr.map((d, idx) => idx === i ? { ...d, [k]: { ...(d?.[k] ?? {}), ...patch } } : d));
+                  };
+                  return (
+                    <div key={i} className="border border-border/60 rounded-lg p-3 space-y-3">
+                      <div>
+                        <Label className="text-xs">Passageiro {i + 1} · {tipo}</Label>
+                        <Input
+                          value={p}
+                          onChange={(e) => {
+                            const arr = [...passageiros]; arr[i] = e.target.value; setPassageiros(arr);
+                          }}
+                        />
+                      </div>
+                      <div className={`grid gap-3 ${temVolta ? "md:grid-cols-2" : ""}`}>
+                        {(temVolta ? (["ida", "volta"] as const) : (["ida"] as const)).map((k) => (
+                          <PaxTrechoForm key={k} titulo={k === "ida" ? "Ida" : "Volta"} d={detalhes[i]?.[k] ?? {}} onChange={(patch) => setDet(k, patch)} />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
                 {passageiros.length === 0 && (
                   <p className="text-sm text-muted-foreground">Nenhum passageiro definido na cotação.</p>
                 )}
@@ -213,8 +232,6 @@ function VooForm({
   dataDefault?: string;
 }) {
   const set = (patch: Partial<VooData>) => onChange({ ...voo, ...patch });
-  const setBag = (k: "pessoal" | "maoCabine" | "despachada23" | "despachada32", v: number) =>
-    onChange({ ...voo, bagagens: { ...(voo.bagagens ?? {}), [k]: v } });
 
   const trechos = voo.trechos ?? [];
 
@@ -264,26 +281,6 @@ function VooForm({
            <Label className="text-xs">Duração do trecho principal</Label>
            <Input value={voo.duracaoTrecho ?? ""} onChange={(e) => set({ duracaoTrecho: e.target.value })} placeholder="Ex.: 7h" />
          </div>
-         <div className="md:col-span-2">
-           <Label className="text-xs">Assentos</Label>
-           <Input value={voo.assento ?? ""} onChange={(e) => set({ assento: e.target.value })} />
-         </div>
-        <div>
-          <Label className="text-xs">Item pessoal / mochila</Label>
-          <Input type="number" min={0} value={voo.bagagens?.pessoal ?? 1} onChange={(e) => setBag("pessoal", Number(e.target.value))} />
-        </div>
-        <div>
-          <Label className="text-xs">Bagagem de mão (10kg)</Label>
-          <Input type="number" min={0} value={voo.bagagens?.maoCabine ?? 1} onChange={(e) => setBag("maoCabine", Number(e.target.value))} />
-        </div>
-        <div>
-          <Label className="text-xs">Bagagem despachada (23kg)</Label>
-          <Input type="number" min={0} value={voo.bagagens?.despachada23 ?? 0} onChange={(e) => setBag("despachada23", Number(e.target.value))} />
-        </div>
-        <div>
-          <Label className="text-xs">Bagagem despachada (32kg)</Label>
-          <Input type="number" min={0} value={voo.bagagens?.despachada32 ?? 0} onChange={(e) => setBag("despachada32", Number(e.target.value))} />
-        </div>
       </div>
 
       <div className="space-y-3">
@@ -364,5 +361,29 @@ function VooForm({
         ))}
       </div>
     </section>
+  );
+}
+
+function PaxTrechoForm({ titulo, d, onChange }: { titulo: string; d: PaxTrechoDetalhe; onChange: (p: Partial<PaxTrechoDetalhe>) => void }) {
+  const num = (k: "pessoal" | "maoCabine" | "despachada23" | "despachada32", label: string, def: number) => (
+    <div>
+      <Label className="text-[11px]">{label}</Label>
+      <Input type="number" min={0} value={d[k] ?? def} onChange={(e) => onChange({ [k]: Math.max(0, Number(e.target.value) || 0) })} />
+    </div>
+  );
+  return (
+    <div className="bg-muted/30 rounded-md p-2 space-y-2">
+      <div className="text-xs font-semibold text-foreground flex items-center gap-1"><Plane className="size-3.5 text-primary" /> {titulo}</div>
+      <div>
+        <Label className="text-[11px]">Assento</Label>
+        <Input value={d.assento ?? ""} placeholder="Ex.: 12A (vazio = sem assento)" onChange={(e) => onChange({ assento: e.target.value })} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        {num("pessoal", "Item pessoal", 1)}
+        {num("maoCabine", "Mão (10kg)", 1)}
+        {num("despachada23", "Despachada 23kg", 0)}
+        {num("despachada32", "Despachada 32kg", 0)}
+      </div>
+    </div>
   );
 }
