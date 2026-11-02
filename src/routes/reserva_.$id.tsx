@@ -140,7 +140,7 @@ function ReservaPage() {
   const headerLocalizador =
     (cotacao as any).localizador || vooIda?.localizador || vooVolta?.localizador || `BRK-${cotacao.code.toUpperCase()}`;
 
-  const totalPax = (cotacao.adultos ?? 0) + (cotacao.criancas ?? 0);
+  const totalPax = (cotacao.adultos ?? 0) + (cotacao.criancas ?? 0) + (cotacao.bebes ?? 0);
   const trechosIda = getTrechos(vooIda);
   const trechosVolta = getTrechos(vooVolta);
 
@@ -213,7 +213,7 @@ function ReservaPage() {
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">Passageiros: {totalPax}</h3>
                 {Array.from({ length: Math.max(totalPax, 1) }).map((_, i) => {
                   const nome = (cotacao as any).passageirosNomes?.[i] || (i === 0 ? cotacao.cliente?.nome : `Passageiro ${i + 1}`) || `Passageiro ${i + 1}`;
-                  return <PaxBlock key={i} nome={nome} idaVoo={vooIda} voltaVoo={trechosVolta.length > 0 ? vooVolta : null} />;
+                  return <PaxBlock key={i} nome={nome} detalhe={(cotacao as any).passageirosDetalhes?.[i]} idaVoo={vooIda} voltaVoo={trechosVolta.length > 0 ? vooVolta : null} />;
                 })}
               </section>
 
@@ -339,11 +339,16 @@ function TrechoRow({ t, isEscala }: { t: Trecho; isEscala?: boolean }) {
   );
 }
 
-function PaxBlock({ nome, idaVoo, voltaVoo }: { nome: string; idaVoo: any; voltaVoo: any }) {
+function paxVoo(voo: any, d: any) {
+  if (!d) return voo;
+  return { ...voo, assento: d.assento ?? "", bagagens: { pessoal: d.pessoal ?? 0, maoCabine: d.maoCabine ?? 0, despachada23: d.despachada23 ?? 0, despachada32: d.despachada32 ?? 0 } };
+}
+
+function PaxBlock({ nome, idaVoo, voltaVoo, detalhe }: { nome: string; idaVoo: any; voltaVoo: any; detalhe?: any }) {
   const hasVolta = !!voltaVoo;
   const items = hasVolta
-    ? [{ label: "Ida", voo: idaVoo }, { label: "Volta", voo: voltaVoo }]
-    : [{ label: "Ida", voo: idaVoo }];
+    ? [{ label: "Ida", voo: paxVoo(idaVoo, detalhe?.ida) }, { label: "Volta", voo: paxVoo(voltaVoo, detalhe?.volta) }]
+    : [{ label: "Ida", voo: paxVoo(idaVoo, detalhe?.ida) }];
   return (
     <div className="mb-2 border border-slate-200 rounded overflow-hidden">
       <div className="bg-slate-50 px-3 py-1 print-bg">

@@ -204,6 +204,7 @@ function VisualizarCotacao() {
                   <div className="mt-0.5 font-semibold text-slate-800">
                     {cotacao.adultos} {cotacao.adultos === 1 ? "Adulto" : "Adultos"}
                     {cotacao.criancas > 0 && `, ${cotacao.criancas} ${cotacao.criancas === 1 ? "Criança" : "Crianças"}`}
+                    {(cotacao.bebes ?? 0) > 0 && `, ${cotacao.bebes} ${cotacao.bebes === 1 ? "Bebê (não pagante)" : "Bebês (não pagantes)"}`}
                   </div>
                 </div>
               </section>
@@ -259,7 +260,7 @@ function VisualizarCotacao() {
                   ) : null}
                   <div className="flex items-baseline justify-between pt-1.5 mt-1 border-t border-slate-200">
                     <span className="font-bold text-slate-900 text-sm">
-                      Total{cotacao.valorIndividual ? ` (${Math.max(1, (cotacao.adultos ?? 1) + (cotacao.criancas ?? 0))} passageiros)` : ""}
+                      Total{cotacao.valorIndividual ? ` (${Math.max(1, (cotacao.adultos ?? 1) + (cotacao.criancas ?? 0))} passageiros pagantes)` : ""}
                     </span>
                     <span className="font-bold text-slate-900 text-sm">R$ {formatBRL(cotacao.total)}</span>
                   </div>
