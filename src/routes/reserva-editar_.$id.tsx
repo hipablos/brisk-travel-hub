@@ -281,26 +281,6 @@ function VooForm({
            <Label className="text-xs">Duração do trecho principal</Label>
            <Input value={voo.duracaoTrecho ?? ""} onChange={(e) => set({ duracaoTrecho: e.target.value })} placeholder="Ex.: 7h" />
          </div>
-         <div className="md:col-span-2">
-           <Label className="text-xs">Assentos</Label>
-           <Input value={voo.assento ?? ""} onChange={(e) => set({ assento: e.target.value })} />
-         </div>
-        <div>
-          <Label className="text-xs">Item pessoal / mochila</Label>
-          <Input type="number" min={0} value={voo.bagagens?.pessoal ?? 1} onChange={(e) => setBag("pessoal", Number(e.target.value))} />
-        </div>
-        <div>
-          <Label className="text-xs">Bagagem de mão (10kg)</Label>
-          <Input type="number" min={0} value={voo.bagagens?.maoCabine ?? 1} onChange={(e) => setBag("maoCabine", Number(e.target.value))} />
-        </div>
-        <div>
-          <Label className="text-xs">Bagagem despachada (23kg)</Label>
-          <Input type="number" min={0} value={voo.bagagens?.despachada23 ?? 0} onChange={(e) => setBag("despachada23", Number(e.target.value))} />
-        </div>
-        <div>
-          <Label className="text-xs">Bagagem despachada (32kg)</Label>
-          <Input type="number" min={0} value={voo.bagagens?.despachada32 ?? 0} onChange={(e) => setBag("despachada32", Number(e.target.value))} />
-        </div>
       </div>
 
       <div className="space-y-3">
