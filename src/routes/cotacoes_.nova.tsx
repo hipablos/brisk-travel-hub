@@ -22,7 +22,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  saveCotacao, useClientes, getCotacao, genCode, formatBRL,
+  saveCotacao, lastSaveCotacaoError, useClientes, getCotacao, genCode, formatBRL,
   useFormasPagamento, computeFormaTotal, deleteCotacao,
   DEFAULT_TERMOS, DEFAULT_OUTRAS_INFORMACOES,
   useTermosModelos,
