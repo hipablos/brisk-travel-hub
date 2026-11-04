@@ -329,7 +329,9 @@ export async function getCotacao(id: string): Promise<Cotacao | undefined> {
   return rowToCotacao(data);
 }
 
+export let lastSaveCotacaoError: string | null = null;
 export async function saveCotacao(c: Cotacao): Promise<Cotacao | null> {
+  lastSaveCotacaoError = null;
   const uid = await currentUserId();
   if (!uid) return null;
   const normalized = normalizeCotacaoDates(c) as Cotacao;
@@ -351,12 +353,12 @@ export async function saveCotacao(c: Cotacao): Promise<Cotacao | null> {
         .eq("id", id)
         .select()
         .single();
-      if (error) { console.error("[cotacoes] update error:", error); return null; }
+      if (error) { console.error("[cotacoes] update error:", error); lastSaveCotacaoError = error.message; return null; }
       return rowToCotacao(data);
     }
   }
   const { data, error } = await supabase.from("cotacoes").insert(payload).select().single();
-  if (error) { console.error("[cotacoes] insert error:", error); return null; }
+  if (error) { console.error("[cotacoes] insert error:", error); lastSaveCotacaoError = error.message; return null; }
   return rowToCotacao(data);
 }
 
