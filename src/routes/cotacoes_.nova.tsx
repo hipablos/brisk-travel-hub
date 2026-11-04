@@ -422,17 +422,18 @@ function NovaCotacao() {
       return;
     }
     const loteSelecionado = milhasLotes.find((l) => l.id === milhasLoteId);
-    const quantidadeDisponivel = (loteSelecionado?.quantidadeDisponivel ?? 0) +
-      (editing && loteSelecionado ? Math.max(0, Number(milhasQuantidade.replace(/\./g, "").replace(",", ".")) || 0) : 0);
+    const usoAtivo = milhasOperacoes.find((o) => o.cotacaoId === editId && o.tipo === "utilizacao_cotacao" && o.status === "ativa");
+    const jaAlocadoNoLote = usoAtivo ? milhasAlocacoes.filter((a) => a.operacaoSaidaId === usoAtivo.id && a.loteId === milhasLoteId && a.ativa).reduce((t, a) => t + a.quantidade, 0) : 0;
+    const quantidadeDisponivel = (loteSelecionado?.quantidadeDisponivel ?? 0) + jaAlocadoNoLote;
     if (milhasProprias && loteSelecionado && quantidadeMilhas > quantidadeDisponivel) {
-      toast.error("A quantidade informada é maior que o saldo disponível no lote.");
+      toast.error(`Saldo insuficiente no lote: disponível ${quantidadeDisponivel.toLocaleString("pt-BR")} milhas, informado ${quantidadeMilhas.toLocaleString("pt-BR")}.`);
       return;
     }
     const cotacao = await buildCotacao();
     if (!cotacao) return;
     const saved = await saveCotacao(cotacao);
     if (!saved) {
-      toast.error("Não foi possível salvar a cotação");
+      toast.error(lastSaveCotacaoError ? `Não foi possível salvar: ${lastSaveCotacaoError}` : "Não foi possível salvar a cotação");
       return;
     }
     await syncHospedagensExperiencias(saved.id, clienteId || null);
